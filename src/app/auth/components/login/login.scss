@@ -1,0 +1,7 @@
+// All styles handled via Tailwind CSS utility classes in the template.
+// Prevent any page-level scrolling
+:host {
+    display: block;
+    height: 100vh;
+    overflow: hidden;
+}

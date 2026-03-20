@@ -1,1 +1,101 @@
-<p>login works!</p>
+<div class="h-screen overflow-hidden bg-slate-50 flex flex-col">
+    <!-- Header -->
+    <header class="px-8 py-3 shrink-0">
+        <div class="flex items-center gap-2">
+            <div class="w-9 h-9 bg-indigo-600 rounded-xl flex items-center justify-center">
+                <app-icon [name]="'logo'"></app-icon>
+            </div>
+            <span class="text-xl font-bold text-slate-800">Job<span class="text-indigo-600">AI</span></span>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex items-center justify-center px-4 overflow-hidden">
+        <div
+            class="w-full max-w-md bg-white rounded-2xl shadow-lg shadow-slate-200/80 border border-slate-100 px-10 py-7">
+
+            <!-- Title -->
+            <div class="text-center mb-8">
+                <h1 class="text-2xl font-bold text-slate-800 mb-1">Welcome Back</h1>
+                <p class="text-sm text-slate-400">Sign in to continue to your dashboard</p>
+            </div>
+
+            <!-- Role Toggle -->
+            <div class="mb-4">
+                <p class="text-sm font-medium text-slate-700 mb-2">Sign in as</p>
+                <div class="grid grid-cols-2 gap-2">
+                    <button (click)="setRole('jobseeker')"
+                        [class]="getRoleClass('jobseeker')">
+                        <app-icon name="jobseeker"></app-icon>
+                        Job Seeker
+                    </button>
+                    <button (click)="setRole('employer')"
+                        [class]="getRoleClass('employer')">
+                        <app-icon name="employer"></app-icon>
+                        Employer
+                    </button>
+                </div>
+            </div>
+
+            <!-- Email Field -->
+            <div class="mb-3">
+                <label class="block text-sm font-medium text-slate-700 mb-1.5">Email</label>
+                <input type="email" [(ngModel)]="email" placeholder="you@example.com"
+                    class="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-slate-800 text-sm placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all" />
+            </div>
+
+            <!-- Password Field -->
+            <div class="mb-4">
+                <div class="flex items-center justify-between mb-1.5">
+                    <label class="text-sm font-medium text-slate-700">Password</label>
+                    <a href="#"
+                        class="text-sm text-indigo-500 hover:text-indigo-700 font-medium transition-colors">Forgot
+                        password?</a>
+                </div>
+                <div class="relative">
+                    <input [type]="showPassword ? 'text' : 'password'" [(ngModel)]="password" placeholder="••••••••••"
+                        class="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-slate-800 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all pr-10" />
+                    <button type="button" (click)="togglePassword()"
+                        class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors">
+                    <app-icon [name]="showPassword ? 'eye-off' : 'eye'"></app-icon>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Sign In Button -->
+            <button (click)="onSignIn()"
+                class="w-full py-3 rounded-lg bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-semibold text-sm tracking-wide transition-all duration-150 shadow-sm shadow-indigo-200">
+                Sign In
+            </button>
+
+            <!-- Divider -->
+            <div class="flex items-center gap-3 my-4">
+                <div class="flex-1 h-px bg-slate-200"></div>
+                <span class="text-xs text-slate-400 font-medium tracking-widest uppercase">Or continue with</span>
+                <div class="flex-1 h-px bg-slate-200"></div>
+            </div>
+
+            <!-- OAuth Buttons -->
+            <div class="grid grid-cols-2 gap-3 mb-4">
+                <button
+                    class="flex items-center justify-center gap-2 py-2.5 rounded-lg border border-slate-200 bg-white text-slate-600 text-sm font-medium hover:bg-slate-50 hover:border-slate-300 transition-all">
+                    <app-icon [name]="'google'"></app-icon>
+                    Google
+                </button>
+                <button
+                    class="flex items-center justify-center gap-2 py-2.5 rounded-lg border border-slate-200 bg-white text-slate-600 text-sm font-medium hover:bg-slate-50 hover:border-slate-300 transition-all">
+                    <app-icon [name]="'linkedin'"></app-icon>
+                    LinkedIn
+                </button>
+            </div>
+
+            <!-- Sign Up Link -->
+            <p class="text-center text-sm text-slate-400">
+                Don't have an account?
+                <a href="/signup" class="text-indigo-600 font-semibold hover:text-indigo-700 transition-colors ml-1">Sign
+                    up</a>
+            </p>
+
+        </div>
+    </main>
+</div>
