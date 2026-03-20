@@ -16,7 +16,7 @@ export class Login {
 
   getRoleClass(role: string) {
     return this.selectedRole === role
-      ? 'flex items-center justify-center gap-2 py-2.5 rounded-lg border-2 border-indigo-600 bg-indigo-600 text-white font-semibold text-sm transition-all'
+      ? 'flex items-center justify-center gap-2 py-2.5 rounded-lg border-2 border-[#7375F2] bg-[#7375F2] text-white font-semibold text-sm transition-all'
       : 'flex items-center justify-center gap-2 py-2.5 rounded-lg border-2 border-slate-200 bg-white text-slate-500 font-semibold text-sm hover:border-indigo-300 hover:text-indigo-500 transition-all';
   }
 
