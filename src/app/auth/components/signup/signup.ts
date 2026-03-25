@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Icons } from '../../../shared/icons/icons';
 import { UserRole } from '../../../shared/enums/UserRole ';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { Auth } from '../../services/auth';
+import { AuthService } from '../../services/auth';
 
 @Component({
   selector: 'app-signup',
@@ -17,16 +17,25 @@ export class Signup {
   selectedIntent: 'find' | 'hire' = 'find';
   showPassword = false;
   showConfirmPassword = false;
+  passwordMismatch = false;
 
   constructor(
     private fb: FormBuilder,
-    private authService: Auth,
+    private authService: AuthService,
   ) {
     this.signupForm = this.fb.group({
       fullName: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
       confirmPassword: ['', [Validators.required]],
+    });
+
+    // Clear mismatch error when either password field changes
+    this.signupForm.get('password')?.valueChanges.subscribe(() => {
+      this.passwordMismatch = false;
+    });
+    this.signupForm.get('confirmPassword')?.valueChanges.subscribe(() => {
+      this.passwordMismatch = false;
     });
   }
 
@@ -47,6 +56,8 @@ export class Signup {
   }
 
   onCreateAccount(): void {
+    this.passwordMismatch = false;
+
     if (this.signupForm.invalid) {
       this.signupForm.markAllAsTouched();
       return;
@@ -55,7 +66,7 @@ export class Signup {
     const { password, confirmPassword, fullName, email } = this.signupForm.value;
 
     if (password !== confirmPassword) {
-      console.error('Passwords do not match');
+      this.passwordMismatch = true;
       return;
     }
 

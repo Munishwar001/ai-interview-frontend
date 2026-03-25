@@ -1,18 +1,33 @@
 import { Component } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Icons } from '../../../shared/icons/icons';
+import { AuthService } from '../../services/auth';
+import { Router } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
+
 @Component({
   selector: 'app-login',
-  imports: [FormsModule, CommonModule, Icons],
+  imports: [ReactiveFormsModule, CommonModule, Icons],
   templateUrl: './login.html',
   styleUrl: './login.scss',
 })
 export class Login {
+  loginForm: FormGroup;
   selectedRole: 'jobseeker' | 'employer' = 'employer';
-  email: string = '';
-  password: string = '';
   showPassword: boolean = false;
+
+  constructor(
+    private fb: FormBuilder,
+    private authService: AuthService , 
+    private router: Router ,
+    private toastr: ToastrService
+  ) {
+    this.loginForm = this.fb.group({
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required]],
+    });
+  }
 
   getRoleClass(role: string) {
     return this.selectedRole === role
@@ -29,8 +44,27 @@ export class Login {
   }
 
   onSignIn(): void {
-    console.log('Sign in as:', this.selectedRole);
-    console.log('Email:', this.email);
-    // Add your auth logic here
+    if (this.loginForm.invalid) {
+      this.loginForm.markAllAsTouched();
+      return;
+    }
+
+    const { email, password } = this.loginForm.value;
+
+    const payload = {
+      email,
+      password,
+      role: this.selectedRole === 'jobseeker' ? 'JobSeeker' : 'Employer',
+    };
+
+    this.authService.login(payload).subscribe({
+      next: (res) => {
+          this.toastr.success('Login successful!');
+          this.router.navigate(['/dashboard']);
+      },
+      error: (err) => {
+        console.error('Login Error:', err);
+      },
+    });
   }
 }

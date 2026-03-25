@@ -9,6 +9,7 @@
 
 @import "tailwindcss";
 
+@import 'ngx-toastr/toastr';
 html {
   @include mat.theme((
     color: (
