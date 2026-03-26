@@ -1,2 +1,60 @@
-Landing page 
-[#7375F2]
+<nav class="w-full bg-white/80 backdrop-blur-xl border-b border-slate-200 sticky top-0 z-50">
+  <div class="max-w-7xl mx-auto px-8 py-4 flex items-center justify-between">
+    <!-- Logo -->
+    <a routerLink="/" class="flex items-center gap-3 no-underline">
+      <div class="w-10 h-10 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-md">
+        <app-icon [name]="'logo'"></app-icon>
+      </div>
+      <span class="text-2xl font-bold text-slate-900 tracking-tight">
+        Job<span class="text-indigo-600">AI</span>
+      </span>
+    </a>
+
+    <!-- Nav Links -->
+    <ul class="flex items-center gap-10 list-none m-0 p-0">
+      <li *ngFor="let link of navLinks">
+        <a
+          [routerLink]="link.route"
+          [fragment]="link.fragment"
+          class="text-[15px] font-medium text-slate-600 hover:text-indigo-600 transition-all duration-200 no-underline"
+        >
+          {{ link.label }}
+        </a>
+      </li>
+    </ul>
+
+    <!-- Right Side -->
+    <div class="flex items-center gap-5">
+      <!-- Theme Toggle -->
+      <button
+        type="button"
+        (click)="toggleTheme()"
+        class="p-2.5 rounded-xl text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 transition cursor-pointer"
+      >
+        <app-icon [name]="isDark ? 'sun' : 'moon'"></app-icon>
+      </button>
+
+      <!-- Sign In -->
+      <button
+        type="button"
+        (click)="onSignIn()"
+        class="text-[15px] font-medium text-slate-700 hover:text-indigo-600 transition cursor-pointer"
+      >
+        Sign In
+      </button>
+
+      <!-- Get Started -->
+      <button
+        type="button"
+        (click)="onGetStarted()"
+class="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 
+hover:scale-105 active:scale-95 
+transition-all duration-300 
+text-white px-6 py-3 rounded-xl font-semibold shadow-lg shadow-indigo-200"      >
+        <app-icon [name]="'sparkles'"></app-icon>
+        Get Started
+      </button>
+    </div>
+  </div>
+</nav>
+<router-outlet></router-outlet>
