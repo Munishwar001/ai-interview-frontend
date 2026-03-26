@@ -9,7 +9,7 @@ import { Sidebar } from '../../../shared/components/sidebar/sidebar';
 @Component({
   selector: 'app-dashboard-layout',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, Navbar, Icons, CommonModule ,Sidebar],
+  imports: [RouterOutlet, Navbar, CommonModule ,Sidebar],
   templateUrl: './dashboard-layout.html',
   styleUrl: './dashboard-layout.scss',
 })

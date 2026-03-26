@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { exhaustMap, Observable ,switchMap,tap ,of, catchError } from 'rxjs';
+import { exhaustMap, Observable, switchMap, tap, of, catchError } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
-import { RegisterRequest, LoginRequest ,AuthResponse ,RefreshRequest } from '../auth.models';
+import { RegisterRequest, LoginRequest, AuthResponse, RefreshRequest } from '../auth.models';
 import { environment } from '../../../../environment/environment';
 import { User } from '../../core/services/user';
 import { UserStore } from '../../core/services/user-store';
@@ -16,9 +16,9 @@ export class AuthService {
   constructor(
     private http: HttpClient,
     private userService: User,
-    private userStore: UserStore ,
+    private userStore: UserStore,
     private authStore: AuthStore,
-    private router: Router
+    private router: Router,
   ) {}
 
   register(data: RegisterRequest): Observable<any> {
@@ -26,30 +26,25 @@ export class AuthService {
   }
 
   login(data: LoginRequest): Observable<any> {
-    return this.http
-      .post<AuthResponse>(`${this.baseUrl}/login`, data)
-      .pipe(
-        tap((resp) => {
-           this.authStore.setAccessAndRefreshToken(
-            resp.accessToken,
-            resp.accessTokenExpiration,
-            resp.refreshToken,
-          );
-        }),
-        exhaustMap(() => this.userService.getUserDetails()),
-        tap((res) => {
-          this.userStore.setUserState(res);
-        }),
-        switchMap(() => of(void 0))
-      );
+    return this.http.post<AuthResponse>(`${this.baseUrl}/login`, data).pipe(
+      tap((resp) => {
+        this.authStore.setAccessAndRefreshToken(
+          resp.accessToken,
+          resp.accessTokenExpiration,
+          resp.refreshToken,
+        );
+      }),
+      exhaustMap(() => this.userService.getUserDetails()),
+      tap((res) => {
+        this.userStore.setUserState(res);
+      }),
+      switchMap(() => of(void 0)),
+    );
   }
 
   refreshToken(refreshRequest: RefreshRequest) {
     return this.http
-      .post<AuthResponse>(
-        `${environment.apiUrl}/account/refresh-token`,
-        refreshRequest,
-      )
+      .post<AuthResponse>(`${environment.apiUrl}/account/refresh-token`, refreshRequest)
       .pipe(
         tap((resp) => {
           this.authStore.setAccessAndRefreshToken(
@@ -87,7 +82,7 @@ export class AuthService {
     }
   }
 
-    isAccessTokenValid() {
+  isAccessTokenValid() {
     let token = this.authStore.getAccessToken();
     console.log('access toke expire => ' + token?.accessTokenExpiration);
 
@@ -104,8 +99,7 @@ export class AuthService {
     let refreshReq: RefreshRequest = { accessToken: '', refreshToken: '' };
 
     let currentAccessToken = this.authStore.getAccessToken();
-    if (currentAccessToken)
-      refreshReq.accessToken = currentAccessToken.accessToken;
+    if (currentAccessToken) refreshReq.accessToken = currentAccessToken.accessToken;
 
     let currentRefreshToken = this.authStore.getRefreshToken();
     if (currentRefreshToken) refreshReq.refreshToken = currentRefreshToken;
@@ -113,11 +107,26 @@ export class AuthService {
     return refreshReq;
   }
 
-    logout() {
-    console.log('logging out...');
+  logout() {
     this.authStore.clearStorage();
     this.userStore.removeUserState();
     this.router.navigate(['/login']);
   }
 
+  googleLogin(payload: { idToken: string; role: string }): Observable<any> {
+    return this.http.post<AuthResponse>(`${this.baseUrl}/google-login`, payload).pipe(
+      tap((resp) => {
+        this.authStore.setAccessAndRefreshToken(
+          resp.accessToken,
+          resp.accessTokenExpiration,
+          resp.refreshToken,
+        );
+      }),
+      exhaustMap(() => this.userService.getUserDetails()),
+      tap((res) => {
+        this.userStore.setUserState(res);
+      }),
+      switchMap(() => of(void 0)),
+    );
+  }
 }

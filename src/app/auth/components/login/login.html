@@ -96,17 +96,15 @@
             </div>
 
             <!-- OAuth Buttons -->
-            <div class="grid grid-cols-2 gap-3 mb-4">
-                <button type="button"
-                    class="flex items-center justify-center gap-2 py-2.5 rounded-lg border border-slate-200 bg-white text-slate-600 text-sm font-medium hover:bg-slate-50 hover:border-slate-300 transition-all">
-                    <app-icon [name]="'google'"></app-icon>
-                    Google
-                </button>
-                <button type="button"
-                    class="flex items-center justify-center gap-2 py-2.5 rounded-lg border border-slate-200 bg-white text-slate-600 text-sm font-medium hover:bg-slate-50 hover:border-slate-300 transition-all">
-                    <app-icon [name]="'linkedin'"></app-icon>
-                    LinkedIn
-                </button>
+            <div class="flex justify-center mb-4">
+                <asl-google-signin-button
+                    type="standard"
+                    size="large"
+                    text="signin_with"
+                    shape="rectangular"
+                    theme="outline"
+                    [width]="364">
+                </asl-google-signin-button>
             </div>
 
             <!-- Sign Up Link -->
