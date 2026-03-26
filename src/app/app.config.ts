@@ -5,6 +5,8 @@ import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideToastr } from 'ngx-toastr';
 import { routes } from './app.routes';
 import { authInterceptor } from './auth/auth-interceptor';
+import { environment } from '../../environment/environment';
+
 import {
   GoogleLoginProvider,
   SocialAuthService,
@@ -24,14 +26,14 @@ export const appConfig: ApplicationConfig = {
       timeOut: 3000,
     }),
     {
-      provide: 'SocialAuthServiceConfig',  // ✅ string token works in v2.4.0
+      provide: 'SocialAuthServiceConfig',  
       useValue: {
         autoLogin: false,
         providers: [
           {
             id: GoogleLoginProvider.PROVIDER_ID,
             provider: new GoogleLoginProvider(
-              '635416058990-pg1ilpquqvks2qqkqqsdt8154bgknobr.apps.googleusercontent.com' ,{
+              environment.googleClientId, {
                 oneTapEnabled: false,  
               } as GoogleInitOptions
             )
