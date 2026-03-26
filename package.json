@@ -34,10 +34,12 @@
     "@angular/platform-browser": "20.3.18",
     "@angular/router": "20.3.18",
     "@tailwindcss/postcss": "^4.2.1",
+    "gsap": "^3.14.2",
     "localstorage-slim": "^2.7.1",
     "ngx-toastr": "19.1.0",
     "postcss": "^8.5.8",
     "rxjs": "~7.8.0",
+    "split-type": "^0.3.4",
     "tailwindcss": "^4.2.1",
     "tslib": "^2.3.0",
     "zone.js": "~0.15.0"

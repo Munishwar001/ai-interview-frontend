@@ -1,0 +1,63 @@
+<section class="w-full bg-gradient-to-br from-[#F8F5FE] to-[#F3F0FF] py-20">
+  <div class="max-w-5xl mx-auto px-6 text-center">
+    
+    <!-- Badge -->
+    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-50 text-indigo-600 text-sm font-medium mb-6">
+      <app-icon [name]="'sparkles'"></app-icon>
+      <span class="text-sm font-medium">Powered by Advanced AI</span>
+    </div>
+
+    <!-- Heading -->
+    <h1 class="text-5xl md:text-6xl font-bold text-slate-900 leading-tight">
+      Find Jobs <span class="text-indigo-600">Smarter</span><br />
+      with AI
+    </h1>
+
+    <!-- Subtext -->
+    <p class="mt-6 text-lg text-slate-600 max-w-2xl mx-auto">
+      Transform your job search with intelligent matching, AI-enhanced resumes, and interview
+      preparation that gets you hired faster.
+    </p>
+
+    <!-- Buttons -->
+    <div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
+      <button
+        (click)="onJobSeeker()"
+        class="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 hover:scale-105 active:scale-95 transition-all duration-300 text-white px-6 py-3 rounded-xl font-semibold shadow-lg shadow-indigo-200"
+      >
+        <app-icon name="jobseeker"></app-icon>
+        Get Started as Job Seeker →
+      </button>
+
+      <button
+        (click)="onEmployer()"
+        class="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 hover:scale-105 active:scale-95 transition-all duration-300 text-white px-6 py-3 rounded-xl font-semibold shadow-lg shadow-indigo-200"
+      >
+        <app-icon name="employer"></app-icon>
+        Hire Talent as Employer
+      </button>
+    </div>
+
+    <!-- Features -->
+    <div class="mt-6 flex flex-wrap justify-center gap-6 text-sm text-slate-600">
+      <div *ngFor="let item of features" class="flex items-center gap-2">
+        <span class="text-green-500">✔</span>
+        {{ item }}
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="mt-14 grid grid-cols-2 md:grid-cols-4 gap-6">
+      <div *ngFor="let stat of stats" class="bg-white rounded-2xl py-6 shadow-sm">
+        <h3 class="text-2xl font-bold text-indigo-600">
+          {{ stat.value }}
+        </h3>
+
+        <p class="text-sm text-slate-500">
+          {{ stat.label }}
+        </p>
+      </div>
+    </div>
+
+  </div>
+</section>

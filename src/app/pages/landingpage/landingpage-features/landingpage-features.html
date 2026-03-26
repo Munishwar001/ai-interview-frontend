@@ -1,0 +1,43 @@
+<section id="features" class="py-20 bg-[#F8F5FE]">
+  <div class="max-w-6xl mx-auto px-6 text-center">
+    <!-- Badge -->
+    <div
+      class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-50 text-indigo-600 text-sm font-medium mb-4"
+    >
+      <app-icon [name]="'sparkles'"></app-icon> AI Powered
+    </div>
+
+    <!-- Heading -->
+    <h2 class="text-3xl md:text-4xl font-bold text-slate-900">Supercharge Your Job Search</h2>
+
+    <p class="mt-4 text-slate-600 max-w-2xl mx-auto">
+      Our AI-powered tools help you stand out from the crowd and land your dream job faster.
+    </p>
+
+    <!-- Cards -->
+    <div class="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div
+        *ngFor="let item of featuresList"
+        class="bg-white rounded-2xl p-6 text-left shadow-sm border border-slate-100 hover:shadow-md transition"
+      >
+        <!-- Icon -->
+        <div
+          [ngClass]="item.iconBg"
+          class="w-12 h-12 rounded-xl flex items-center justify-center mb-4"
+        >
+          <app-icon [name]="item.icon" class="text-white"></app-icon>
+        </div>
+
+        <!-- Title -->
+        <h3 class="text-lg font-semibold text-slate-900">
+          {{ item.title }}
+        </h3>
+
+        <!-- Desc -->
+        <p class="mt-2 text-sm text-slate-600">
+          {{ item.desc }}
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
