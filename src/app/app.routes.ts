@@ -6,6 +6,14 @@ export const routes: Routes = [
     path: '',
     loadComponent: () =>
       import('./core/components/landing-layout/landing-layout').then((m) => m.LandingLayout),
+     children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./pages/landingpage/landingpage')
+            .then((m) => m.Landingpage),
+      },
+    ]
   },
   {
     path: 'login',
