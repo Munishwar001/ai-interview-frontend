@@ -1,11 +1,30 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { Navbar } from '../../../shared/components/navbar/navbar';
+import { Icons } from '../../../shared/icons/icons';
+import { CommonModule } from '@angular/common';
+import { SIDEBAR_MENU } from '../../config/sidebar.config';
+import { Sidebar } from '../../../shared/components/sidebar/sidebar';
 
 @Component({
   selector: 'app-dashboard-layout',
-  imports: [],
+  standalone: true,
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, Navbar, Icons, CommonModule ,Sidebar],
   templateUrl: './dashboard-layout.html',
   styleUrl: './dashboard-layout.scss',
 })
-export class DashboardLayout {
+export class DashboardLayout implements OnInit {
+  pageTitle: string = 'Dashboard';
+  menuItems = SIDEBAR_MENU;
+  isSidebarOpen = true;
 
+  ngOnInit() {
+    if (window.innerWidth < 768) {
+      this.isSidebarOpen = false;
+    }
+  }
+
+  toggleSidebar() {
+    this.isSidebarOpen = !this.isSidebarOpen;
+  }
 }
