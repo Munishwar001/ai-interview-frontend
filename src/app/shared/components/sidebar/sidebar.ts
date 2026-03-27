@@ -30,7 +30,5 @@ export class Sidebar {
   onLogout(): void {
     this.closeProfileMenu();
     this.logout.emit();
-    // If you're not using an Output, handle logout logic directly here:
-    // e.g. this.authService.logout(); this.router.navigate(['/login']);
   }
 }

@@ -1,0 +1,4 @@
+// Word container — clip overflow so words slide in/out cleanly
+span[class*="overflow-hidden"] {
+  display: inline-block;
+}

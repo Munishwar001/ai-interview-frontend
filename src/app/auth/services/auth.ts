@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { exhaustMap, Observable, switchMap, tap, of, catchError } from 'rxjs';
+import { exhaustMap, Observable, switchMap, tap, of, catchError, finalize } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { RegisterRequest, LoginRequest, AuthResponse, RefreshRequest } from '../auth.models';
 import { environment } from '../../../../environment/environment';
@@ -7,6 +7,8 @@ import { User } from '../../core/services/user';
 import { UserStore } from '../../core/services/user-store';
 import { AuthStore } from './auth-store';
 import { Router } from '@angular/router';
+import { SocialAuthService } from '@abacritt/angularx-social-login';
+
 @Injectable({
   providedIn: 'root',
 })
@@ -19,6 +21,7 @@ export class AuthService {
     private userStore: UserStore,
     private authStore: AuthStore,
     private router: Router,
+    private socialAuthService: SocialAuthService,
   ) {}
 
   register(data: RegisterRequest): Observable<any> {
@@ -43,17 +46,15 @@ export class AuthService {
   }
 
   refreshToken(refreshRequest: RefreshRequest) {
-    return this.http
-      .post<AuthResponse>(`${environment.apiUrl}/account/refresh-token`, refreshRequest)
-      .pipe(
-        tap((resp) => {
-          this.authStore.setAccessAndRefreshToken(
-            resp.accessToken,
-            resp.accessTokenExpiration,
-            resp.refreshToken,
-          );
-        }),
-      );
+    return this.http.post<AuthResponse>(`${this.baseUrl}/refresh-token`, refreshRequest).pipe(
+      tap((resp) => {
+        this.authStore.setAccessAndRefreshToken(
+          resp.accessToken,
+          resp.accessTokenExpiration,
+          resp.refreshToken,
+        );
+      }),
+    );
   }
 
   isAuthenticated(): Observable<boolean> {
@@ -107,11 +108,27 @@ export class AuthService {
     return refreshReq;
   }
 
-  logout() {
-    this.authStore.clearStorage();
-    this.userStore.removeUserState();
-    this.router.navigate(['/login']);
+  revokeRefreshToken() {
+    console.log('revoking...');
+    let currentRefreshToken = this.authStore.getRefreshToken();
+    return this.http.post<boolean>(`${this.baseUrl}/revoke-token`, {
+      refreshToken: currentRefreshToken,
+    });
   }
+
+  logout() {
+  this.socialAuthService.signOut().catch(() => {
+    console.log('Google signout failed or not logged in');
+  });
+  
+  this.revokeRefreshToken().pipe(
+    finalize(() => {
+      this.authStore.clearStorage();
+      this.userStore.removeUserState();
+      this.router.navigate(['/login']);
+    })
+  ).subscribe();
+}
 
   googleLogin(payload: { idToken: string; role: string }): Observable<any> {
     return this.http.post<AuthResponse>(`${this.baseUrl}/google-login`, payload).pipe(
