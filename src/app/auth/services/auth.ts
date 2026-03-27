@@ -113,7 +113,7 @@ export class AuthService {
     this.router.navigate(['/login']);
   }
 
-  googleLogin(payload: { idToken: string; role: string }): Observable<any> {
+  googleLogin(payload: { idToken: string|undefined; role: string }): Observable<any> {
     return this.http.post<AuthResponse>(`${this.baseUrl}/google-login`, payload).pipe(
       tap((resp) => {
         this.authStore.setAccessAndRefreshToken(

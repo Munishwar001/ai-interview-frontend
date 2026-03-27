@@ -24,6 +24,6 @@ export class LandingpagePricing {
   }
 
   onSignIn(): void {
-    this.router.navigate(['/login']);
+    this.router.navigate(['/signin']);
   }
 }
