@@ -9,6 +9,7 @@ export const routes: Routes = [
      children: [
       {
         path: '',
+        pathMatch: 'full',
         loadComponent: () =>
           import('./pages/landingpage/landingpage')
             .then((m) => m.Landingpage),

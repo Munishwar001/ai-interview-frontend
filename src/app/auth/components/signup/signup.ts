@@ -4,10 +4,12 @@ import { Icons } from '../../../shared/icons/icons';
 import { UserRole } from '../../../shared/enums/UserRole ';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth';
+import { RouterLink } from "@angular/router";
 
 @Component({
   selector: 'app-signup',
-  imports: [CommonModule, ReactiveFormsModule, Icons],
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, Icons, RouterLink],
   templateUrl: './signup.html',
   styleUrl: './signup.scss',
 })

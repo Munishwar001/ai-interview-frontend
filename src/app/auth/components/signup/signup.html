@@ -1,54 +1,54 @@
-<div class="h-screen overflow-hidden bg-[#F8F5FE] flex flex-col">
+<div class="min-h-screen bg-[#F8F5FE] flex flex-col">
 
     <!-- Header -->
-    <header class="px-8 py-3 shrink-0">
+    <header class="px-4 sm:px-6 md:px-8 py-3 sm:py-4 shrink-0">
         <div class="flex items-center gap-2">
-            <div class="w-9 h-9 bg-indigo-600 rounded-xl flex items-center justify-center">
+            <div class="w-8 sm:w-9 h-8 sm:h-9 bg-indigo-600 rounded-lg sm:rounded-xl flex items-center justify-center">
                 <app-icon [name]="'logo'"></app-icon>
             </div>
-            <span class="text-xl font-bold text-slate-800">Job<span class="text-indigo-600">AI</span></span>
+            <span class="text-lg sm:text-xl font-bold text-slate-800">Job<span class="text-indigo-600">AI</span></span>
         </div>
     </header>
 
     <!-- Main -->
-    <main class="flex-1 flex items-center justify-center px-4 overflow-hidden">
+    <main class="flex-1 flex items-center justify-center px-4 sm:px-6 py-6 sm:py-8 overflow-auto">
         <form [formGroup]="signupForm" (ngSubmit)="onCreateAccount()"
-            class="w-full max-w-md bg-white rounded-2xl shadow-lg shadow-slate-200/80 border border-slate-100 px-10 py-6">
+            class="w-full max-w-md bg-white rounded-xl sm:rounded-2xl shadow-lg shadow-slate-200/80 border border-slate-100 px-4 sm:px-8 md:px-10 py-6">
 
             <!-- Title -->
             <div class="text-center mb-5">
-                <h1 class="text-2xl font-bold text-slate-800 mb-1">Create Your Account</h1>
-                <p class="text-sm text-slate-400">Start your AI-powered job journey today</p>
+                <h1 class="text-xl sm:text-2xl font-bold text-slate-800 mb-1">Create Your Account</h1>
+                <p class="text-xs sm:text-sm text-slate-400">Start your AI-powered job journey today</p>
             </div>
 
             <!-- Intent Toggle -->
-            <div class="mb-4">
-                <p class="text-sm font-medium text-slate-700 mb-2">I want to</p>
+            <div class="mb-4 sm:mb-5">
+                <p class="text-xs sm:text-sm font-medium text-slate-700 mb-2">I want to</p>
                 <div class="grid grid-cols-2 gap-2">
                     <button type="button" (click)="setIntent('find')"
                         [class]="selectedIntent === 'find'
-            ? 'flex flex-col items-center justify-center gap-1.5 py-3 rounded-xl border-2 border-[#7375F2] bg-[#7375F2] text-white font-semibold text-sm transition-all'
-            : 'flex flex-col items-center justify-center gap-1.5 py-3 rounded-xl border-2 border-slate-200 bg-white text-slate-500 font-semibold text-sm hover:border-indigo-300 hover:text-indigo-500 transition-all'">
+            ? 'flex flex-col items-center justify-center gap-1.5 py-2.5 sm:py-3 rounded-lg sm:rounded-xl border-2 border-[#7375F2] bg-[#7375F2] text-white font-semibold text-xs sm:text-sm transition-all'
+            : 'flex flex-col items-center justify-center gap-1.5 py-2.5 sm:py-3 rounded-lg sm:rounded-xl border-2 border-slate-200 bg-white text-slate-500 font-semibold text-xs sm:text-sm hover:border-indigo-300 hover:text-indigo-500 transition-all'">
                         <app-icon name="jobseeker"></app-icon>
-                        Find Jobs
+                        <span class="text-xs">Find Jobs</span>
                     </button>
                     <button type="button" (click)="setIntent('hire')"
                         [class]="selectedIntent === 'hire'
-            ? 'flex flex-col items-center justify-center gap-1.5 py-3 rounded-xl border-2 border-[#7375F2] bg-[#7375F2] text-white font-semibold text-sm transition-all'
-            : 'flex flex-col items-center justify-center gap-1.5 py-3 rounded-xl border-2 border-slate-200 bg-white text-slate-500 font-semibold text-sm hover:border-indigo-300 hover:text-indigo-500 transition-all'">
+            ? 'flex flex-col items-center justify-center gap-1.5 py-2.5 sm:py-3 rounded-lg sm:rounded-xl border-2 border-[#7375F2] bg-[#7375F2] text-white font-semibold text-xs sm:text-sm transition-all'
+            : 'flex flex-col items-center justify-center gap-1.5 py-2.5 sm:py-3 rounded-lg sm:rounded-xl border-2 border-slate-200 bg-white text-slate-500 font-semibold text-xs sm:text-sm hover:border-indigo-300 hover:text-indigo-500 transition-all'">
                         <app-icon name="employer"></app-icon>
-                        Hire Talent
+                        <span class="text-xs">Hire Talent</span>
                     </button>
                 </div>
             </div>
 
             <!-- Full Name -->
-            <div class="mb-3">
-                <label class="block text-sm font-medium text-slate-700 mb-1.5">Full Name</label>
+            <div class="mb-3 sm:mb-4">
+                <label class="block text-xs sm:text-sm font-medium text-slate-700 mb-1.5">Full Name</label>
                 <input type="text" formControlName="fullName" placeholder="John Doe"
                     [class]="signupForm.get('fullName')?.invalid && signupForm.get('fullName')?.touched
-                        ? 'w-full px-4 py-2.5 rounded-lg border border-red-400 text-slate-800 text-sm placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent transition-all'
-                        : 'w-full px-4 py-2.5 rounded-lg border border-slate-200 text-slate-800 text-sm placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all'" />
+                        ? 'w-full px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg border border-red-400 text-slate-800 text-xs sm:text-sm placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent transition-all'
+                        : 'w-full px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg border border-slate-200 text-slate-800 text-xs sm:text-sm placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all'" />
                 <p *ngIf="signupForm.get('fullName')?.invalid && signupForm.get('fullName')?.touched"
                     class="mt-1.5 text-xs text-red-500">
                     Full name is required.
@@ -56,12 +56,12 @@
             </div>
 
             <!-- Email -->
-            <div class="mb-3">
-                <label class="block text-sm font-medium text-slate-700 mb-1.5">Email</label>
+            <div class="mb-3 sm:mb-4">
+                <label class="block text-xs sm:text-sm font-medium text-slate-700 mb-1.5">Email</label>
                 <input type="email" formControlName="email" placeholder="you@example.com"
                     [class]="signupForm.get('email')?.invalid && signupForm.get('email')?.touched
-                        ? 'w-full px-4 py-2.5 rounded-lg border border-red-400 text-slate-800 text-sm placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent transition-all'
-                        : 'w-full px-4 py-2.5 rounded-lg border border-slate-200 text-slate-800 text-sm placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all'" />
+                        ? 'w-full px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg border border-red-400 text-slate-800 text-xs sm:text-sm placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent transition-all'
+                        : 'w-full px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg border border-slate-200 text-slate-800 text-xs sm:text-sm placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all'" />
                 <p *ngIf="signupForm.get('email')?.hasError('required') && signupForm.get('email')?.touched"
                     class="mt-1.5 text-xs text-red-500">
                     Email is required.
@@ -73,16 +73,16 @@
             </div>
 
             <!-- Password -->
-            <div class="mb-3">
-                <label class="block text-sm font-medium text-slate-700 mb-1.5">Password</label>
+            <div class="mb-3 sm:mb-4">
+                <label class="block text-xs sm:text-sm font-medium text-slate-700 mb-1.5">Password</label>
                 <div class="relative">
                     <input [type]="showPassword ? 'text' : 'password'" formControlName="password"
                         placeholder="••••••••••"
                         [class]="signupForm.get('password')?.invalid && signupForm.get('password')?.touched
-                            ? 'w-full px-4 py-2.5 rounded-lg border border-red-400 text-slate-800 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent transition-all pr-10'
-                            : 'w-full px-4 py-2.5 rounded-lg border border-slate-200 text-slate-800 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all pr-10'" />
+                            ? 'w-full px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg border border-red-400 text-slate-800 text-xs sm:text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent transition-all pr-9'
+                            : 'w-full px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg border border-slate-200 text-slate-800 text-xs sm:text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all pr-9'" />
                     <button type="button" (click)="togglePassword()"
-                        class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors">
+                        class="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors p-1">
                         <app-icon [name]="showPassword ? 'eye-off' : 'eye'"></app-icon>
                     </button>
                 </div>
@@ -98,15 +98,15 @@
 
             <!-- Confirm Password -->
             <div class="mb-5">
-                <label class="block text-sm font-medium text-slate-700 mb-1.5">Confirm Password</label>
+                <label class="block text-xs sm:text-sm font-medium text-slate-700 mb-1.5">Confirm Password</label>
                 <div class="relative">
                     <input [type]="showConfirmPassword ? 'text' : 'password'" formControlName="confirmPassword"
                         placeholder="••••••••••"
                         [class]="(signupForm.get('confirmPassword')?.invalid && signupForm.get('confirmPassword')?.touched) || passwordMismatch
-                            ? 'w-full px-4 py-2.5 rounded-lg border border-red-400 text-slate-800 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent transition-all pr-10'
-                            : 'w-full px-4 py-2.5 rounded-lg border border-slate-200 text-slate-800 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all pr-10'" />
+                            ? 'w-full px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg border border-red-400 text-slate-800 text-xs sm:text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent transition-all pr-9'
+                            : 'w-full px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg border border-slate-200 text-slate-800 text-xs sm:text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all pr-9'" />
                     <button type="button" (click)="toggleConfirmPassword()"
-                        class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors">
+                        class="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors p-1">
                         <app-icon [name]="showConfirmPassword ? 'eye-off' : 'eye'"></app-icon>
                     </button>
                 </div>
@@ -122,15 +122,15 @@
 
             <!-- Create Account Button -->
             <button type="submit"
-                class="w-full py-3 rounded-lg bg-[#7375F2] hover:bg-[#5a5cda] active:bg-[#4143b0] text-white font-semibold text-sm tracking-wide transition-all duration-150 shadow-sm shadow-indigo-200 flex items-center justify-center gap-2 mb-4">
+                class="w-full py-2.5 sm:py-3 rounded-lg bg-[#7375F2] hover:bg-[#5a5cda] active:bg-[#4143b0] text-white font-semibold text-xs sm:text-sm tracking-wide transition-all duration-150 shadow-sm shadow-indigo-200 flex items-center justify-center gap-2 mb-4">
                 <app-icon name="sparkles"></app-icon>
-                Create Account
+                <span>Create Account</span>
             </button>
 
             <!-- Sign In Link -->
-            <p class="text-center text-sm text-slate-400 mb-2">
+            <p class="text-center text-xs sm:text-sm text-slate-400 mb-2">
                 Already have an account?
-                <a href="/login" class="text-[#7375F2] font-semibold hover:text-indigo-700 transition-colors ml-1">Sign
+                <a routerLink="/login" class="text-[#7375F2] font-semibold hover:text-indigo-700 transition-colors ml-1">Sign
                     in</a>
             </p>
 

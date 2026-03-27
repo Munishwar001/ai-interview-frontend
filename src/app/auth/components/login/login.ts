@@ -3,14 +3,16 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 import { CommonModule } from '@angular/common';
 import { Icons } from '../../../shared/icons/icons';
 import { AuthService } from '../../services/auth';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { SocialAuthService, GoogleSigninButtonModule } from '@abacritt/angularx-social-login';
 import { UserRole } from '../../../shared/enums/UserRole ';
 
+
 @Component({
   selector: 'app-login',
-  imports: [ReactiveFormsModule, CommonModule, Icons, GoogleSigninButtonModule], // ✅ added
+  standalone: true,
+  imports: [ReactiveFormsModule, CommonModule, Icons, GoogleSigninButtonModule, RouterLink],
   templateUrl: './login.html',
   styleUrl: './login.scss',
 })

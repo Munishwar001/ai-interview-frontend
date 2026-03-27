@@ -1,7 +1,11 @@
 import { Component, ElementRef, ViewChild, AfterViewInit, OnDestroy, NgZone } from '@angular/core';
-import { Icons } from '../../../shared/icons/icons';
 import { CommonModule } from '@angular/common';
 import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { StepCardComponent } from '../../../shared/components/step-card/step-card.component';
+import { TestimonialCardComponent } from '../../../shared/components/testimonial-card/testimonial-card.component';
+
+gsap.registerPlugin(ScrollTrigger);
 
 interface Testimonial {
   name: string;
@@ -18,7 +22,7 @@ interface StepItem {
 
 @Component({
   selector: 'app-landingpage-testimonials',
-  imports: [Icons, CommonModule],
+  imports: [CommonModule,StepCardComponent, TestimonialCardComponent],
   templateUrl: './landingpage-testimonials.html',
   styleUrl: './landingpage-testimonials.scss',
 })
@@ -34,7 +38,7 @@ export class LandingpageTestimonials implements AfterViewInit, OnDestroy {
     {
       name: 'Sarah Chen',
       role: 'Software Engineer at TechCorp',
-      message: 'The AI resume enhancer helped me land 3x more interviews. The suggestions were spot-on and really made my experience shine.',
+      message: 'The AI resume enhancer helped me get three times more interviews. Its suggestions were incredibly accurate.',
       image: 'https://randomuser.me/api/portraits/women/44.jpg',
     },
     {

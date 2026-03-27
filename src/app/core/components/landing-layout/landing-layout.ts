@@ -19,6 +19,7 @@ interface NavLink {
 export class LandingLayout {
 
   isDark = false;
+  isMobileMenuOpen = false;
 
   navLinks: NavLink[] = [
     { label: 'Features',     route: '/', fragment: 'features'     },
@@ -33,11 +34,21 @@ export class LandingLayout {
     document.documentElement.classList.toggle('dark', this.isDark);
   }
 
+  toggleMobileMenu(): void {
+    this.isMobileMenuOpen = !this.isMobileMenuOpen;
+  }
+
+  closeMobileMenu(): void {
+    this.isMobileMenuOpen = false;
+  }
+
   onSignIn(): void {
+    this.closeMobileMenu();
     this.router.navigate(['/login']);
   }
 
   onGetStarted(): void {
+    this.closeMobileMenu();
     this.router.navigate(['/signup']);
   }
 }
