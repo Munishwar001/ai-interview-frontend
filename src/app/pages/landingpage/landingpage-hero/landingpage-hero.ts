@@ -27,14 +27,10 @@ export class LandingpageHero implements AfterViewInit, OnDestroy {
   constructor(private router: Router, private ngZone: NgZone) {}
 
   rotatingWords: string[] = [
-    'Faster',
+    'Quicker',
     'Sharper',
     'Smarter', 
   ];
-
-  get displayWords(): string[] {
-    return ['Smarter', 'Faster', 'Sharper', 'Better', 'Easier'];
-  }
 
   stats: Stat[] = [
     { value: '50K+',  label: 'Jobs Posted' },
@@ -60,30 +56,35 @@ export class LandingpageHero implements AfterViewInit, OnDestroy {
     const els = this.wordEls.toArray().map(r => r.nativeElement);
     if (!els.length) return;
 
-    // Show first word immediately
-    gsap.set(els[0], { opacity: 1, y: 0 });
+    // Initial setup - show first word
+    gsap.set(els[0], { opacity: 1, y: 0, display: 'flex' });
+    els.forEach((el, idx) => {
+      if (idx !== 0) gsap.set(el, { opacity: 0, y: 20, display: 'flex' });
+    });
 
     this.intervalId = setInterval(() => {
       const current = els[this.currentIndex];
       const next = els[(this.currentIndex + 1) % els.length];
 
-      // Animate OUT current word
+      // Animate OUT current word (slide up and fade)
       gsap.to(current, {
         opacity: 0,
-        y: -30,
-        duration: 0.45,
+        y: -40,
+        duration: 0.4,
         ease: 'power2.in',
       });
 
-      // Animate IN next word (slight delay so they don't overlap)
-      gsap.fromTo(
-        next,
-        { opacity: 0, y: 30 },
-        { opacity: 1, y: 0, duration: 0.5, ease: 'power3.out', delay: 0.25 }
-      );
+      // Animate IN next word (slide up from bottom and fade in)
+      gsap.to(next, {
+        opacity: 1,
+        y: 0,
+        duration: 0.5,
+        ease: 'back.out',
+        delay: 0.1,
+      });
 
       this.currentIndex = (this.currentIndex + 1) % els.length;
-    }, 2200);
+    }, 3000);
   }
 
   ngOnDestroy(): void {

@@ -1,4 +1,4 @@
-<section class="py-20 bg-[#F8F5FE]">
+<!-- <section class="py-20 bg-[#F8F5FE]">
   <div class="max-w-6xl mx-auto px-6 text-center">
     <h2 class="text-3xl md:text-4xl font-bold text-slate-900">How It Works</h2>
     <p class="mt-4 text-slate-600 max-w-xl mx-auto">
@@ -6,29 +6,18 @@
     </p>
 
     <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-10">
-      <div
+      <app-step-card
         *ngFor="let step of steps; let i = index"
-        class="step-card flex flex-col items-center text-center"
-        [attr.data-index]="i"
-      >
-        <div class="relative">
-          <div class="w-20 h-20 rounded-full bg-indigo-100 flex items-center justify-center">
-            <app-icon [name]="step.icon" class="text-indigo-600 w-6 h-6"></app-icon>
-          </div>
-          <div
-            class="absolute -top-2 -right-2 bg-indigo-600 text-white text-xs font-bold w-6 h-6 rounded-full flex items-center justify-center"
-          >
-            {{ i + 1 }}
-          </div>
-        </div>
-        <h3 class="mt-6 text-lg font-semibold text-slate-900">{{ step.title }}</h3>
-        <p class="mt-2 text-sm text-slate-600 max-w-xs">{{ step.desc }}</p>
-      </div>
+        [icon]="step.icon"
+        [title]="step.title"
+        [desc]="step.desc"
+        [index]="i"
+      ></app-step-card>
     </div>
   </div>
 </section>
 
-<!-- Testimonials with GSAP Marquee -->
+
 <section id="testimonials" class="py-20 bg-[#F8F5FE] overflow-hidden">
   <div class="max-w-6xl mx-auto px-6 text-center">
     <h2 class="text-3xl md:text-4xl font-bold text-slate-900">Loved by Job Seekers & Employers</h2>
@@ -37,31 +26,76 @@
     </p>
   </div>
 
-  <!-- Marquee Track -->
+
   <div class="mt-12 relative">
-    <!-- Fade edges -->
-    <div class="pointer-events-none absolute left-0 top-0 h-full w-32 z-10 bg-gradient-to-r from-[#F8F5FE] to-transparent"></div>
-    <div class="pointer-events-none absolute right-0 top-0 h-full w-32 z-10 bg-gradient-to-l from-[#F8F5FE] to-transparent"></div>
+   
+    <div
+      class="pointer-events-none absolute left-0 top-0 h-full w-32 z-10 bg-gradient-to-r from-[#F8F5FE] to-transparent"
+    ></div>
+    <div
+      class="pointer-events-none absolute right-0 top-0 h-full w-32 z-10 bg-gradient-to-l from-[#F8F5FE] to-transparent"
+    ></div>
 
     <div #marqueeWrapper class="flex gap-6 w-max will-change-transform">
-      <!-- Render testimonials twice for seamless loop -->
+      
       <ng-container *ngFor="let repeat of [0, 1]">
-        <div
+        <app-testimonial-card
           *ngFor="let t of testimonials"
-          class="testimonial-card bg-white rounded-2xl p-6 text-left shadow-sm border border-slate-100 hover:shadow-md transition flex-shrink-0 w-80"
-        >
-          <div class="flex items-center gap-1 text-yellow-400 mb-4">
-            <app-icon name="star" *ngFor="let s of [1,2,3,4,5]"></app-icon>
-          </div>
-          <p class="text-sm text-slate-600 leading-relaxed">"{{ t.message }}"</p>
-          <div class="flex items-center gap-3 mt-6">
-            <img [src]="t.image" class="w-10 h-10 rounded-full object-cover" />
-            <div>
-              <p class="text-sm font-semibold text-slate-900">{{ t.name }}</p>
-              <p class="text-xs text-slate-500">{{ t.role }}</p>
-            </div>
-          </div>
-        </div>
+          [name]="t.name"
+          [role]="t.role"
+          [message]="t.message"
+          [image]="t.image"
+        ></app-testimonial-card>
+      </ng-container>
+    </div>
+  </div>
+</section> -->
+<section class="py-20 relative overflow-hidden" style="background: #ffffff;">
+  <!-- Grid -->
+  <div class="absolute inset-0" style="
+    background-image: linear-gradient(rgba(108,61,232,0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(108,61,232,0.07) 1px, transparent 1px);
+    background-size: 48px 48px;
+    mask-image: radial-gradient(ellipse 90% 90% at 50% 40%, black 20%, transparent 100%);
+    -webkit-mask-image: radial-gradient(ellipse 90% 90% at 50% 40%, black 20%, transparent 100%);
+  "></div>
+  <div class="absolute rounded-full" style="width:500px; height:500px; background: radial-gradient(circle, rgba(167,139,250,0.25), transparent 70%); top:-150px; left:-100px;"></div>
+  <div class="absolute rounded-full" style="width:400px; height:400px; background: radial-gradient(circle, rgba(108,61,232,0.15), transparent 70%); bottom:-100px; right:-80px;"></div>
+  <div class="absolute rounded-full" style="width:350px; height:350px; background: radial-gradient(circle, rgba(196,181,253,0.2), transparent 70%); top:40%; left:65%;"></div>
+
+  <div class="relative z-10 max-w-6xl mx-auto px-6 text-center">
+    <h2 class="text-3xl md:text-4xl font-bold text-slate-900">How It Works</h2>
+    <p class="mt-4 text-slate-600 max-w-xl mx-auto">Get started in minutes and let AI do the heavy lifting</p>
+    <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-10">
+      <app-step-card *ngFor="let step of steps; let i = index" [icon]="step.icon" [title]="step.title" [desc]="step.desc" [index]="i"></app-step-card>
+    </div>
+  </div>
+</section>
+
+<!-- Testimonials -->
+<section id="testimonials" class="py-20 relative overflow-hidden" style="background: #ffffff;">
+  <div class="absolute inset-0" style="
+    background-image: linear-gradient(rgba(108,61,232,0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(108,61,232,0.07) 1px, transparent 1px);
+    background-size: 48px 48px;
+    mask-image: radial-gradient(ellipse 90% 90% at 50% 40%, black 20%, transparent 100%);
+    -webkit-mask-image: radial-gradient(ellipse 90% 90% at 50% 40%, black 20%, transparent 100%);
+  "></div>
+  <div class="absolute rounded-full" style="width:500px; height:500px; background: radial-gradient(circle, rgba(167,139,250,0.25), transparent 70%); top:-150px; right:-100px;"></div>
+  <div class="absolute rounded-full" style="width:400px; height:400px; background: radial-gradient(circle, rgba(108,61,232,0.15), transparent 70%); bottom:-100px; left:-80px;"></div>
+
+  <div class="relative z-10 max-w-6xl mx-auto px-6 text-center">
+    <h2 class="text-3xl md:text-4xl font-bold text-slate-900">Loved by Job Seekers & Employers</h2>
+    <p class="mt-4 text-slate-600 max-w-xl mx-auto">See what our community has to say about their experience</p>
+  </div>
+
+  <!-- Marquee Track -->
+  <div class="mt-12 relative">
+    <div class="pointer-events-none absolute left-0 top-0 h-full w-32 z-10 bg-gradient-to-r from-white to-transparent"></div>
+    <div class="pointer-events-none absolute right-0 top-0 h-full w-32 z-10 bg-gradient-to-l from-white to-transparent"></div>
+    <div #marqueeWrapper class="flex gap-6 w-max will-change-transform">
+      <ng-container *ngFor="let repeat of [0, 1]">
+        <app-testimonial-card *ngFor="let t of testimonials" [name]="t.name" [role]="t.role" [message]="t.message" [image]="t.image"></app-testimonial-card>
       </ng-container>
     </div>
   </div>

@@ -1,0 +1,97 @@
+// import { Component } from '@angular/core';
+// import { CommonModule } from '@angular/common';
+// import { Icons } from '../../icons/icons';
+
+// @Component({
+//   selector: 'app-footer',
+//   imports: [CommonModule, Icons],
+//   template: `
+//     <footer class="py-20 bg-[#F8F5FE]">
+//       <div class="max-w-6xl mx-auto px-6">
+//         <div class="grid grid-cols-1 md:grid-cols-6 gap-10">
+//           <!-- Logo + About -->
+//           <div class="md:col-span-2">
+//             <div class="flex items-center gap-3">
+//               <div class="w-10 h-10 rounded-xl flex items-center justify-center"
+//                 style="background: linear-gradient(135deg, #6c3de8, #a78bfa)">
+//                 <app-icon name="logo" class="text-white"></app-icon>
+//               </div>
+//               <span class="text-xl font-bold text-slate-900">
+//                 Job<span class="bg-gradient-to-r from-[#6c3de8] to-[#a78bfa] bg-clip-text text-transparent">AI</span>
+//               </span>
+//             </div>
+//             <p class="mt-4 text-sm text-slate-600 max-w-xs">
+//               Find your dream job smarter with AI-powered matching, resume enhancement, and interview preparation.
+//             </p>
+//             <div class="flex items-center gap-4 mt-4 text-slate-500">
+//               <app-icon name="twitter"></app-icon>
+//               <app-icon name="linkedin"></app-icon>
+//               <app-icon name="github"></app-icon>
+//             </div>
+//           </div>
+
+//           <!-- Product -->
+//           <div>
+//             <h3 class="text-sm font-semibold text-slate-900 mb-3">Product</h3>
+//             <ul class="space-y-2 text-sm text-slate-600">
+//               <li>Features</li>
+//               <li>Pricing</li>
+//               <li>AI Resume Enhancer</li>
+//               <li>AI Job Matching</li>
+//             </ul>
+//           </div>
+
+//           <!-- Company -->
+//           <div>
+//             <h3 class="text-sm font-semibold text-slate-900 mb-3">Company</h3>
+//             <ul class="space-y-2 text-sm text-slate-600">
+//               <li>About Us</li>
+//               <li>Careers</li>
+//               <li>Blog</li>
+//               <li>Press</li>
+//             </ul>
+//           </div>
+
+//           <!-- Resources -->
+//           <div>
+//             <h3 class="text-sm font-semibold text-slate-900 mb-3">Resources</h3>
+//             <ul class="space-y-2 text-sm text-slate-600">
+//               <li>Help Center</li>
+//               <li>Interview Tips</li>
+//               <li>Resume Guide</li>
+//               <li>Career Advice</li>
+//             </ul>
+//           </div>
+
+//           <!-- Legal -->
+//           <div>
+//             <h3 class="text-sm font-semibold text-slate-900 mb-3">Legal</h3>
+//             <ul class="space-y-2 text-sm text-slate-600">
+//               <li>Privacy Policy</li>
+//               <li>Terms of Service</li>
+//               <li>Cookie Policy</li>
+//             </ul>
+//           </div>
+//         </div>
+
+//         <!-- Divider -->
+//         <div class="border-t border-slate-200 mt-12 pt-6 flex flex-col md:flex-row justify-between items-center text-sm text-slate-500">
+//           <p>© 2026 JobAI. All rights reserved.</p>
+//           <p class="mt-2 md:mt-0">Made with ❤️ for job seekers worldwide</p>
+//         </div>
+//       </div>
+//     </footer>
+//   `
+// })
+// export class FooterComponent {}
+import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Icons } from '../../icons/icons';
+
+@Component({
+  selector: 'app-footer',
+  imports: [CommonModule, Icons],
+  templateUrl: './footer.component.html',
+  styleUrl: './footer.component.css'
+})
+export class FooterComponent {}

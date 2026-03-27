@@ -1,0 +1,12 @@
+<div class="step-card flex flex-col items-center text-center">
+      <div class="relative">
+        <div class="w-20 h-20 rounded-full bg-indigo-100 flex items-center justify-center">
+          <app-icon [name]="icon" class="text-indigo-600 w-6 h-6"></app-icon>
+        </div>
+        <div class="absolute -top-2 -right-2 bg-indigo-600 text-white text-xs font-bold w-6 h-6 rounded-full flex items-center justify-center">
+          {{ index + 1 }}
+        </div>
+      </div>
+      <h3 class="mt-6 text-lg font-semibold text-slate-900">{{ title }}</h3>
+      <p class="mt-2 text-sm text-slate-600 max-w-xs">{{ desc }}</p>
+    </div>

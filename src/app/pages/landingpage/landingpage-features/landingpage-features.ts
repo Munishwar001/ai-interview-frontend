@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { Icons } from '../../../shared/icons/icons';
+import { FeatureCardComponent } from '../../../shared/components/feature-card/feature-card.component';
 
 interface FeatureItem {
   icon: string;
@@ -11,7 +12,7 @@ interface FeatureItem {
 
 @Component({
   selector: 'app-landingpage-features',
-  imports: [CommonModule ,Icons],
+  imports: [CommonModule ,Icons,FeatureCardComponent],
   templateUrl: './landingpage-features.html',
   styleUrl: './landingpage-features.scss',
 })

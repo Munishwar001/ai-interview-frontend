@@ -1,0 +1,13 @@
+   <div class="testimonial-card bg-white rounded-2xl p-6 text-left shadow-sm border border-slate-100 hover:shadow-md transition flex-shrink-0 w-80">
+      <div class="flex items-center gap-1 text-yellow-400 mb-4">
+        <app-icon name="star" *ngFor="let s of [1,2,3,4,5]"></app-icon>
+      </div>
+      <p class="text-sm text-slate-600 leading-relaxed">"{{ message }}"</p>
+      <div class="flex items-center gap-3 mt-6">
+        <img [src]="image" class="w-10 h-10 rounded-full object-cover" />
+        <div>
+          <p class="text-sm font-semibold text-slate-900">{{ name }}</p>
+          <p class="text-xs text-slate-500">{{ role }}</p>
+        </div>
+      </div>
+    </div>

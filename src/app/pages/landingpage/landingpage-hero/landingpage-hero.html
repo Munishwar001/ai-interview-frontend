@@ -1,23 +1,36 @@
-<section class="w-full bg-gradient-to-br from-[#F8F5FE] to-[#F3F0FF] py-20">
-  <div class="max-w-5xl mx-auto px-6 text-center">
+<section class="w-full py-10 md:py-20 relative overflow-hidden" style="background: #ffffff;">
+  <!-- Grid - Hidden on mobile -->
+  <div class="hidden md:block absolute inset-0" style="
+    background-image: linear-gradient(rgba(108,61,232,0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(108,61,232,0.07) 1px, transparent 1px);
+    background-size: 48px 48px;
+    mask-image: radial-gradient(ellipse 90% 90% at 50% 40%, black 20%, transparent 100%);
+    -webkit-mask-image: radial-gradient(ellipse 90% 90% at 50% 40%, black 20%, transparent 100%);
+  "></div>
 
+  <!-- Blobs - Hidden on mobile -->
+  <div class="hidden md:block absolute rounded-full" style="width:500px; height:500px; background: radial-gradient(circle, rgba(167,139,250,0.25), transparent 70%); top:-150px; left:-100px;"></div>
+  <div class="hidden md:block absolute rounded-full" style="width:400px; height:400px; background: radial-gradient(circle, rgba(108,61,232,0.15), transparent 70%); bottom:-100px; right:-80px;"></div>
+  <div class="hidden md:block absolute rounded-full" style="width:350px; height:350px; background: radial-gradient(circle, rgba(196,181,253,0.2), transparent 70%); top:40%; left:65%;"></div>
+
+  <!-- Content -->
+  <div class="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 text-center">
     <!-- Badge -->
-    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-50 text-indigo-600 text-sm font-medium mb-6">
+    <div class="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-full bg-indigo-50 text-indigo-600 text-xs sm:text-sm font-medium mb-4 sm:mb-6">
       <app-icon [name]="'sparkles'"></app-icon>
-      <span class="text-sm font-medium">Powered by Advanced AI</span>
+      <span class="text-xs sm:text-sm font-medium">Powered by Advanced AI</span>
     </div>
 
     <!-- Heading -->
-    <h1 class="text-5xl md:text-6xl font-bold text-slate-900 leading-tight">
+    <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 leading-tight">
       Find Jobs
-      <span class="relative inline-block">
-        <!-- Rotating words container -->
+      <span class="relative inline-block align-bottom">
         <span #wordContainer class="relative inline-block overflow-hidden align-bottom"
-              style="min-width: 280px; height: 1.2em; vertical-align: bottom;">
+              style="min-width: 215px; height: 1.2em; vertical-align: bottom; display: inline-block;">
           <span
             *ngFor="let word of rotatingWords; let i = index"
             #wordEl
-            class="absolute inset-0 flex items-center justify-center text-indigo-600"
+            class="absolute inset-0 flex items-center justify-center font-bold bg-gradient-to-r from-[#6c3de8] to-[#a78bfa] bg-clip-text text-transparent"
             [style.opacity]="0"
           >{{ word }}</span>
         </span>
@@ -26,45 +39,47 @@
     </h1>
 
     <!-- Subtext -->
-    <p class="mt-6 text-lg text-slate-600 max-w-2xl mx-auto">
+    <p class="mt-4 sm:mt-6 text-base sm:text-lg text-slate-600 max-w-2xl mx-auto px-2">
       Transform your job search with intelligent matching, AI-enhanced resumes, and interview
       preparation that gets you hired faster.
     </p>
 
     <!-- Buttons -->
-    <div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
+    <div class="mt-6 sm:mt-8 flex flex-col items-center justify-center gap-3 sm:gap-4">
       <button
         (click)="onJobSeeker()"
-        class="flex items-center gap-2 bg-[#7274F2] hover:bg-indigo-700 hover:scale-105 active:scale-95 transition-all duration-300 text-white px-6 py-3 rounded-xl font-semibold shadow-lg shadow-indigo-200"
+        class="w-full sm:w-auto flex items-center justify-center gap-2 hover:scale-105 active:scale-95 transition-all duration-300 text-white px-4 sm:px-6 py-3 rounded-xl font-semibold shadow-lg text-sm sm:text-base"
+        style="background-color: #7375F2; isolation: isolate;"
       >
         <app-icon name="jobseeker"></app-icon>
-        Get Started as Job Seeker →
+        <span class="hidden sm:inline">Get Started as Job Seeker →</span>
+        <span class="sm:hidden">Job Seeker</span>
       </button>
 
       <button
         (click)="onEmployer()"
-        class="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 hover:scale-105 active:scale-95 transition-all duration-300 text-white px-6 py-3 rounded-xl font-semibold shadow-lg shadow-indigo-200"
+        class="w-full sm:w-auto flex items-center justify-center gap-2 bg-white border border-slate-200 hover:scale-105 active:scale-95 transition-all duration-300 text-slate-800 px-4 sm:px-6 py-3 rounded-xl font-semibold shadow-lg shadow-slate-200 text-sm sm:text-base"
       >
         <app-icon name="employer"></app-icon>
-        Hire Talent as Employer
+        <span class="hidden sm:inline">Hire Talent as Employer</span>
+        <span class="sm:hidden">Employer</span>
       </button>
     </div>
 
     <!-- Features -->
-    <div class="mt-6 flex flex-wrap justify-center gap-6 text-sm text-slate-600">
-      <div *ngFor="let item of features" class="flex items-center gap-2">
+    <div class="mt-6 flex flex-wrap justify-center gap-2 sm:gap-6 text-xs sm:text-sm text-slate-600">
+      <div *ngFor="let item of features" class="flex items-center gap-1 sm:gap-2">
         <span class="text-green-500">✔</span>
-        {{ item }}
+        <span class="text-xs sm:text-sm">{{ item }}</span>
       </div>
     </div>
 
     <!-- Stats -->
-    <div class="mt-14 grid grid-cols-2 md:grid-cols-4 gap-6">
-      <div *ngFor="let stat of stats" class="bg-white rounded-2xl py-6 shadow-sm">
-        <h3 class="text-2xl font-bold text-indigo-600">{{ stat.value }}</h3>
-        <p class="text-sm text-slate-500">{{ stat.label }}</p>
+    <div class="mt-10 sm:mt-14 grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6">
+      <div *ngFor="let stat of stats" class="bg-white rounded-xl sm:rounded-2xl py-4 sm:py-6 px-3 sm:px-4 shadow-sm border border-slate-100">
+        <h3 class="text-xl sm:text-2xl font-bold text-indigo-600">{{ stat.value }}</h3>
+        <p class="text-xs sm:text-sm text-slate-500">{{ stat.label }}</p>
       </div>
     </div>
-
   </div>
 </section>
