@@ -1,6 +1,6 @@
 <section class="w-full bg-gradient-to-br from-[#F8F5FE] to-[#F3F0FF] py-20">
   <div class="max-w-5xl mx-auto px-6 text-center">
-    
+
     <!-- Badge -->
     <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-50 text-indigo-600 text-sm font-medium mb-6">
       <app-icon [name]="'sparkles'"></app-icon>
@@ -9,8 +9,20 @@
 
     <!-- Heading -->
     <h1 class="text-5xl md:text-6xl font-bold text-slate-900 leading-tight">
-      Find Jobs <span class="text-[#7547EE]">Smarter</span><br />
-      with AI
+      Find Jobs
+      <span class="relative inline-block">
+        <!-- Rotating words container -->
+        <span #wordContainer class="relative inline-block overflow-hidden align-bottom"
+              style="min-width: 280px; height: 1.2em; vertical-align: bottom;">
+          <span
+            *ngFor="let word of rotatingWords; let i = index"
+            #wordEl
+            class="absolute inset-0 flex items-center justify-center text-indigo-600"
+            [style.opacity]="0"
+          >{{ word }}</span>
+        </span>
+      </span>
+      <br />with AI
     </h1>
 
     <!-- Subtext -->
@@ -49,13 +61,8 @@
     <!-- Stats -->
     <div class="mt-14 grid grid-cols-2 md:grid-cols-4 gap-6">
       <div *ngFor="let stat of stats" class="bg-white rounded-2xl py-6 shadow-sm">
-        <h3 class="text-2xl font-bold text-indigo-600">
-          {{ stat.value }}
-        </h3>
-
-        <p class="text-sm text-slate-500">
-          {{ stat.label }}
-        </p>
+        <h3 class="text-2xl font-bold text-indigo-600">{{ stat.value }}</h3>
+        <p class="text-sm text-slate-500">{{ stat.label }}</p>
       </div>
     </div>
 

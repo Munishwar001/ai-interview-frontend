@@ -3,7 +3,8 @@
   <!-- Sidebar -->
 <app-sidebar
   [isSidebarOpen]="isSidebarOpen"
-  [menuItems]="menuItems">
+  [menuItems]="menuItems"
+    (logout)="handleLogout()">
 </app-sidebar>
 
   <!-- Main Content Area -->
