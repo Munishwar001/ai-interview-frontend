@@ -6,15 +6,13 @@ export const routes: Routes = [
     path: '',
     loadComponent: () =>
       import('./core/components/landing-layout/landing-layout').then((m) => m.LandingLayout),
-     children: [
+    children: [
       {
         path: '',
         pathMatch: 'full',
-        loadComponent: () =>
-          import('./pages/landingpage/landingpage')
-            .then((m) => m.Landingpage),
+        loadComponent: () => import('./pages/landingpage/landingpage').then((m) => m.Landingpage),
       },
-    ]
+    ],
   },
   {
     path: 'login',
@@ -29,6 +27,13 @@ export const routes: Routes = [
     canMatch: [authGuard],
     loadComponent: () =>
       import('./core/components/dashboard-layout/dashboard-layout').then((m) => m.DashboardLayout),
+    children: [
+      {
+        path: 'post-job',
+        loadComponent: () =>
+          import('./features/post-job/post-job-home/post-job-home').then((m) => m.PostJobHome),
+      },
+    ],
   },
   {
     path: '**',

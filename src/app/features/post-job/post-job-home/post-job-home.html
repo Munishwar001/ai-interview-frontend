@@ -5,7 +5,8 @@
     <div>
       <div class="flex items-center gap-3 mb-1">
         <h1 class="text-3xl font-bold text-gray-900">Post New Job</h1>
-        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-700 border border-purple-200">
+        <span
+          class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-700 border border-purple-200">
           <app-icon name="sparkles" class="w-3.5 h-3.5 text-purple-500"></app-icon>
           AI Powered
         </span>
@@ -14,25 +15,19 @@
     </div>
 
     <div class="flex items-center gap-3">
-      <button
-        type="button"
-        (click)="onPreview()"
-        class="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 text-gray-700 text-sm font-medium bg-white hover:bg-gray-50 transition-colors duration-150 cursor-pointer"
-      >
+      <button type="button" (click)="onPreview()"
+        class="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 text-gray-700 text-sm font-medium bg-white hover:bg-gray-50 transition-colors duration-150 cursor-pointer">
         <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-          <circle cx="12" cy="12" r="3"/>
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+          <circle cx="12" cy="12" r="3" />
         </svg>
         Preview
       </button>
-      <button
-        type="button"
-        (click)="onSubmit()"
-        class="flex items-center gap-2 px-5 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium transition-colors duration-150 cursor-pointer shadow-sm"
-      >
+      <button type="button" (click)="onSubmit()"
+        class="flex items-center gap-2 px-5 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium transition-colors duration-150 cursor-pointer shadow-sm">
         <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-          <polyline points="14 2 14 8 20 8"/>
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+          <polyline points="14 2 14 8 20 8" />
         </svg>
         Post Job
       </button>
@@ -49,76 +44,112 @@
 
       <!-- Job Title -->
       <div class="mb-5">
-        <label class="block text-sm font-medium text-gray-700 mb-1.5">
-          Job Title <span class="text-red-500">*</span>
-        </label>
-        <input
-          type="text"
-          formControlName="jobTitle"
+        <app-input
+          label="Job Title"
+          controlName="title"
           placeholder="e.g., Senior Frontend Developer"
-          class="w-full px-3.5 py-2.5 rounded-lg border text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
-          [class.border-red-400]="jobTitle.invalid && jobTitle.touched"
-          [class.border-gray-300]="!(jobTitle.invalid && jobTitle.touched)"
-        />
-        @if (jobTitle.invalid && jobTitle.touched) {
-          <p class="mt-1 text-xs text-red-500">
-            @if (jobTitle.errors?.['required']) { Job title is required. }
-            @else if (jobTitle.errors?.['minlength']) { Must be at least 3 characters. }
-          </p>
-        }
+        ></app-input>
       </div>
 
       <!-- Location & Job Type -->
       <div class="grid grid-cols-2 gap-4 mb-5">
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1.5">Location</label>
-          <input
-            type="text"
-            formControlName="location"
+          <app-input
+            label="Location"
+            controlName="location"
             placeholder="e.g., San Francisco, CA"
-            class="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
-          />
+          ></app-input>
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1.5">Job Type</label>
           <div class="relative">
-            <select
-              formControlName="jobType"
-              class="w-full appearance-none px-3.5 py-2.5 rounded-lg border border-gray-300 text-sm text-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition bg-white cursor-pointer"
-            >
+            <select formControlName="jobType"
+              class="w-full appearance-none px-3.5 py-2.5 rounded-lg border border-gray-300 text-sm text-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition bg-white cursor-pointer">
               <option value="" disabled>Select type</option>
-              <option value="full-time">Full-time</option>
-              <option value="part-time">Part-time</option>
-              <option value="contract">Contract</option>
-              <option value="internship">Internship</option>
+              <option *ngFor="let type of jobTypes" [value]="type.id">
+                {{ type.name }}
+              </option>
             </select>
-            <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="6 9 12 15 18 9"/>
+            <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"
+              viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 12 15 18 9" />
             </svg>
           </div>
         </div>
       </div>
 
-      <!-- Salary Range -->
+      <!-- Salary Min & Max -->
       <div class="mb-5">
         <label class="block text-sm font-medium text-gray-700 mb-1.5">Salary Range</label>
-        <input
-          type="text"
-          formControlName="salaryRange"
-          placeholder="e.g., $100k - $150k"
-          class="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
-        />
+        <div class="grid grid-cols-2 gap-3">
+          <input
+            type="number"
+            formControlName="salaryMin"
+            placeholder="Min (e.g. 80000)"
+            class="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
+          />
+          <input
+            type="number"
+            formControlName="salaryMax"
+            placeholder="Max (e.g. 150000)"
+            class="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
+          />
+        </div>
       </div>
 
       <!-- Required Skills -->
       <div class="mb-6">
         <label class="block text-sm font-medium text-gray-700 mb-1.5">Required Skills</label>
-        <input
-          type="text"
-          formControlName="requiredSkills"
-          placeholder="e.g., React, TypeScript, Node.js (comma separated)"
-          class="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
-        />
+
+        <!-- Selected Skill Tags -->
+        <div class="flex flex-wrap gap-2 mb-2" *ngIf="selectedSkills.length > 0">
+          <span *ngFor="let skill of selectedSkills"
+            class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-700 border border-purple-200">
+            {{ skill.name }}
+            <button type="button" (click)="removeSkill(skill)"
+              class="hover:text-purple-900 transition-colors cursor-pointer">
+              <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+          </span>
+        </div>
+
+        <!-- Input & Dropdown -->
+        <div class="relative">
+          <input
+            type="text"
+            [(ngModel)]="skillSearch"
+            [ngModelOptions]="{standalone: true}"
+            (input)="onSkillSearch()"
+            (focus)="showDropdown = true"
+            (blur)="onBlur()"
+            placeholder="Type to search skills..."
+            class="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
+          />
+
+          <!-- Dropdown Results -->
+          <div *ngIf="showDropdown && filteredSkills.length > 0"
+            class="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden">
+            <ul class="max-h-48 overflow-y-auto py-1">
+              <li *ngFor="let skill of filteredSkills"
+                (mousedown)="selectSkill(skill)"
+                class="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700 cursor-pointer transition-colors">
+                <svg class="w-3.5 h-3.5 text-purple-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
+                </svg>
+                <span [innerHTML]="highlightMatch(skill.name)"></span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- No Results -->
+          <div *ngIf="showDropdown && skillSearch.length > 0 && filteredSkills.length === 0"
+            class="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg px-4 py-3 text-sm text-gray-400">
+            No skills found for "<strong class="text-gray-600">{{ skillSearch }}</strong>"
+          </div>
+        </div>
       </div>
     </div>
 
@@ -127,18 +158,20 @@
       <div class="flex items-start justify-between mb-1">
         <h2 class="text-lg font-semibold text-gray-900">Job Description</h2>
         <div class="flex items-center gap-2">
-          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-700 border border-purple-200">
+          <span
+            class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-700 border border-purple-200">
             <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+              <path
+                d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
             </svg>
             AI Powered
           </span>
-          <button
-            type="button"
-            class="flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white text-xs font-semibold transition-colors duration-150 cursor-pointer shadow-sm"
-          >
+          <button type="button"
+            (click)="generateWithAI()"
+            class="flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white text-xs font-semibold transition-colors duration-150 cursor-pointer shadow-sm">
             <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+              <path
+                d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
             </svg>
             Generate with AI
           </button>
@@ -146,11 +179,8 @@
       </div>
       <p class="text-sm text-gray-500 mb-4">Let AI create a compelling job description based on your inputs</p>
 
-      <textarea
-        formControlName="jobDescription"
-        placeholder="Enter your job description here..."
-        class="flex-1 w-full min-h-64 px-3.5 py-3 rounded-lg border border-gray-300 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition resize-none"
-      ></textarea>
+      <textarea formControlName="description" placeholder="Enter your job description here..."
+        class="flex-1 w-full min-h-64 px-3.5 py-3 rounded-lg border border-gray-300 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition resize-none"></textarea>
     </div>
 
   </form>
