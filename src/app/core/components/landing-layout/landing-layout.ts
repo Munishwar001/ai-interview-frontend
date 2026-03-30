@@ -18,7 +18,6 @@ interface NavLink {
 })
 export class LandingLayout {
 
-  isDark = false;
   isMobileMenuOpen = false;
 
   navLinks: NavLink[] = [
@@ -28,11 +27,6 @@ export class LandingLayout {
   ];
 
   constructor(private router: Router) {}
-
-  toggleTheme(): void {
-    this.isDark = !this.isDark;
-    document.documentElement.classList.toggle('dark', this.isDark);
-  }
 
   toggleMobileMenu(): void {
     this.isMobileMenuOpen = !this.isMobileMenuOpen;

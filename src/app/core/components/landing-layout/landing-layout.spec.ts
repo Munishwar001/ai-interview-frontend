@@ -24,10 +24,4 @@ describe('LandingLayout', () => {
   it('should have 3 nav links', () => {
     expect(component.navLinks.length).toBe(3);
   });
-
-  it('should toggle dark mode', () => {
-    expect(component.isDark).toBeFalse();
-    component.toggleTheme();
-    expect(component.isDark).toBeTrue();
-  });
 });
