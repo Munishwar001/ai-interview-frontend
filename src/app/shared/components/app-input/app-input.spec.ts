@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { PostJobHome } from './post-job-home';
+import { AppInput } from './app-input';
 
-describe('PostJobHome', () => {
-  let component: PostJobHome;
-  let fixture: ComponentFixture<PostJobHome>;
+describe('AppInput', () => {
+  let component: AppInput;
+  let fixture: ComponentFixture<AppInput>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [PostJobHome], 
+      imports: [AppInput]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(PostJobHome);
+    fixture = TestBed.createComponent(AppInput);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

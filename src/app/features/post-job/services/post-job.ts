@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../../../environment/environment';
 
 export interface CreateJobPayload {
   title: string;
@@ -16,12 +17,16 @@ export interface CreateJobPayload {
 @Injectable({
   providedIn: 'root',
 })
-export class PostJob {
-  private baseUrl = 'https://api.example.com/jobs'; 
+export class JobService {
+  private baseUrl = environment.apiUrl + '/jobs';
 
   constructor(private http: HttpClient) {}
 
-    createJob(payload: CreateJobPayload): Observable<any> {
+  createJob(payload: CreateJobPayload): Observable<any> {
     return this.http.post(this.baseUrl, payload);
   }
+
+ generateDescription(payload: { title: string; skills: string[] }): Observable<any> {
+  return this.http.post(`${this.baseUrl}/generate-description`, payload);
+}
 }
