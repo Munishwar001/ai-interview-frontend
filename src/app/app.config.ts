@@ -10,7 +10,8 @@ import {
   GoogleLoginProvider,
   SocialAuthService,
   SocialAuthServiceConfig ,
-  GoogleInitOptions
+  GoogleInitOptions,
+  SOCIAL_AUTH_CONFIG 
 } from '@abacritt/angularx-social-login';
 
 export const appConfig: ApplicationConfig = {
@@ -25,7 +26,7 @@ export const appConfig: ApplicationConfig = {
       timeOut: 3000,
     }),
     {
-      provide: 'SocialAuthServiceConfig',  
+      provide: SOCIAL_AUTH_CONFIG,  
       useValue: {
         autoLogin: false,
         providers: [
