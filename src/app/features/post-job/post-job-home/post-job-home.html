@@ -23,14 +23,12 @@
         </svg>
         Preview
       </button>
-      <button type="button" (click)="onSubmit()"
-        class="flex items-center gap-2 px-5 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium transition-colors duration-150 cursor-pointer shadow-sm">
-        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-          <polyline points="14 2 14 8 20 8" />
-        </svg>
-        Post Job
-      </button>
+  <button class="inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm font-medium ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-[#7375F2] text-white hover:bg-[#5C5EDB] shadow-sm hover:shadow-md h-10 px-4 py-2 gap-2">
+ <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
+</svg>
+  Post Job
+</button>
     </div>
   </div>
 
@@ -160,28 +158,27 @@
         <div class="flex items-center gap-2">
           <span
             class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-700 border border-purple-200">
-            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path
-                d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
-            </svg>
+             <app-icon name="sparkles" class="w-3.5 h-3.5 text-purple-500"></app-icon>
             AI Powered
           </span>
           <button type="button"
-            (click)="generateWithAI()"
-            class="flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white text-xs font-semibold transition-colors duration-150 cursor-pointer shadow-sm">
-            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path
-                d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
-            </svg>
-            Generate with AI
-          </button>
+    (click)="generateWithAI()"
+    class="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-[#7375F2] to-[#A855F7] hover:from-[#5C5EDB] hover:to-[#9333EA] text-white text-xs font-semibold transition-all duration-150 cursor-pointer shadow-sm">
+    <app-icon name="magic-wand" class="w-3.5 h-3.5 text-white"></app-icon>
+    Generate with AI
+</button>
         </div>
       </div>
       <p class="text-sm text-gray-500 mb-4">Let AI create a compelling job description based on your inputs</p>
-
-      <textarea formControlName="description" placeholder="Enter your job description here..."
-        class="flex-1 w-full min-h-64 px-3.5 py-3 rounded-lg border border-gray-300 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition resize-none"></textarea>
+<textarea formControlName="description" 
+  placeholder="Enter your job description here..."
+  class="flex-1 w-full min-h-64 px-3.5 py-3 rounded-lg border border-gray-300 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition resize-none"></textarea>
     </div>
 
   </form>
+  <app-job-preview
+  #preview
+  [jobdata]="jobForm.value"
+  [selectedSkills]="selectedSkills">
+</app-job-preview>
 </div>
