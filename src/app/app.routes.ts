@@ -51,6 +51,13 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/profiles/company-profile/company-profile').then((m) => m.CompanyProfile),
       },
+      {
+        path: 'profile',
+        canMatch: [authGuard, userAccessGuard],
+        data: { restrictedUserTypes: [UserRole.Employer] },
+        loadComponent: () =>
+          import('./features/profiles/user-profile/user-profile').then((m) => m.UserProfile),
+      },
     ],
   },
   {
