@@ -25,6 +25,7 @@ export class CompanyProfile implements OnInit {
   isTyping: boolean = false;
   profileCompletion: number = 0;
   logoPreview: string | null = null;
+  coverPreview: string | null = null;
   companySizeLabel: string = '';
 
   constructor(
@@ -134,6 +135,18 @@ export class CompanyProfile implements OnInit {
 
   triggerLogoUpload(): void {
     document.getElementById('logoInput')?.click();
+  }
+
+  onCoverChange(event: Event): void {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => { this.coverPreview = e.target?.result as string; };
+    reader.readAsDataURL(file);
+  }
+
+  triggerCoverUpload(): void {
+    document.getElementById('coverInput')?.click();
   }
 
   generateDescriptionWithAI(): void {
