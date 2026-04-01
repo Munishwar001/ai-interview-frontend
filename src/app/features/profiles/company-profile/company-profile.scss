@@ -1,0 +1,8 @@
+// All styles handled via Tailwind CSS utility classes in the template.
+// Add component-specific overrides here if needed.
+
+:host {
+  display: block;
+  height: 100%;
+  overflow-y: auto;
+}
