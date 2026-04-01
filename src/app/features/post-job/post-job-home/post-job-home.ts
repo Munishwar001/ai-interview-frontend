@@ -1,4 +1,4 @@
-import { Component, OnInit ,ViewChild ,ElementRef} from '@angular/core';
+import { Component, OnInit,ViewChild,ElementRef} from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -6,15 +6,18 @@ import { Icons } from '../../../shared/icons/icons';
 import { Lookup } from '../../../shared/services/lookup';
 import { AppInput } from '../../../shared/components/app-input/app-input';
 import { JobService } from '../services/post-job';
+import { JobPreviewComponent } from '../job-preview/job-preview.component';
 import { marked } from 'marked';
 
 @Component({
   selector: 'app-post-job-home',
-  imports: [ReactiveFormsModule, FormsModule, CommonModule, Icons, AppInput],
+  imports: [ReactiveFormsModule, FormsModule, CommonModule, Icons, AppInput, JobPreviewComponent],
   templateUrl: './post-job-home.html',
   styleUrl: './post-job-home.scss',
 })
 export class PostJobHome implements OnInit {
+  @ViewChild('preview')
+  previewComponent!: JobPreviewComponent;
   jobForm: FormGroup;
   jobTypes: any[] = [];
   skills: any[] = [];
@@ -44,13 +47,27 @@ export class PostJobHome implements OnInit {
     });
   }
 
-  get title() { return this.jobForm.get('title')!; }
-  get location() { return this.jobForm.get('location')!; }
-  get jobType() { return this.jobForm.get('jobType')!; }
-  get salaryMin() { return this.jobForm.get('salaryMin')!; }
-  get salaryMax() { return this.jobForm.get('salaryMax')!; }
-  get requiredSkills() { return this.jobForm.get('requiredSkills')!; }
-  get jobDescription() { return this.jobForm.get('jobDescription')!; }
+  get title() {
+    return this.jobForm.get('title')!;
+  }
+  get location() {
+    return this.jobForm.get('location')!;
+  }
+  get jobType() {
+    return this.jobForm.get('jobType')!;
+  }
+  get salaryMin() {
+    return this.jobForm.get('salaryMin')!;
+  }
+  get salaryMax() {
+    return this.jobForm.get('salaryMax')!;
+  }
+  get requiredSkills() {
+    return this.jobForm.get('requiredSkills')!;
+  }
+  get jobDescription() {
+    return this.jobForm.get('jobDescription')!;
+  }
 
   ngOnInit(): void {
     this.getJobTypes();
@@ -58,7 +75,7 @@ export class PostJobHome implements OnInit {
   }
 
   onPreview() {
-    console.log('Preview:', this.jobForm.value);
+    this.previewComponent.open();
   }
 
   onSubmit() {
