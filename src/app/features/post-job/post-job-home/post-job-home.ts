@@ -6,6 +6,7 @@ import { Icons } from '../../../shared/icons/icons';
 import { Lookup } from '../../../shared/services/lookup';
 import { AppInput } from '../../../shared/components/app-input/app-input';
 import { JobService } from '../services/post-job';
+import { marked } from 'marked';
 
 @Component({
   selector: 'app-post-job-home',
@@ -174,12 +175,8 @@ export class PostJobHome implements OnInit {
     });
   }
 
-  markdownToHtml(text: string): string {
-  return text
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')  
-    .replace(/\*(.*?)\*/g, '<em>$1</em>')              
-    .replace(/^- (.+)/gm, '• $1')                      
-    .replace(/\n/g, '<br>');                    
+ markdownToHtml(text: string): string {
+  return marked.parse(text) as string;
 }
 
 onDescriptionInput(event: Event) {

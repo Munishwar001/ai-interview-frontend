@@ -1,5 +1,7 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './auth/guard/auth-guard';
+import { UserRole } from './shared/enums/UserRole ';
+import { userAccessGuard } from './core/guard/user-access-guard';
 
 export const routes: Routes = [
   {
@@ -30,8 +32,24 @@ export const routes: Routes = [
     children: [
       {
         path: 'post-job',
+         canMatch: [authGuard, userAccessGuard],
+         data: {restrictedUserTypes: [UserRole.JobSeeker]},
         loadComponent: () =>
           import('./features/post-job/post-job-home/post-job-home').then((m) => m.PostJobHome),
+      },
+      {
+        path: 'posted-jobs',
+        canMatch: [authGuard, userAccessGuard],
+        data: { restrictedUserTypes: [UserRole.JobSeeker] },
+        loadComponent: () =>
+          import('./features/posted-job/posted-job-home/posted-job-home').then((m) => m.PostedJobHome),
+      },
+      {
+        path: 'company-profile',
+        canMatch: [authGuard, userAccessGuard],
+        data: { restrictedUserTypes: [UserRole.JobSeeker] },
+        loadComponent: () =>
+          import('./features/profiles/company-profile/company-profile').then((m) => m.CompanyProfile),
       },
     ],
   },

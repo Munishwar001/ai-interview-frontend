@@ -27,9 +27,9 @@ export class LandingpageHero implements AfterViewInit, OnDestroy {
   constructor(private router: Router, private ngZone: NgZone) {}
 
   rotatingWords: string[] = [
-    'Quicker',
-    'Sharper',
     'Smarter', 
+    'Quicker',
+    'Sharper'
   ];
 
   stats: Stat[] = [

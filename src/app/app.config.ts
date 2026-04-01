@@ -6,6 +6,7 @@ import { provideToastr } from 'ngx-toastr';
 import { routes } from './app.routes';
 import { authInterceptor } from './auth/auth-interceptor';
 import { environment } from '../../environment/environment';
+import { errorInterceptor } from '../app/core/interceptors/error-interceptor';
 import {
   GoogleLoginProvider,
   SocialAuthService,
@@ -19,7 +20,7 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes,withInMemoryScrolling({ scrollPositionRestoration: 'top', anchorScrolling: 'enabled' })),
-    provideHttpClient(withInterceptors([authInterceptor])),
+    provideHttpClient(withInterceptors([authInterceptor ,errorInterceptor])),
     provideAnimations(),
     provideToastr({
       positionClass: 'toast-top-right',

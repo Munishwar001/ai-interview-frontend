@@ -11,10 +11,15 @@
 >
   <!-- Logo -->
   <div class="flex items-center gap-2 px-4 sm:px-5 py-4 sm:py-5 border-b border-gray-100">
-    <div class="w-8 sm:w-9 h-8 sm:h-9 bg-indigo-600 rounded-lg sm:rounded-xl flex items-center justify-center shrink-0">
+    <div
+      class="w-8 sm:w-9 h-8 sm:h-9 bg-indigo-600 rounded-lg sm:rounded-xl flex items-center justify-center shrink-0"
+    >
       <app-icon [name]="'logo'"></app-icon>
     </div>
-    <span class="text-lg sm:text-xl font-bold text-slate-800 overflow-hidden whitespace-nowrap" *ngIf="isSidebarOpen">
+    <span
+      class="text-lg sm:text-xl font-bold text-slate-800 overflow-hidden whitespace-nowrap"
+      *ngIf="isSidebarOpen"
+    >
       Job<span class="text-indigo-600">AI</span>
     </span>
   </div>
@@ -47,7 +52,6 @@
 
   <!-- User Profile at bottom -->
   <div class="px-3 sm:px-4 py-3 sm:py-4 border-t border-gray-100 relative">
-
     <!-- Popup Menu (appears above) -->
     <div
       *ngIf="isProfileMenuOpen"
@@ -92,21 +96,23 @@
       class="flex items-center gap-2 sm:gap-3 w-full text-left rounded-lg hover:bg-gray-100 p-1 sm:p-1.5 transition-colors text-xs sm:text-sm"
       [ngClass]="{ 'justify-center': !isSidebarOpen }"
     >
-      <!-- Avatar -->
+      <!-- Avatar — now shows first letter of real name -->
       <div
         class="w-7 sm:w-8 h-7 sm:h-8 rounded-full bg-violet-200 text-violet-700 flex items-center justify-center font-semibold text-xs shrink-0"
       >
-        A
+        {{ avatarLetter }}
       </div>
 
       <!-- Name & Email (only when sidebar is open) -->
       <ng-container *ngIf="isSidebarOpen">
         <div class="flex-1 min-w-0">
-          <p class="text-sm font-medium text-gray-800 truncate">admin</p>
-          <p class="text-xs text-gray-400 truncate">admin&#64;necho.com</p>
+          <p class="text-sm font-medium text-gray-800 truncate">
+            {{ userState?.fullName || 'User' }}
+          </p>
+          <p class="text-xs text-gray-400 truncate">{{ userState?.email || '' }}</p>
         </div>
 
-        <!-- Chevron (rotates when open) -->
+        <!-- Chevron -->
         <svg
           class="w-4 h-4 text-gray-400 transition-transform duration-200 shrink-0"
           [ngClass]="{ 'rotate-180': isProfileMenuOpen }"
@@ -114,7 +120,12 @@
           stroke="currentColor"
           viewBox="0 0 24 24"
         >
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M19 9l-7 7-7-7"
+          />
         </svg>
       </ng-container>
     </button>
@@ -122,8 +133,4 @@
 </aside>
 
 <!-- Backdrop to close menu when clicking outside -->
-<div
-  *ngIf="isProfileMenuOpen"
-  (click)="closeProfileMenu()"
-  class="fixed inset-0 z-40"
-></div>
+<div *ngIf="isProfileMenuOpen" (click)="closeProfileMenu()" class="fixed inset-0 z-40"></div>
