@@ -1,4 +1,4 @@
-import { Component, OnInit,ViewChild,ElementRef} from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -8,6 +8,7 @@ import { AppInput } from '../../../shared/components/app-input/app-input';
 import { JobService } from '../services/post-job';
 import { JobPreviewComponent } from '../job-preview/job-preview.component';
 import { marked } from 'marked';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-post-job-home',
@@ -18,6 +19,9 @@ import { marked } from 'marked';
 export class PostJobHome implements OnInit {
   @ViewChild('preview')
   previewComponent!: JobPreviewComponent;
+
+  @ViewChild('descriptionBox') descriptionBox!: ElementRef;
+
   jobForm: FormGroup;
   jobTypes: any[] = [];
   skills: any[] = [];
@@ -28,12 +32,11 @@ export class PostJobHome implements OnInit {
   isGenerating: boolean = false;
   isTyping: boolean = false;
 
-  @ViewChild('descriptionBox') descriptionBox!: ElementRef;
-
   constructor(
     private fb: FormBuilder,
     private lookup: Lookup,
     private jobService: JobService,
+    private toastr: ToastrService
   ) {
     this.jobForm = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(3)]],
@@ -47,27 +50,12 @@ export class PostJobHome implements OnInit {
     });
   }
 
-  get title() {
-    return this.jobForm.get('title')!;
-  }
-  get location() {
-    return this.jobForm.get('location')!;
-  }
-  get jobType() {
-    return this.jobForm.get('jobType')!;
-  }
-  get salaryMin() {
-    return this.jobForm.get('salaryMin')!;
-  }
-  get salaryMax() {
-    return this.jobForm.get('salaryMax')!;
-  }
-  get requiredSkills() {
-    return this.jobForm.get('requiredSkills')!;
-  }
-  get jobDescription() {
-    return this.jobForm.get('jobDescription')!;
-  }
+  get title() { return this.jobForm.get('title')!; }
+  get location() { return this.jobForm.get('location')!; }
+  get jobType() { return this.jobForm.get('jobType')!; }
+  get salaryMin() { return this.jobForm.get('salaryMin')!; }
+  get salaryMax() { return this.jobForm.get('salaryMax')!; }
+  get requiredSkills() { return this.jobForm.get('requiredSkills')!; }
 
   ngOnInit(): void {
     this.getJobTypes();
@@ -81,39 +69,36 @@ export class PostJobHome implements OnInit {
   onSubmit() {
     if (this.jobForm.invalid) {
       this.jobForm.markAllAsTouched();
+      this.toastr.warning('Please fill all required fields.', 'Validation'); 
       return;
     }
     const payload = this.jobForm.value;
-    console.log('Payload:', payload);
     this.jobService.createJob(payload).subscribe({
       next: (res) => {
         console.log('Job Created:', res);
-        alert('Job posted successfully 🔥');
+         this.toastr.success('Job posted successfully!', 'Success');
         this.jobForm.reset();
+        if (this.descriptionBox) {
+          this.descriptionBox.nativeElement.innerHTML = '';
+        }
       },
       error: (err) => {
         console.error('Error creating job', err);
-        alert('Something went wrong ❌');
+        this.toastr.error('Something went wrong. Please try again.', 'Error');
       },
     });
   }
 
   getJobTypes() {
     this.lookup.getJobTypes().subscribe({
-      next: (res) => {
-        console.log('Job Types:', res);
-        this.jobTypes = res;
-      },
+      next: (res) => { this.jobTypes = res; },
       error: (err) => console.error(err),
     });
   }
 
   getSkills() {
     this.lookup.getSkills().subscribe({
-      next: (res) => {
-        console.log('Skills:', res);
-        this.skills = res;
-      },
+      next: (res) => { this.skills = res; },
       error: (err) => console.error(err),
     });
   }
@@ -136,16 +121,12 @@ export class PostJobHome implements OnInit {
     this.skillSearch = '';
     this.filteredSkills = [];
     this.showDropdown = false;
-    this.jobForm.patchValue({
-      skillIds: this.selectedSkills.map(s => s.id)
-    });
+    this.jobForm.patchValue({ skillIds: this.selectedSkills.map(s => s.id) });
   }
 
   removeSkill(skill: any) {
     this.selectedSkills = this.selectedSkills.filter((s) => s.id !== skill.id);
-    this.jobForm.patchValue({
-      skillIds: this.selectedSkills.map(s => s.id)
-    });
+    this.jobForm.patchValue({ skillIds: this.selectedSkills.map(s => s.id) });
   }
 
   onBlur() {
@@ -165,9 +146,18 @@ export class PostJobHome implements OnInit {
     );
   }
 
+  markdownToHtml(text: string): string {
+    return marked.parse(text) as string;
+  }
+
+  onDescriptionInput(event: Event) {
+    const el = event.target as HTMLElement;
+    this.jobForm.patchValue({ description: el.innerText });
+  }
+
   generateWithAI() {
     if (!this.jobForm.value.title) {
-      alert('Please enter job title first ⚠️');
+        this.toastr.warning('Please enter job title first.', 'Required');
       return;
     }
 
@@ -179,50 +169,44 @@ export class PostJobHome implements OnInit {
     this.isGenerating = true;
     this.jobForm.patchValue({ description: '' });
 
+    // Clear the div immediately
+    if (this.descriptionBox) {
+      this.descriptionBox.nativeElement.innerHTML = '';
+    }
+
     this.jobService.generateDescription(payload).subscribe({
       next: (res) => {
         this.isGenerating = false;
         this.typewriterEffect(res.description);
+        this.toastr.success('Description generated!', 'AI');
       },
       error: (err) => {
         this.isGenerating = false;
         console.error('AI Error:', err);
-        alert('Failed to generate description ❌');
       }
     });
   }
 
- markdownToHtml(text: string): string {
-  return marked.parse(text) as string;
-}
+  typewriterEffect(text: string) {
+    this.isTyping = true;
+    let i = 0;
+    let currentText = '';
+    this.jobForm.patchValue({ description: '' });
 
-onDescriptionInput(event: Event) {
-  const el = event.target as HTMLElement;
-  this.jobForm.patchValue({ description: el.innerText });
-}
-
- typewriterEffect(text: string) {
-  this.isTyping = true;
-  let i = 0;
-  let currentText = '';
-  this.jobForm.patchValue({ description: '' });
-
-  const interval = setInterval(() => {
-    if (i < text.length) {
-      currentText += text.charAt(i);
-      // Update the div's HTML with parsed markdown
-      if (this.descriptionBox) {
-        this.descriptionBox.nativeElement.innerHTML = this.markdownToHtml(currentText);
-        // Auto scroll to bottom
-        this.descriptionBox.nativeElement.scrollTop = 
-          this.descriptionBox.nativeElement.scrollHeight;
+    const interval = setInterval(() => {
+      if (i < text.length) {
+        currentText += text.charAt(i);
+        if (this.descriptionBox) {
+          this.descriptionBox.nativeElement.innerHTML = this.markdownToHtml(currentText);
+          this.descriptionBox.nativeElement.scrollTop =
+            this.descriptionBox.nativeElement.scrollHeight;
+        }
+        this.jobForm.patchValue({ description: currentText });
+        i++;
+      } else {
+        clearInterval(interval);
+        this.isTyping = false;
       }
-      this.jobForm.patchValue({ description: currentText });
-      i++;
-    } else {
-      clearInterval(interval);
-      this.isTyping = false;
-    }
-  }, 18);
-}
+    }, 18);
+  }
 }

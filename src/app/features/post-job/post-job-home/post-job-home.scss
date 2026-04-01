@@ -4,4 +4,24 @@
   display: block;
   height: 100%;
   overflow: hidden;
+}/* Placeholder for the contenteditable description box */
+
+.description-box:empty::before {
+  content: 'Enter your job description here...';
+  color: #9ca3af;
+  pointer-events: none;
+}
+
+/* Prose styling for markdown rendered inside the box */
+.description-box {
+  h1, h2, h3 { font-weight: 600; margin-bottom: 0.5rem; }
+  h1 { font-size: 1.25rem; }
+  h2 { font-size: 1.1rem; }
+  h3 { font-size: 1rem; }
+  ul, ol { padding-left: 1.25rem; margin-bottom: 0.5rem; }
+  ul { list-style-type: disc; }
+  ol { list-style-type: decimal; }
+  li { margin-bottom: 0.25rem; }
+  p { margin-bottom: 0.5rem; }
+  strong { font-weight: 600; }
 }
