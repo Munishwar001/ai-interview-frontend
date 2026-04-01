@@ -1,43 +1,43 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { environment } from '../../../../../../environment/environment';
-
-@Injectable({ providedIn: 'root' })
+@Injectable({
+  providedIn: 'root'
+})
 export class CompanyProfileService {
+
   private readonly baseUrl = `${environment.apiUrl}/CompanyProfile`;
 
   constructor(private http: HttpClient) {}
 
   getProfile(): Observable<any> {
-    return this.http.get<any>(`${this.baseUrl}/me`).pipe(
+    return this.http.get<any>(this.baseUrl + '/me').pipe(
       catchError((error) => {
-        if (error.status === 404) return of(null);
-        throw error;
+        if (error.status === 404) {
+          // Handle 404 error gracefully
+          console.warn('Profile not found, returning default profile.');
+          return of(null); // Return a default value or null
+        }
+        throw error; // Re-throw other errors
       })
     );
   }
 
-  /** PUT /CompanyProfile — application/json */
   saveProfile(payload: any): Observable<any> {
     return this.http.put<any>(this.baseUrl, payload);
   }
 
-  /** POST /CompanyProfile/upload-images — multipart/form-data */
-  uploadImages(logoFile?: File | null, coverFile?: File | null): Observable<any> {
-    const fd = new FormData();
-    if (logoFile)  fd.append('logo',        logoFile,  logoFile.name);
-    if (coverFile) fd.append('coverImage',  coverFile, coverFile.name);
-    return this.http.post<any>(`${this.baseUrl}/upload-images`, fd);
+  uploadLogo(file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('logo', file);
+    return this.http.post<any>(`${this.baseUrl}/logo`, formData);
   }
 
-  /** POST /CompanyProfile/generate-description */
-  generateDescription(companyName: string, industry: string, tagline: string): Observable<{ description: string }> {
-    return this.http.post<{ description: string }>(`${this.baseUrl}/generate-description`, {
-      companyName,
-      industry,
-      tagline,
-    });
+  uploadCover(file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('cover', file);
+    return this.http.post<any>(`${this.baseUrl}/cover`, formData);
   }
 }
