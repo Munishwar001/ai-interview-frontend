@@ -25,6 +25,7 @@ export class CompanyProfile implements OnInit {
   isGenerating: boolean = false;
   isTyping: boolean = false;
   profileCompletion: number = 0;
+  currentYear = new Date().getFullYear();
   logoPreview: string | null = null;
   coverPreview: string | null = null;
   companySizeLabel: string = '';
@@ -42,8 +43,17 @@ export class CompanyProfile implements OnInit {
       website: [''],
       industry: [''],
       companySizeId: [''],
+      foundedYear: [''],
       city: [''],
+      state: [''],
       country: [''],
+      addressLine1: [''],
+      addressLine2: [''],
+      postalCode: [''],
+      phone: [''],
+      email: [''],
+      linkedInUrl: [''],
+      twitterUrl: [''],
     });
   }
 
@@ -66,8 +76,17 @@ export class CompanyProfile implements OnInit {
             website: res.website,
             industry: res.industry,
             companySizeId: res.companySizeId,
+            foundedYear: res.foundedYear,
             city: res.city,
+            state: res.state,
             country: res.country,
+            addressLine1: res.addressLine1,
+            addressLine2: res.addressLine2,
+            postalCode: res.postalCode,
+            phone: res.phone,
+            email: res.email,
+            linkedInUrl: res.linkedInUrl,
+            twitterUrl: res.twitterUrl,
           });
           this.profileCompletion = res.profileCompletionPercentage ?? 0;
           this.logoPreview = res.logoUrl ?? null;
@@ -99,6 +118,7 @@ export class CompanyProfile implements OnInit {
       ...formValue,
       description: this.rawDescription || formValue.description,
       companySizeId: formValue.companySizeId ? Number(formValue.companySizeId) : null,
+      foundedYear: formValue.foundedYear ? Number(formValue.foundedYear) : null,
     };
     this.companyProfileService.saveProfile(payload).subscribe({
       next: () => {
