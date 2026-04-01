@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit,ViewChild,ElementRef} from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -6,6 +6,7 @@ import { Icons } from '../../../shared/icons/icons';
 import { Lookup } from '../../../shared/services/lookup';
 import { AppInput } from '../../../shared/components/app-input/app-input';
 import { JobService } from '../services/post-job';
+import { JobPreviewComponent } from '../job-preview/job-preview.component';
 @Component({
   selector: 'app-post-job-home',
   imports: [ReactiveFormsModule, FormsModule, CommonModule, Icons, AppInput, JobPreviewComponent],
