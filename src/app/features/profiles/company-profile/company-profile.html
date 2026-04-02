@@ -1,17 +1,16 @@
 <div class="min-h-screen bg-gray-50 px-8 py-8">
 
   <!-- Loading -->
-  <div *ngIf="isLoading" class="flex items-center justify-center py-24">
-    <div class="flex flex-col items-center gap-3">
-      <svg class="w-8 h-8 animate-spin text-purple-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
-      </svg>
-      <p class="text-sm text-gray-500">Loading profile...</p>
+  @if (isLoading) {
+    <div class="flex items-center justify-center py-24">
+      <div class="flex flex-col items-center gap-3">
+        <app-icon name="spinner" class="w-8 h-8 text-purple-600"/>
+        <p class="text-sm text-gray-500">Loading profile...</p>
+      </div>
     </div>
-  </div>
+  }
 
-  <ng-container *ngIf="!isLoading">
-
+  @if (!isLoading) {
     <!-- Page Header -->
     <div class="flex items-start justify-between mb-6">
       <div>
@@ -22,24 +21,27 @@
         <p class="text-sm text-gray-500 mt-1">Manage your company information and employer brand</p>
       </div>
       <div class="flex items-center gap-2">
-        <button *ngIf="isEditing" type="button" (click)="onDiscard()"
-          class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 bg-white text-gray-700 text-sm font-semibold hover:border-purple-400 hover:text-purple-700 transition cursor-pointer">
-          Discard Changes
-        </button>
-        <button *ngIf="!isEditing" type="button" (click)="toggleEdit()"
-          class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 bg-white text-gray-700 text-sm font-semibold hover:border-purple-400 hover:text-purple-700 transition cursor-pointer">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Z"/>
-          </svg>
-          Edit Profile
-        </button>
-        <button *ngIf="isEditing" type="button" (click)="onSubmit()" [disabled]="isSaving"
-          class="inline-flex items-center gap-2 px-5 py-2 rounded-lg bg-purple-700 text-white text-sm font-semibold hover:bg-indigo-700 transition disabled:opacity-50 disabled:pointer-events-none cursor-pointer">
-          <svg *ngIf="isSaving" class="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
-          </svg>
-          💾 {{ isSaving ? 'Saving...' : 'Save Changes' }}
-        </button>
+        @if (isEditing) {
+          <button type="button" (click)="onDiscard()"
+            class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 bg-white text-gray-700 text-sm font-semibold hover:border-purple-400 hover:text-purple-700 transition cursor-pointer">
+            Discard Changes
+          </button>
+        }
+        @if (!isEditing) {
+          <button type="button" (click)="toggleEdit()"
+            class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 bg-white text-gray-700 text-sm font-semibold hover:border-purple-400 hover:text-purple-700 transition cursor-pointer">
+            <app-icon name="edit" class="w-4 h-4"/>
+            Edit Profile
+          </button>
+        }
+        @if (isEditing) {
+          <button type="button" (click)="onSubmit()" [disabled]="isSaving"
+            class="inline-flex items-center gap-2 px-5 py-2 rounded-lg bg-purple-700 text-white text-sm font-semibold hover:bg-indigo-700 transition disabled:opacity-50 disabled:pointer-events-none cursor-pointer">
+            @if (isSaving) { <app-icon name="spinner" class="w-4 h-4"/> }
+            @if (!isSaving) { <app-icon name="save" class="w-4 h-4"/> }
+            {{ isSaving ? 'Saving...' : 'Save Changes' }}
+          </button>
+        }
       </div>
     </div>
 
@@ -66,23 +68,22 @@
     <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
       <div class="grid grid-cols-2 gap-5">
 
-        <!-- Brand & Identity (full width) -->
+        <!-- Brand & Identity -->
         <div class="col-span-2 bg-white border border-gray-200 rounded-2xl overflow-hidden">
           <div class="px-6 py-4 border-b border-gray-100">
             <h2 class="text-sm font-bold text-gray-900">Brand &amp; Identity</h2>
             <p class="text-xs text-gray-400 mt-0.5">Your company's visual presence</p>
           </div>
           <div class="relative h-36 bg-gradient-to-r from-purple-700 via-indigo-600 to-cyan-500 overflow-hidden">
-            <img *ngIf="coverPreview" [src]="coverPreview" alt="Cover" class="w-full h-full object-cover"/>
+            @if (coverPreview) {
+              <img [src]="coverPreview" alt="Cover" class="w-full h-full object-cover"/>
+            }
             <div class="absolute inset-0 opacity-10"
               style="background-image: radial-gradient(circle at 20% 50%, white 1px, transparent 1px), radial-gradient(circle at 80% 20%, white 1px, transparent 1px); background-size: 40px 40px;">
             </div>
             <button type="button" (click)="triggerCoverUpload()"
               class="absolute top-3 right-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-white/20 backdrop-blur-sm border border-white/30 hover:bg-white/30 transition cursor-pointer">
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z"/>
-                <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM18.75 10.5h.008v.008h-.008V10.5Z"/>
-              </svg>
+              <app-icon name="camera" class="w-3.5 h-3.5"/>
               Change Cover
             </button>
             <input id="coverInput" type="file" accept="image/*" class="hidden" (change)="onCoverChange($event)"/>
@@ -91,32 +92,25 @@
             <div class="flex items-end justify-between -mt-9 mb-5 relative z-10">
               <div class="relative cursor-pointer" (click)="triggerLogoUpload()">
                 <div class="w-[72px] h-[72px] rounded-2xl bg-white border-[3px] border-white shadow-lg flex items-center justify-center overflow-hidden">
-                  <img *ngIf="logoPreview" [src]="logoPreview" alt="Logo" class="w-full h-full object-cover rounded-xl"/>
-                  <span *ngIf="!logoPreview" class="text-2xl font-black text-purple-700">
-                    {{ profileForm.value.companyName?.charAt(0) || 'C' }}
-                  </span>
+                  @if (logoPreview) {
+                    <img [src]="logoPreview" alt="Logo" class="w-full h-full object-cover rounded-xl"/>
+                  } @else {
+                    <span class="text-2xl font-black text-purple-700">
+                      {{ profileForm.value.companyName?.charAt(0) || 'C' }}
+                    </span>
+                  }
                 </div>
                 <div class="absolute -bottom-1 -right-1 w-6 h-6 bg-purple-700 rounded-full flex items-center justify-center border-2 border-white">
-                  <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Z"/>
-                  </svg>
+                  <app-icon name="edit" class="w-3 h-3 text-white"/>
                 </div>
                 <input id="logoInput" type="file" accept="image/*" class="hidden" (change)="onLogoChange($event)"/>
               </div>
             </div>
             <div class="grid grid-cols-2 gap-4">
-              <div>
-                <label class="block text-xs font-semibold text-gray-700 mb-1.5">Company Name <span class="text-red-500">*</span></label>
-                <div *ngIf="!isEditing" class="text-sm text-gray-900 py-2">{{ profileForm.value.companyName || 'Not set' }}</div>
-                <input *ngIf="isEditing" type="text" formControlName="companyName" placeholder="e.g., TechCorp Solutions"
-                  class="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"/>
-              </div>
-              <div>
-                <label class="block text-xs font-semibold text-gray-700 mb-1.5">Tagline</label>
-                <div *ngIf="!isEditing" class="text-sm text-gray-900 py-2">{{ profileForm.value.tagline || 'Not set' }}</div>
-                <input *ngIf="isEditing" type="text" formControlName="tagline" placeholder="e.g., Building the future of work"
-                  class="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"/>
-              </div>
+              <app-input label="Company Name" controlName="companyName" placeholder="e.g., TechCorp Solutions"
+                [isEditing]="isEditing" [viewValue]="profileForm.value.companyName" [required]="true"/>
+              <app-input label="Tagline" controlName="tagline" placeholder="e.g., Building the future of work"
+                [isEditing]="isEditing" [viewValue]="profileForm.value.tagline"/>
             </div>
           </div>
         </div>
@@ -128,33 +122,14 @@
             <p class="text-xs text-gray-400 mt-0.5">Core details about your company</p>
           </div>
           <div class="px-6 py-5 flex flex-col gap-4">
-            <div>
-              <label class="block text-xs font-semibold text-gray-700 mb-1.5">Industry</label>
-              <div *ngIf="!isEditing" class="text-sm text-gray-900 py-2">{{ profileForm.value.industry || 'Not set' }}</div>
-              <input *ngIf="isEditing" type="text" formControlName="industry" placeholder="e.g., Technology, Finance"
-                class="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"/>
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-gray-700 mb-1.5">Company Size</label>
-              <div *ngIf="!isEditing" class="text-sm text-gray-900 py-2">{{ companySizeLabel || 'Not set' }}</div>
-              <input *ngIf="isEditing" type="number" formControlName="companySizeId" placeholder="Company size ID"
-                class="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"/>
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-gray-700 mb-1.5">Founded Year</label>
-              <div *ngIf="!isEditing" class="text-sm text-gray-900 py-2">{{ profileForm.value.foundedYear || 'Not set' }}</div>
-              <input *ngIf="isEditing" type="number" formControlName="foundedYear" placeholder="e.g. 2010" min="1800" [max]="currentYear"
-                class="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"/>
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-gray-700 mb-1.5">Website</label>
-              <div *ngIf="!isEditing" class="text-sm text-gray-900 py-2">{{ profileForm.value.website || 'Not set' }}</div>
-              <div *ngIf="isEditing" class="flex rounded-lg border border-gray-300 overflow-hidden focus-within:ring-2 focus-within:ring-purple-500 focus-within:border-transparent transition">
-                <span class="px-3 py-2.5 bg-gray-50 text-gray-400 text-xs font-semibold border-r border-gray-300 whitespace-nowrap">https://</span>
-                <input type="text" formControlName="website" placeholder="www.yourcompany.com"
-                  class="flex-1 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none bg-white"/>
-              </div>
-            </div>
+            <app-select label="Industry" controlName="industry" placeholder="Select industry..."
+              [options]="industryOptions" [isEditing]="isEditing" [searchable]="true"/>
+            <app-select label="Company Size" controlName="companySizeId" placeholder="Select company size..."
+              [options]="companySizeOptions" [isEditing]="isEditing"/>
+            <app-input label="Founded Year" controlName="foundedYear" type="number" placeholder="e.g. 2010"
+              [isEditing]="isEditing" [viewValue]="profileForm.value.foundedYear"/>
+            <app-input label="Website" controlName="website" placeholder="www.yourcompany.com"
+              prefix="https://" [isEditing]="isEditing" [viewValue]="profileForm.value.website"/>
           </div>
         </div>
 
@@ -169,80 +144,49 @@
           </div>
           <div class="px-6 py-5 flex flex-col gap-3">
             <label class="block text-xs font-semibold text-gray-700">Description</label>
-
-            <!-- View mode -->
-            <div *ngIf="!isEditing" class="text-sm text-gray-900 py-2 whitespace-pre-line min-h-[80px]"
-              [innerHTML]="profileForm.value.description || 'Not set'">
-            </div>
-
-            <!-- Edit mode -->
-            <ng-container *ngIf="isEditing">
-              <div #descriptionBox
-                contenteditable="true"
-                (input)="onDescriptionInput($event)"
-                class="w-full min-h-[160px] px-3.5 py-2.5 rounded-lg border border-gray-300 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition overflow-y-auto prose prose-sm max-w-none"
-                [attr.data-placeholder]="'Describe your company culture, mission, and what makes it a great place to work...'">
+            @if (!isEditing) {
+              <div class="text-sm text-gray-900 py-2 prose prose-sm max-w-none min-h-[80px]"
+                [innerHTML]="md.parse(profileForm.value.description || '')">
               </div>
-
+            }
+            @if (isEditing) {
+              <div #descriptionBox contenteditable="true" (input)="onDescriptionInput($event)"
+                class="w-full min-h-[160px] px-3.5 py-2.5 rounded-lg border border-gray-300 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition overflow-y-auto prose prose-sm max-w-none"
+                [attr.data-placeholder]="'Describe your company culture, mission...'">
+              </div>
               <button type="button" (click)="generateDescriptionWithAI()" [disabled]="isGenerating || isTyping"
                 class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-purple-700 text-white text-sm font-semibold hover:bg-indigo-700 transition disabled:opacity-60 disabled:pointer-events-none cursor-pointer">
-                <svg *ngIf="isGenerating || isTyping" class="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
-                </svg>
-                <span *ngIf="!isGenerating && !isTyping">✦ Generate with AI</span>
-                <span *ngIf="isGenerating">Generating...</span>
-                <span *ngIf="isTyping">Writing...</span>
+                @if (isGenerating || isTyping) { <app-icon name="spinner" class="w-4 h-4"/> }
+                @if (!isGenerating && !isTyping) { ✦ Generate with AI }
+                @if (isGenerating) { Generating... }
+                @if (isTyping) { Writing... }
               </button>
-            </ng-container>
+            }
           </div>
         </div>
 
-        <!-- Location -->
+        <!-- Location & Address -->
         <div class="bg-white border border-gray-200 rounded-2xl">
           <div class="px-6 py-4 border-b border-gray-100">
             <h2 class="text-sm font-bold text-gray-900">Location &amp; Address</h2>
             <p class="text-xs text-gray-400 mt-0.5">Where is your company based?</p>
           </div>
           <div class="px-6 py-5 flex flex-col gap-4">
-            <div>
-              <label class="block text-xs font-semibold text-gray-700 mb-1.5">Address Line 1</label>
-              <div *ngIf="!isEditing" class="text-sm text-gray-900 py-2">{{ profileForm.value.addressLine1 || 'Not set' }}</div>
-              <input *ngIf="isEditing" type="text" formControlName="addressLine1" placeholder="Street address, P.O. box"
-                class="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"/>
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-gray-700 mb-1.5">Address Line 2</label>
-              <div *ngIf="!isEditing" class="text-sm text-gray-900 py-2">{{ profileForm.value.addressLine2 || '—' }}</div>
-              <input *ngIf="isEditing" type="text" formControlName="addressLine2" placeholder="Apartment, suite, unit, building (optional)"
-                class="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"/>
+            <app-input label="Address Line 1" controlName="addressLine1" placeholder="Street address, P.O. box"
+              [isEditing]="isEditing" [viewValue]="profileForm.value.addressLine1"/>
+            <app-input label="Address Line 2" controlName="addressLine2" placeholder="Apartment, suite, unit (optional)"
+              [isEditing]="isEditing" [viewValue]="profileForm.value.addressLine2"/>
+            <div class="grid grid-cols-2 gap-3">
+              <app-input label="City" controlName="city" placeholder="City"
+                [isEditing]="isEditing" [viewValue]="profileForm.value.city"/>
+              <app-input label="State / Province" controlName="state" placeholder="State"
+                [isEditing]="isEditing" [viewValue]="profileForm.value.state"/>
             </div>
             <div class="grid grid-cols-2 gap-3">
-              <div>
-                <label class="block text-xs font-semibold text-gray-700 mb-1.5">City</label>
-                <div *ngIf="!isEditing" class="text-sm text-gray-900 py-2">{{ profileForm.value.city || 'Not set' }}</div>
-                <input *ngIf="isEditing" type="text" formControlName="city" placeholder="City"
-                  class="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"/>
-              </div>
-              <div>
-                <label class="block text-xs font-semibold text-gray-700 mb-1.5">State / Province</label>
-                <div *ngIf="!isEditing" class="text-sm text-gray-900 py-2">{{ profileForm.value.state || 'Not set' }}</div>
-                <input *ngIf="isEditing" type="text" formControlName="state" placeholder="State"
-                  class="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"/>
-              </div>
-            </div>
-            <div class="grid grid-cols-2 gap-3">
-              <div>
-                <label class="block text-xs font-semibold text-gray-700 mb-1.5">Postal Code</label>
-                <div *ngIf="!isEditing" class="text-sm text-gray-900 py-2">{{ profileForm.value.postalCode || 'Not set' }}</div>
-                <input *ngIf="isEditing" type="text" formControlName="postalCode" placeholder="e.g. 10001"
-                  class="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"/>
-              </div>
-              <div>
-                <label class="block text-xs font-semibold text-gray-700 mb-1.5">Country</label>
-                <div *ngIf="!isEditing" class="text-sm text-gray-900 py-2">{{ profileForm.value.country || 'Not set' }}</div>
-                <input *ngIf="isEditing" type="text" formControlName="country" placeholder="Country"
-                  class="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"/>
-              </div>
+              <app-input label="Postal Code" controlName="postalCode" placeholder="e.g. 10001"
+                [isEditing]="isEditing" [viewValue]="profileForm.value.postalCode"/>
+              <app-input label="Country" controlName="country" placeholder="Country"
+                [isEditing]="isEditing" [viewValue]="profileForm.value.country"/>
             </div>
           </div>
         </div>
@@ -254,40 +198,18 @@
             <p class="text-xs text-gray-400 mt-0.5">How candidates can reach you</p>
           </div>
           <div class="px-6 py-5 flex flex-col gap-4">
-            <div>
-              <label class="block text-xs font-semibold text-gray-700 mb-1.5">Email</label>
-              <div *ngIf="!isEditing" class="text-sm text-gray-900 py-2">{{ profileForm.value.email || 'Not set' }}</div>
-              <input *ngIf="isEditing" type="email" formControlName="email" placeholder="contact@company.com"
-                class="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"/>
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-gray-700 mb-1.5">Phone</label>
-              <div *ngIf="!isEditing" class="text-sm text-gray-900 py-2">{{ profileForm.value.phone || 'Not set' }}</div>
-              <input *ngIf="isEditing" type="tel" formControlName="phone" placeholder="+1 (555) 000-0000"
-                class="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"/>
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-gray-700 mb-1.5">LinkedIn</label>
-              <div *ngIf="!isEditing" class="text-sm text-gray-900 py-2">{{ profileForm.value.linkedInUrl || 'Not set' }}</div>
-              <div *ngIf="isEditing" class="flex rounded-lg border border-gray-300 overflow-hidden focus-within:ring-2 focus-within:ring-purple-500 focus-within:border-transparent transition">
-                <span class="px-3 py-2.5 bg-gray-50 text-gray-400 text-xs font-semibold border-r border-gray-300 whitespace-nowrap">linkedin.com/company/</span>
-                <input type="text" formControlName="linkedInUrl" placeholder="your-company"
-                  class="flex-1 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none bg-white"/>
-              </div>
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-gray-700 mb-1.5">Twitter / X</label>
-              <div *ngIf="!isEditing" class="text-sm text-gray-900 py-2">{{ profileForm.value.twitterUrl || 'Not set' }}</div>
-              <div *ngIf="isEditing" class="flex rounded-lg border border-gray-300 overflow-hidden focus-within:ring-2 focus-within:ring-purple-500 focus-within:border-transparent transition">
-                <span class="px-3 py-2.5 bg-gray-50 text-gray-400 text-xs font-semibold border-r border-gray-300 whitespace-nowrap">x.com/</span>
-                <input type="text" formControlName="twitterUrl" placeholder="yourhandle"
-                  class="flex-1 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none bg-white"/>
-              </div>
-            </div>
+            <app-input label="Email" controlName="email" type="email" placeholder="contact@company.com"
+              [isEditing]="isEditing" [viewValue]="profileForm.value.email"/>
+            <app-input label="Phone" controlName="phone" type="tel" placeholder="+1 (555) 000-0000"
+              [isEditing]="isEditing" [viewValue]="profileForm.value.phone"/>
+            <app-input label="LinkedIn" controlName="linkedInUrl" placeholder="your-company"
+              prefix="linkedin.com/company/" [isEditing]="isEditing" [viewValue]="profileForm.value.linkedInUrl"/>
+            <app-input label="Twitter / X" controlName="twitterUrl" placeholder="yourhandle"
+              prefix="x.com/" [isEditing]="isEditing" [viewValue]="profileForm.value.twitterUrl"/>
           </div>
         </div>
 
-        <!-- Profile Settings (full width) -->
+        <!-- Profile Settings -->
         <div class="col-span-2 bg-white border border-gray-200 rounded-2xl">
           <div class="px-6 py-4 border-b border-gray-100">
             <h2 class="text-sm font-bold text-gray-900">Profile Settings</h2>
@@ -316,20 +238,20 @@
       </div>
 
       <!-- Footer Save -->
-      <div *ngIf="isEditing" class="flex justify-end gap-3 mt-6 pt-5 border-t border-gray-200">
-        <button type="button" (click)="onDiscard()"
-          class="px-5 py-2 rounded-lg border border-gray-300 bg-white text-gray-700 text-sm font-semibold hover:border-purple-400 hover:text-purple-700 transition cursor-pointer">
-          Discard Changes
-        </button>
-        <button type="submit" [disabled]="isSaving"
-          class="inline-flex items-center gap-2 px-5 py-2 rounded-lg bg-purple-700 text-white text-sm font-semibold hover:bg-indigo-700 transition disabled:opacity-50 cursor-pointer">
-          <svg *ngIf="isSaving" class="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
-          </svg>
-          💾 {{ isSaving ? 'Saving...' : 'Save Changes' }}
-        </button>
-      </div>
-
+      @if (isEditing) {
+        <div class="flex justify-end gap-3 mt-6 pt-5 border-t border-gray-200">
+          <button type="button" (click)="onDiscard()"
+            class="px-5 py-2 rounded-lg border border-gray-300 bg-white text-gray-700 text-sm font-semibold hover:border-purple-400 hover:text-purple-700 transition cursor-pointer">
+            Discard Changes
+          </button>
+          <button type="submit" [disabled]="isSaving"
+            class="inline-flex items-center gap-2 px-5 py-2 rounded-lg bg-purple-700 text-white text-sm font-semibold hover:bg-indigo-700 transition disabled:opacity-50 cursor-pointer">
+            @if (isSaving) { <app-icon name="spinner" class="w-4 h-4"/> }
+             @if (!isSaving) { <app-icon name="save" class="w-4 h-4"/> }
+            {{ isSaving ? 'Saving...' : 'Save Changes' }}
+          </button>
+        </div>
+      }
     </form>
-  </ng-container>
+  }
 </div>
