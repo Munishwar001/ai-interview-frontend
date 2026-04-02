@@ -7,7 +7,7 @@ import { Lookup } from '../../../shared/services/lookup';
 import { AppInput } from '../../../shared/components/app-input/app-input';
 import { JobService } from '../services/post-job';
 import { JobPreviewComponent } from '../job-preview/job-preview.component';
-import { marked } from 'marked';
+import { MarkdownService } from '../../../shared/services/markdown.service';
 import { ToastrService } from 'ngx-toastr';
 
 @Component({
@@ -36,7 +36,8 @@ export class PostJobHome implements OnInit {
     private fb: FormBuilder,
     private lookup: Lookup,
     private jobService: JobService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    public md: MarkdownService
   ) {
     this.jobForm = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(3)]],
@@ -147,7 +148,7 @@ export class PostJobHome implements OnInit {
   }
 
   markdownToHtml(text: string): string {
-    return marked.parse(text) as string;
+    return this.md.parse(text);
   }
 
   onDescriptionInput(event: Event) {

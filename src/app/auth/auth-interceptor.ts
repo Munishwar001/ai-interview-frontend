@@ -88,8 +88,6 @@ const addAuthenticationToken = (request: HttpRequest<unknown>, localStorageServi
   }
 
   return request.clone({
-    setHeaders: {
-      Authorization: `Bearer ${token.accessToken}`
-    }
+    setHeaders: { Authorization: `Bearer ${token.accessToken}` }
   });
 };
