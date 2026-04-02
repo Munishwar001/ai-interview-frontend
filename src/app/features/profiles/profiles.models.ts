@@ -13,8 +13,11 @@ export interface Education {
   id: string;
   degree: string;
   institution: string;
-  location: string;
-  year: string;
+  fieldOfStudy?: string;
+  startYear: number;
+  endYear?: number;
+  isCurrent: boolean;
+  description?: string;
 }
 
 export interface SocialLinks {
@@ -32,6 +35,7 @@ export interface UserProfileData {
   profileCompletion: number;
   socialLinks: SocialLinks;
   resume: File | null;
+  resumeFileName?: string;
   experience: Experience[];
   education: Education[];
   skills: string[];

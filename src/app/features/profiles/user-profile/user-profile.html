@@ -140,10 +140,7 @@
               </button>
             </div>
             <div *ngIf="showMapPicker()" class="mt-2">
-              <app-map-picker
-                [zoom]="3"
-                (locationSelected)="onLocationSelected($event)"
-              ></app-map-picker>
+              <app-location-search (locationSelected)="onLocationSelected($event)"></app-location-search>
             </div>
           </div>
 
@@ -238,22 +235,31 @@
       <!-- Hidden file input -->
       <input id="resumeInput" type="file" accept=".pdf,.doc,.docx" class="hidden" (change)="onResumeSelected($event)" />
 
+      <!-- Uploading state -->
+      <div *ngIf="isUploadingResume()"
+           class="border-2 border-dashed border-violet-200 rounded-xl p-8 text-center bg-violet-50/30">
+        <svg class="w-8 h-8 text-violet-400 animate-spin mx-auto mb-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+        </svg>
+        <p class="text-sm text-violet-600 font-medium">Uploading resume...</p>
+      </div>
+
       <!-- No resume: drop zone -->
-      <div *ngIf="!resumeFileName()"
+      <div *ngIf="!resumeFileName() && !isUploadingResume()"
            (click)="triggerResumeUpload()"
            class="border-2 border-dashed border-gray-200 rounded-xl p-8 text-center cursor-pointer hover:border-violet-400 hover:bg-violet-50/30 transition group">
         <svg class="w-10 h-10 text-gray-300 group-hover:text-violet-400 mx-auto mb-3 transition" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/>
         </svg>
         <p class="text-sm font-medium text-gray-600 group-hover:text-violet-700">Upload your resume</p>
-        <p class="text-xs text-gray-400 mt-1">PDF or DOC up to 10MB</p>
+        <p class="text-xs text-gray-400 mt-1">PDF or DOC up to 5MB</p>
         <button class="mt-4 px-4 py-1.5 text-xs font-medium border border-gray-200 rounded-lg hover:bg-gray-50 transition text-gray-600">
           Choose File
         </button>
       </div>
 
       <!-- Resume uploaded: file row with actions -->
-      <div *ngIf="resumeFileName()"
+      <div *ngIf="resumeFileName() && !isUploadingResume()"
            class="flex items-center gap-3 p-4 rounded-xl bg-violet-50 border border-violet-100">
         <!-- Icon -->
         <div class="w-10 h-10 rounded-lg bg-violet-100 flex items-center justify-center shrink-0">
@@ -362,7 +368,7 @@
     <div *ngIf="showAddExperience()"
          class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
          (click)="cancelExperience()">
-      <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 space-y-4 max-h-[90vh] overflow-y-auto" (click)="$event.stopPropagation()">
+      <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6 space-y-4 max-h-[90vh] overflow-y-auto" (click)="$event.stopPropagation()">
         <h2 class="text-lg font-semibold text-gray-900">{{ editingExperienceId() ? 'Edit' : 'Add' }} Experience</h2>
         <div class="grid grid-cols-1 gap-3">
           <div>
@@ -393,18 +399,22 @@
               </button>
             </div>
             <div *ngIf="showExpMapPicker()" class="mt-2">
-              <app-map-picker [zoom]="3" (locationSelected)="onExpLocationSelected($event)"></app-map-picker>
+              <app-location-search (locationSelected)="onExpLocationSelected($event)"></app-location-search>
             </div>
           </div>
           <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="field-label">Start Date</label>
-              <input [(ngModel)]="newExperience.startDate" class="input-field" placeholder="Jan 2022"/>
-            </div>
-            <div>
-              <label class="field-label">End Date</label>
-              <input [(ngModel)]="newExperience.endDate" class="input-field" placeholder="Dec 2023" [disabled]="newExperience.current ?? false"/>
-            </div>
+            <app-date-picker
+              label="Start Date"
+              placeholder="Select start date"
+              [value]="newExperience.startDate ?? ''"
+              (valueChange)="newExperience.startDate = $event"/>
+            <app-date-picker
+              label="End Date"
+              placeholder="Select end date"
+              [value]="newExperience.endDate ?? ''"
+              (valueChange)="newExperience.endDate = $event"
+              [class.pointer-events-none]="newExperience.current"
+              [class.opacity-40]="newExperience.current"/>
           </div>
           <label class="flex items-center gap-2 text-xs text-gray-600 cursor-pointer">
             <input type="checkbox" [(ngModel)]="newExperience.current" class="rounded accent-violet-600"/>
@@ -453,19 +463,13 @@
           </div>
           <div class="flex-1 min-w-0">
             <p class="text-sm font-semibold text-gray-900">{{ edu.degree }}</p>
-            <p class="text-xs text-gray-500 mt-0.5">{{ edu.institution }}</p>
+            <p class="text-xs text-gray-500 mt-0.5">{{ edu.institution }}<span *ngIf="edu.fieldOfStudy"> · {{ edu.fieldOfStudy }}</span></p>
             <div class="flex flex-wrap gap-2 mt-1 text-xs text-gray-400">
-              <span class="flex items-center gap-1">
-                <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                </svg>
-                {{ edu.location }}
-              </span>
               <span class="flex items-center gap-1">
                 <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                 </svg>
-                {{ edu.year }}
+                {{ edu.startYear }} – {{ edu.isCurrent ? 'Present' : (edu.endYear || '') }}
               </span>
             </div>
           </div>
@@ -483,8 +487,8 @@
           </div>
         </div>
 
-        <div *ngIf="profile().education.length === 0" class="text-center py-8 text-sm text-gray-400">
-          No education added yet.
+        <div *ngIf="profile().education.length === 0">
+            
         </div>
       </div>
     </section>
@@ -493,7 +497,7 @@
     <div *ngIf="showAddEducation()"
          class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
          (click)="cancelEducation()">
-      <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 space-y-4" (click)="$event.stopPropagation()">
+      <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6 space-y-4 max-h-[90vh] overflow-y-auto" (click)="$event.stopPropagation()">
         <h2 class="text-lg font-semibold text-gray-900">{{ editingEducationId() ? 'Edit' : 'Add' }} Education</h2>
         <div class="grid grid-cols-1 gap-3">
           <div>
@@ -505,31 +509,27 @@
             <input [(ngModel)]="newEducation.institution" class="input-field" placeholder="e.g. Stanford University"/>
           </div>
           <div>
-            <label class="field-label">Location</label>
-            <div class="flex gap-2">
-              <input [(ngModel)]="newEducation.location" class="input-field flex-1" placeholder="City, State"/>
-              <button
-                type="button"
-                (click)="showEduMapPicker.set(!showEduMapPicker())"
-                class="shrink-0 px-3 py-2 text-xs font-medium border border-gray-200 rounded-xl hover:bg-violet-50 hover:border-violet-300 hover:text-violet-700 transition flex items-center gap-1.5"
-                [class.bg-violet-50]="showEduMapPicker()"
-                [class.border-violet-300]="showEduMapPicker()"
-                [class.text-violet-700]="showEduMapPicker()"
-              >
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                </svg>
-                Map
-              </button>
+            <label class="field-label">Field of Study</label>
+            <input [(ngModel)]="newEducation.fieldOfStudy" class="input-field" placeholder="e.g. Computer Science"/>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="field-label">Start Year</label>
+              <input [(ngModel)]="newEducation.startYear" type="number" class="input-field" placeholder="e.g. 2018" min="1950" [max]="currentYear"/>
             </div>
-            <div *ngIf="showEduMapPicker()" class="mt-2">
-              <app-map-picker [zoom]="3" (locationSelected)="onEduLocationSelected($event)"></app-map-picker>
+            <div>
+              <label class="field-label">End Year</label>
+              <input [(ngModel)]="newEducation.endYear" type="number" class="input-field" placeholder="e.g. 2022"
+                [disabled]="newEducation.isCurrent ?? false" min="1950" [max]="currentYear + 10"/>
             </div>
           </div>
+          <label class="flex items-center gap-2 text-xs text-gray-600 cursor-pointer">
+            <input type="checkbox" [(ngModel)]="newEducation.isCurrent" class="rounded accent-violet-600"/>
+            Currently studying here
+          </label>
           <div>
-            <label class="field-label">Graduation Year</label>
-            <input [(ngModel)]="newEducation.year" class="input-field" placeholder="2024"/>
+            <label class="field-label">Description</label>
+            <textarea [(ngModel)]="newEducation.description" class="input-field min-h-20 resize-y" placeholder="Achievements, activities..."></textarea>
           </div>
         </div>
         <div class="flex gap-2 pt-2">
@@ -563,17 +563,35 @@
         </span>
       </div>
 
-      <div class="flex gap-2">
-        <input
-          [ngModel]="newSkill()"
-          (ngModelChange)="newSkill.set($event)"
-          (keydown)="onSkillKeydown($event)"
-          class="input-field flex-1"
-          placeholder="Add a skill and press Enter…"
-        />
-        <button (click)="addSkill()" class="btn-primary px-4 py-2 text-xs">Add</button>
+      <div class="relative">
+        <div class="relative">
+          <svg class="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none"
+               fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z"/>
+          </svg>
+          <input
+            [(ngModel)]="skillSearch"
+            (ngModelChange)="skillDropdownVisible = true"
+            (focus)="skillDropdownVisible = true"
+            (blur)="onSkillBlur()"
+            class="input-field pl-8"
+            placeholder="Search and add a skill…"
+          />
+        </div>
+        <div *ngIf="skillDropdownVisible && filteredSkills.length > 0"
+             class="absolute z-50 top-full mt-1 w-full bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden max-h-48 overflow-y-auto">
+          <button *ngFor="let s of filteredSkills"
+            type="button"
+            (mousedown)="selectSkill(s)"
+            class="w-full text-left px-3.5 py-2 text-sm text-gray-700 hover:bg-violet-50 hover:text-violet-700 transition border-b border-gray-50 last:border-0">
+            {{ s.name }}
+          </button>
+        </div>
       </div>
     </section>
 
   </div>
 </div>
+
+
+

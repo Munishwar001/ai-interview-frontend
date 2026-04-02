@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { AppInput } from '../../../shared/components/app-input/app-input';
 import { AppSelect, SelectOption } from '../../../shared/components/app-select/app-select';
 import { Icons } from '../../../shared/icons/icons';
-import { MapPickerComponent } from '../../../shared/components/map-picker/map-picker';
+import { LocationSearch } from '../../../shared/components/location-search/location-search';
 import { ToastrService } from 'ngx-toastr';
 import { CompanyProfileService } from './Services/company-profile.service';
 import { MarkdownService } from '../../../shared/services/markdown.service';
@@ -13,7 +13,7 @@ import { Lookup, lookup } from '../../../shared/services/lookup';
 
 @Component({
   selector: 'app-company-profile',
-  imports: [ReactiveFormsModule, CommonModule, AppInput, AppSelect, Icons, MapPickerComponent],
+  imports: [ReactiveFormsModule, CommonModule, AppInput, AppSelect, Icons, LocationSearch],
   templateUrl: './company-profile.html',
   styleUrl: './company-profile.scss',
 })
@@ -33,9 +33,6 @@ export class CompanyProfile implements OnInit {
   coverPreview: string | null = null;
   companySizeLabel: string = '';
   companySizes: lookup[] = [];
-  selectedLat: number | null = null;
-  selectedLng: number | null = null;
-  showCompanyMap = false;
   private logoFile: File | null = null;
   private coverFile: File | null = null;
 
@@ -170,7 +167,6 @@ export class CompanyProfile implements OnInit {
 
   onDiscard(): void {
     this.isEditing = false;
-    this.showCompanyMap = false;
     this.loadProfile();
   }
 
@@ -291,37 +287,14 @@ export class CompanyProfile implements OnInit {
     this.profileForm.patchValue({ description: el.innerText });
   }
 
-  onCompanyLocationSelected(event: { latlng: { lat: number; lng: number }; address: string }) {
-    this.selectedLat = event.latlng.lat;
-    this.selectedLng = event.latlng.lng;
-    // Re-fetch structured address to fill individual fields
-    fetch(`https://nominatim.openstreetmap.org/reverse?lat=${event.latlng.lat}&lon=${event.latlng.lng}&format=json`)
-      .then(r => r.json())
-      .then(data => {
-        const a = data.address ?? {};
-        this.profileForm.patchValue({
-          city:       a.city || a.town || a.village || a.county || '',
-          state:      a.state || '',
-          country:    a.country || '',
-          postalCode: a.postcode || '',
-        });
-      });
-    this.showCompanyMap = false;
-  }
-
-  get staticMapUrl(): string | null {
-    if (this.selectedLat === null || this.selectedLng === null) return null;
-    const lat = this.selectedLat;
-    const lng = this.selectedLng;
-    const zoom = 13;
-    const size = '600x200';
-    // Use OpenStreetMap static tiles via staticmap service
-    return `https://staticmap.openstreetmap.de/staticmap.php?center=${lat},${lng}&zoom=${zoom}&size=${size}&markers=${lat},${lng},red-pushpin`;
-  }
-
-  get directionsUrl(): string | null {
-    if (this.selectedLat === null || this.selectedLng === null) return null;
-    return `https://www.openstreetmap.org/?mlat=${this.selectedLat}&mlon=${this.selectedLng}&zoom=14`;
+  onCompanyLocationSelected(event: { address: string; structured: any }) {
+    const a = event.structured;
+    this.profileForm.patchValue({
+      city:       a.city || a.town || a.village || a.county || '',
+      state:      a.state || '',
+      country:    a.country || '',
+      postalCode: a.postcode || '',
+    });
   }
 
   get cityStateLine(): string {
