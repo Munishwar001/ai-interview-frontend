@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { AppInput } from '../../../shared/components/app-input/app-input';
 import { AppSelect, SelectOption } from '../../../shared/components/app-select/app-select';
 import { Icons } from '../../../shared/icons/icons';
+import { MapPickerComponent } from '../../../shared/components/map-picker/map-picker';
 import { ToastrService } from 'ngx-toastr';
 import { CompanyProfileService } from './Services/company-profile.service';
 import { MarkdownService } from '../../../shared/services/markdown.service';
@@ -12,7 +13,7 @@ import { Lookup, lookup } from '../../../shared/services/lookup';
 
 @Component({
   selector: 'app-company-profile',
-  imports: [ReactiveFormsModule, CommonModule, AppInput, AppSelect, Icons],
+  imports: [ReactiveFormsModule, CommonModule, AppInput, AppSelect, Icons, MapPickerComponent],
   templateUrl: './company-profile.html',
   styleUrl: './company-profile.scss',
 })
@@ -32,6 +33,7 @@ export class CompanyProfile implements OnInit {
   coverPreview: string | null = null;
   companySizeLabel: string = '';
   companySizes: lookup[] = [];
+  showCompanyMap = false;
   private logoFile: File | null = null;
   private coverFile: File | null = null;
 
@@ -166,6 +168,7 @@ export class CompanyProfile implements OnInit {
 
   onDiscard(): void {
     this.isEditing = false;
+    this.showCompanyMap = false;
     this.loadProfile();
   }
 
@@ -284,6 +287,27 @@ export class CompanyProfile implements OnInit {
     const el = event.target as HTMLElement;
     this.rawDescription = el.innerText;
     this.profileForm.patchValue({ description: el.innerText });
+  }
+
+  onCompanyLocationSelected(event: { latlng: { lat: number; lng: number }; address: string }) {
+    // Re-fetch structured address to fill individual fields
+    fetch(`https://nominatim.openstreetmap.org/reverse?lat=${event.latlng.lat}&lon=${event.latlng.lng}&format=json`)
+      .then(r => r.json())
+      .then(data => {
+        const a = data.address ?? {};
+        this.profileForm.patchValue({
+          city:       a.city || a.town || a.village || a.county || '',
+          state:      a.state || '',
+          country:    a.country || '',
+          postalCode: a.postcode || '',
+        });
+      });
+    this.showCompanyMap = false;
+  }
+
+  get cityStateLine(): string {
+    const v = this.profileForm.value;
+    return [v.city, v.state, v.postalCode].filter((s: string) => !!s).join(', ');
   }
 
   private toAbsoluteUrl(path: string | null | undefined): string | null {
