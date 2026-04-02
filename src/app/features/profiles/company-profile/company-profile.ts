@@ -33,6 +33,8 @@ export class CompanyProfile implements OnInit {
   coverPreview: string | null = null;
   companySizeLabel: string = '';
   companySizes: lookup[] = [];
+  selectedLat: number | null = null;
+  selectedLng: number | null = null;
   showCompanyMap = false;
   private logoFile: File | null = null;
   private coverFile: File | null = null;
@@ -290,6 +292,8 @@ export class CompanyProfile implements OnInit {
   }
 
   onCompanyLocationSelected(event: { latlng: { lat: number; lng: number }; address: string }) {
+    this.selectedLat = event.latlng.lat;
+    this.selectedLng = event.latlng.lng;
     // Re-fetch structured address to fill individual fields
     fetch(`https://nominatim.openstreetmap.org/reverse?lat=${event.latlng.lat}&lon=${event.latlng.lng}&format=json`)
       .then(r => r.json())
@@ -303,6 +307,21 @@ export class CompanyProfile implements OnInit {
         });
       });
     this.showCompanyMap = false;
+  }
+
+  get staticMapUrl(): string | null {
+    if (this.selectedLat === null || this.selectedLng === null) return null;
+    const lat = this.selectedLat;
+    const lng = this.selectedLng;
+    const zoom = 13;
+    const size = '600x200';
+    // Use OpenStreetMap static tiles via staticmap service
+    return `https://staticmap.openstreetmap.de/staticmap.php?center=${lat},${lng}&zoom=${zoom}&size=${size}&markers=${lat},${lng},red-pushpin`;
+  }
+
+  get directionsUrl(): string | null {
+    if (this.selectedLat === null || this.selectedLng === null) return null;
+    return `https://www.openstreetmap.org/?mlat=${this.selectedLat}&mlon=${this.selectedLng}&zoom=14`;
   }
 
   get cityStateLine(): string {
