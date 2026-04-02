@@ -23,4 +23,12 @@ export class Lookup {
   getSkills() {
   return this.http.get<lookup[]>(`${this.baseUrl}/skills`);
   }
+
+  getCompanySizes(): Observable<lookup[]> {
+    return this.http.get<lookup[]>(`${this.baseUrl}/company-sizes`);
+  }
+
+  getIndustries(): Observable<lookup[]> {
+    return this.http.get<lookup[]>(`${this.baseUrl}/industries`);
+  }
 }
