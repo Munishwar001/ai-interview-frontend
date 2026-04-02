@@ -16,7 +16,7 @@ import { Lookup, lookup } from '../../../shared/services/lookup';
   templateUrl: './company-profile.html',
   styleUrl: './company-profile.scss',
 })
-export class CompanyProfile implements OnInit {
+
 export class CompanyProfile implements OnInit {
 
   @ViewChild('descriptionBox') descriptionBox!: ElementRef;
