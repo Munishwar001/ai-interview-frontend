@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { Icons } from '../../../shared/icons/icons';
 import { Lookup } from '../../../shared/services/lookup';
 import { AppInput } from '../../../shared/components/app-input/app-input';
+import { AppSelect, SelectOption } from '../../../shared/components/app-select/app-select';
 import { JobService } from '../services/post-job';
 import { JobPreviewComponent } from '../job-preview/job-preview.component';
 import { MarkdownService } from '../../../shared/services/markdown.service';
@@ -12,7 +13,7 @@ import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-post-job-home',
-  imports: [ReactiveFormsModule, FormsModule, CommonModule, Icons, AppInput, JobPreviewComponent],
+  imports: [ReactiveFormsModule, FormsModule, CommonModule, Icons, AppInput, AppSelect, JobPreviewComponent],
   templateUrl: './post-job-home.html',
   styleUrl: './post-job-home.scss',
 })
@@ -25,6 +26,10 @@ export class PostJobHome implements OnInit {
   jobForm: FormGroup;
   jobTypes: any[] = [];
   skills: any[] = [];
+
+  get jobTypeOptions(): SelectOption[] {
+    return this.jobTypes.map(t => ({ value: t.id, label: t.name }));
+  }
   selectedSkills: any[] = [];
   filteredSkills: any[] = [];
   skillSearch: string = '';

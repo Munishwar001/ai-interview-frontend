@@ -38,10 +38,10 @@ export interface SearchResult {
     .search-dropdown { max-height: 180px; overflow-y: auto; }
   `],
   template: `
-    <div class="space-y-2">
+    <div class="space-y-2 h-full flex flex-col">
 
       <!-- Search Box -->
-      <div class="relative">
+      <div class="relative shrink-0">
         <div class="flex gap-2">
           <div class="relative flex-1">
             <svg class="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none"
@@ -89,20 +89,24 @@ export interface SearchResult {
       </div>
 
       <!-- Map -->
-      <div #mapContainer class="w-full h-56 rounded-xl border border-gray-200 overflow-hidden"></div>
+      <div #mapContainer class="w-full rounded-xl border border-gray-200 overflow-hidden flex-1 min-h-0"
+           [style.height]="height === '100%' ? undefined : height"
+           [class.h-full]="height === '100%'"></div>
 
       <!-- Selected location label -->
-      @if (selectedAddress) {
-        <p class="text-xs text-gray-500 flex items-center gap-1">
-          <svg class="w-3.5 h-3.5 text-violet-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-          </svg>
-          {{ selectedAddress }}
-        </p>
-      } @else {
-        <p class="text-xs text-gray-400">Search or click on the map to pick a location</p>
-      }
+      <div class="shrink-0">
+        @if (selectedAddress) {
+          <p class="text-xs text-gray-500 flex items-center gap-1">
+            <svg class="w-3.5 h-3.5 text-violet-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+            {{ selectedAddress }}
+          </p>
+        } @else {
+          <p class="text-xs text-gray-400">Search or click on the map to pick a location</p>
+        }
+      </div>
     </div>
   `,
 })
@@ -111,6 +115,7 @@ export class MapPickerComponent implements AfterViewInit, OnDestroy {
   @Input() initialLat = 20;
   @Input() initialLng = 0;
   @Input() zoom = 2;
+  @Input() height = '400px';
   @Output() locationSelected = new EventEmitter<{ latlng: LatLng; address: string }>();
 
   private map!: L.Map;
@@ -132,6 +137,9 @@ export class MapPickerComponent implements AfterViewInit, OnDestroy {
     }).addTo(this.map);
 
     this.map.on('click', (e: L.LeafletMouseEvent) => this.onMapClick(e));
+
+    // Force Leaflet to recalculate size after the container is fully painted
+    setTimeout(() => this.map.invalidateSize(), 0);
   }
 
   // Debounced auto-suggest as user types

@@ -1,315 +1,127 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MapPickerComponent } from '../../../shared/components/map-picker/map-picker';
-import { Experience, Education, UserProfileData } from '../profiles.models';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { LocationSearch } from '../../../shared/components/location-search/location-search';
+import { DatePickerComponent } from '../../../shared/components/date-picker/date-picker';
+import { EmptyState } from '../../../shared/components/empty-state/empty-state';
+import { AppDatePipe } from '../../../shared/pipes/app-date.pipe';
+import { Experience, Education, LocationSelection } from '../profiles.models';
+import { ProfileStateService } from './services/profile-state.service';
+import { ExperienceStateService } from './services/experience-state.service';
+import { EducationStateService } from './services/education-state.service';
+import { SkillsStateService } from './services/skills-state.service';
 
 @Component({
   selector: 'app-user-profile',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, MapPickerComponent],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, LocationSearch, DatePickerComponent, EmptyState, AppDatePipe],
   templateUrl: './user-profile.html',
   styleUrl: './user-profile.scss',
+  providers: [ProfileStateService, ExperienceStateService, EducationStateService, SkillsStateService],
 })
-export class UserProfile {
-  // ── State ──────────────────────────────────────────────────────────────────
-  isEditingProfile = signal(false);
-  showAddExperience = signal(false);
-  showAddEducation = signal(false);
-  showMapPicker = signal(false);
-  showExpMapPicker = signal(false);
-  showEduMapPicker = signal(false);
-  newSkill = signal('');
-  editingExperienceId = signal<string | null>(null);
-  editingEducationId = signal<string | null>(null);
+export class UserProfile implements OnInit {
+  readonly currentYear = new Date().getFullYear();
 
-  profile = signal<UserProfileData>({
-    name: 'Admin',
-    title: 'Senior Frontend Developer',
-    location: 'San Francisco, CA',
-    email: 'admin@necho.com',
-    avatarInitial: 'A',
-    profileCompletion: 75,
-    socialLinks: {
-      linkedin: 'https://linkedin.com',
-      github: 'https://github.com',
-      website: 'https://mysite.com',
-    },
-    resume: null,
-    experience: [
-      {
-        id: '1',
-        title: 'Senior Frontend Developer',
-        company: 'TechCorp Inc.',
-        location: 'San Francisco, CA',
-        startDate: 'Jan 2022',
-        endDate: '',
-        current: true,
-        description: 'Led frontend development for enterprise SaaS products. Managed a team of 5 developers.',
-      },
-      {
-        id: '2',
-        title: 'Frontend Developer',
-        company: 'StartupXYZ',
-        location: 'Remote',
-        startDate: 'Jun 2020',
-        endDate: 'Dec 2021',
-        current: false,
-        description: 'Built responsive web applications using React and TypeScript.',
-      },
-    ],
-    education: [
-      {
-        id: '1',
-        degree: 'Bachelor of Science in Computer Science',
-        institution: 'Stanford University',
-        location: 'Stanford, CA',
-        year: '2020',
-      },
-    ],
-    skills: ['React', 'TypeScript', 'JavaScript', 'Node.js', 'Python', 'GraphQL', 'REST APIs', 'CSS/Tailwind', 'Git', 'Agile'],
-  });
+  constructor(
+    public ps: ProfileStateService,
+    public exp: ExperienceStateService,
+    public edu: EducationStateService,
+    public skills: SkillsStateService,
+  ) {}
 
-  // ── Reactive Form for Edit Profile ────────────────────────────────────────
-  profileForm!: FormGroup;
-
-  constructor(private fb: FormBuilder) {
-    this.profileForm = this.buildProfileForm();
+  ngOnInit() {
+    this.ps.load();
+    this.exp.load(this.ps.profile);
+    this.edu.load(this.ps.profile);
+    this.skills.load(this.ps.profile);
   }
 
-  /** Convenience getter for cleaner template access: f['name'], f['email'] etc. */
-  get f() {
-    return this.profileForm.controls;
+  // ── Profile ────────────────────────────────────────────────────────────────
+  get profile() { return this.ps.profile; }
+  get profileForm() { return this.ps.profileForm; }
+  get f() { return this.ps.f; }
+  get completionColor() { return this.ps.completionColor; }
+  get resumeFileName() { return this.ps.resumeFileName; }
+  get isLoading() { return this.ps.isLoading; }
+  get isSaving() { return this.ps.isSaving; }
+  get isEditingProfile() { return this.ps.isEditingProfile; }
+  get showMapPicker() { return this.ps.showMapPicker; }
+  get isUploadingResume() { return this.ps.isUploadingResume; }
+
+  openEditProfile() { this.ps.openEdit(); }
+  saveProfile() { this.ps.save(); }
+  cancelEditProfile() { this.ps.cancelEdit(); }
+
+  onLocationSelected(e: LocationSelection) {
+    this.ps.profileForm.patchValue({ location: e.address });
+    this.ps.showMapPicker.set(false);
   }
 
-  private buildProfileForm(): FormGroup {
-    const p = this.profile();
-    return this.fb.group({
-      name:     [p.name,     [Validators.required]],
-      title:    [p.title],
-      location: [p.location],
-      email:    [p.email,    [Validators.required, Validators.email]],
-      socialLinks: this.fb.group({
-        linkedin: [p.socialLinks.linkedin ?? ''],
-        github:   [p.socialLinks.github   ?? ''],
-        website:  [p.socialLinks.website  ?? ''],
-      }),
-    });
-  }
-
-  // ── Computed ───────────────────────────────────────────────────────────────
-  completionColor = computed(() => {
-    const pct = this.profile().profileCompletion;
-    if (pct >= 80) return 'bg-emerald-500';
-    if (pct >= 50) return 'bg-violet-500';
-    return 'bg-amber-500';
-  });
-
-  resumeFileName = computed(() => this.profile().resume?.name ?? null);
-
-  // ── Profile Edit ───────────────────────────────────────────────────────────
-  openEditProfile() {
-    const p = this.profile();
-    // Reset the form with the latest profile values each time the modal opens
-    this.profileForm.reset({
-      name:     p.name,
-      title:    p.title,
-      location: p.location,
-      email:    p.email,
-      socialLinks: {
-        linkedin: p.socialLinks.linkedin ?? '',
-        github:   p.socialLinks.github   ?? '',
-        website:  p.socialLinks.website  ?? '',
-      },
-    });
-    this.isEditingProfile.set(true);
-  }
-
-  saveProfile() {
-    if (this.profileForm.invalid) {
-      this.profileForm.markAllAsTouched();
-      return;
-    }
-
-    const val = this.profileForm.value;
-    this.profile.update(p => ({
-      ...p,
-      name:     val.name,
-      title:    val.title,
-      location: val.location,
-      email:    val.email,
-      // Update the avatarInitial to match the first letter of the new name
-      avatarInitial: (val.name as string).charAt(0).toUpperCase(),
-      socialLinks: {
-        linkedin: val.socialLinks.linkedin || undefined,
-        github:   val.socialLinks.github   || undefined,
-        website:  val.socialLinks.website  || undefined,
-      },
-    }));
-
-    this.isEditingProfile.set(false);
-  }
-
-  cancelEditProfile() {
-    this.isEditingProfile.set(false);
-    this.showMapPicker.set(false);
-  }
-
-  onLocationSelected(event: { latlng: { lat: number; lng: number }; address: string }) {
-    this.profileForm.patchValue({ location: event.address });
-    this.showMapPicker.set(false);
-  }
-
-  onExpLocationSelected(event: { latlng: { lat: number; lng: number }; address: string }) {
-    this.newExperience.location = event.address;
-    this.showExpMapPicker.set(false);
-  }
-
-  onEduLocationSelected(event: { latlng: { lat: number; lng: number }; address: string }) {
-    this.newEducation.location = event.address;
-    this.showEduMapPicker.set(false);
-  }
-
-  // ── Resume ─────────────────────────────────────────────────────────────────
   onResumeSelected(event: Event) {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0] ?? null;
-    if (file) this.profile.update(p => ({ ...p, resume: file }));
-    // Reset input so the same file can be re-selected after removal
-    input.value = '';
+    const file = (event.target as HTMLInputElement).files?.[0];
+    (event.target as HTMLInputElement).value = '';
+    if (file) this.ps.onResumeSelected(file);
   }
 
-  triggerResumeUpload() {
-    document.getElementById('resumeInput')?.click();
-  }
+  triggerResumeUpload() { document.getElementById('resumeInput')?.click(); }
+  removeResume() { this.ps.removeResume(); }
+  downloadResume() { this.ps.downloadResume(); }
+  printResume() { this.ps.printResume(); }
 
-  removeResume() {
-    this.profile.update(p => ({ ...p, resume: null }));
+  triggerAvatarUpload() { document.getElementById('avatarInput')?.click(); }
+  onAvatarSelected(event: Event) {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    (event.target as HTMLInputElement).value = '';
+    if (file) this.ps.onAvatarSelected(file);
   }
+  removeAvatar() { this.ps.removeAvatar(); }
+  get isUploadingAvatar() { return this.ps.isUploadingAvatar; }
+  get avatarUrl() { return this.ps.avatarUrl; }
+  get showAvatarModal() { return this.ps.showAvatarModal; }
 
   // ── Experience ─────────────────────────────────────────────────────────────
-  blankExperience(): Partial<Experience> {
-    return { title: '', company: '', location: '', startDate: '', endDate: '', current: false, description: '' };
-  }
+  get newExperience() { return this.exp.newExperience; }
+  get showAddExperience() { return this.exp.showModal; }
+  get editingExperienceId() { return this.exp.editingId; }
+  get showExpMapPicker() { return this.exp.showMapPicker; }
 
-  newExperience: Partial<Experience> = this.blankExperience();
+  openAddExperience() { this.exp.openAdd(); }
+  startEditExperience(e: Experience) { this.exp.openEdit(e); }
+  saveExperience() { this.exp.save(this.ps.profile); }
+  saveEditExperience() { this.exp.update(this.ps.profile); }
+  deleteExperience(id: string) { this.exp.delete(id, this.ps.profile); }
+  cancelExperience() { this.exp.cancel(); }
 
-  openAddExperience() {
-    this.newExperience = this.blankExperience();
-    this.showAddExperience.set(true);
-  }
-
-  saveExperience() {
-    const exp: Experience = {
-      id:          Date.now().toString(),
-      title:       this.newExperience.title       ?? '',
-      company:     this.newExperience.company     ?? '',
-      location:    this.newExperience.location    ?? '',
-      startDate:   this.newExperience.startDate   ?? '',
-      endDate:     this.newExperience.endDate     ?? '',
-      current:     this.newExperience.current     ?? false,
-      description: this.newExperience.description ?? '',
-    };
-    this.profile.update(p => ({ ...p, experience: [...p.experience, exp] }));
-    this.showAddExperience.set(false);
-  }
-
-  deleteExperience(id: string) {
-    this.profile.update(p => ({ ...p, experience: p.experience.filter(e => e.id !== id) }));
-  }
-
-  startEditExperience(exp: Experience) {
-    this.newExperience = { ...exp };
-    this.editingExperienceId.set(exp.id);
-    this.showAddExperience.set(true);
-  }
-
-  saveEditExperience() {
-    this.profile.update(p => ({
-      ...p,
-      experience: p.experience.map(e =>
-        e.id === this.editingExperienceId()
-          ? { ...e, ...this.newExperience, id: e.id }
-          : e
-      ),
-    }));
-    this.editingExperienceId.set(null);
-    this.showAddExperience.set(false);
-  }
-
-  cancelExperience() {
-    this.editingExperienceId.set(null);
-    this.showAddExperience.set(false);
-    this.showExpMapPicker.set(false);
+  onExpLocationSelected(e: LocationSelection) {
+    this.exp.newExperience.location = e.address;
+    this.exp.showMapPicker.set(false);
   }
 
   // ── Education ──────────────────────────────────────────────────────────────
-  blankEducation(): Partial<Education> {
-    return { degree: '', institution: '', location: '', year: '' };
-  }
+  get newEducation() { return this.edu.newEducation; }
+  get showAddEducation() { return this.edu.showModal; }
+  get editingEducationId() { return this.edu.editingId; }
+  get newEducationStartDate() { return this.edu.startYearInput; }
+  set newEducationStartDate(v: string) { this.edu.startYearInput = v; }
+  get newEducationEndDate() { return this.edu.endYearInput; }
+  set newEducationEndDate(v: string) { this.edu.endYearInput = v; }
 
-  newEducation: Partial<Education> = this.blankEducation();
-
-  openAddEducation() {
-    this.newEducation = this.blankEducation();
-    this.showAddEducation.set(true);
-  }
-
-  saveEducation() {
-    const edu: Education = {
-      id:          Date.now().toString(),
-      degree:      this.newEducation.degree      ?? '',
-      institution: this.newEducation.institution ?? '',
-      location:    this.newEducation.location    ?? '',
-      year:        this.newEducation.year        ?? '',
-    };
-    this.profile.update(p => ({ ...p, education: [...p.education, edu] }));
-    this.showAddEducation.set(false);
-  }
-
-  deleteEducation(id: string) {
-    this.profile.update(p => ({ ...p, education: p.education.filter(e => e.id !== id) }));
-  }
-
-  startEditEducation(edu: Education) {
-    this.newEducation = { ...edu };
-    this.editingEducationId.set(edu.id);
-    this.showAddEducation.set(true);
-  }
-
-  saveEditEducation() {
-    this.profile.update(p => ({
-      ...p,
-      education: p.education.map(e =>
-        e.id === this.editingEducationId()
-          ? { ...e, ...this.newEducation, id: e.id }
-          : e
-      ),
-    }));
-    this.editingEducationId.set(null);
-    this.showAddEducation.set(false);
-  }
-
-  cancelEducation() {
-    this.editingEducationId.set(null);
-    this.showAddEducation.set(false);
-    this.showEduMapPicker.set(false);
-  }
+  openAddEducation() { this.edu.openAdd(); }
+  startEditEducation(e: Education) { this.edu.openEdit(e); }
+  saveEducation() { this.edu.save(this.ps.profile); }
+  saveEditEducation() { this.edu.update(this.ps.profile); }
+  deleteEducation(id: string) { this.edu.delete(id, this.ps.profile); }
+  cancelEducation() { this.edu.cancel(); }
 
   // ── Skills ─────────────────────────────────────────────────────────────────
-  addSkill() {
-    const skill = this.newSkill().trim();
-    if (skill && !this.profile().skills.includes(skill)) {
-      this.profile.update(p => ({ ...p, skills: [...p.skills, skill] }));
-    }
-    this.newSkill.set('');
-  }
+  get filteredSkills() { return this.skills.filtered; }
+  get skillSearch() { return this.skills.search; }
+  set skillSearch(v: string) { this.skills.search = v; this.skills.dropdownVisible = true; }
+  get skillDropdownVisible() { return this.skills.dropdownVisible; }
+  set skillDropdownVisible(v: boolean) { this.skills.dropdownVisible = v; }
+  showSkillDropdown() { this.skills.dropdownVisible = true; }
 
-  removeSkill(skill: string) {
-    this.profile.update(p => ({ ...p, skills: p.skills.filter(s => s !== skill) }));
-  }
-
-  onSkillKeydown(event: KeyboardEvent) {
-    if (event.key === 'Enter') this.addSkill();
-  }
+  selectSkill(s: any) { this.skills.select(s, this.ps.profile); }
+  removeSkill(name: string) { this.skills.remove(name, this.ps.profile); }
+  onSkillBlur() { this.skills.onBlur(); }
 }

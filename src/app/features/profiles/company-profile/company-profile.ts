@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { AppInput } from '../../../shared/components/app-input/app-input';
 import { AppSelect, SelectOption } from '../../../shared/components/app-select/app-select';
 import { Icons } from '../../../shared/icons/icons';
+import { LocationSearch } from '../../../shared/components/location-search/location-search';
 import { ToastrService } from 'ngx-toastr';
 import { CompanyProfileService } from './Services/company-profile.service';
 import { MarkdownService } from '../../../shared/services/markdown.service';
@@ -12,7 +13,7 @@ import { Lookup, lookup } from '../../../shared/services/lookup';
 
 @Component({
   selector: 'app-company-profile',
-  imports: [ReactiveFormsModule, CommonModule, AppInput, AppSelect, Icons],
+  imports: [ReactiveFormsModule, CommonModule, AppInput, AppSelect, Icons, LocationSearch],
   templateUrl: './company-profile.html',
   styleUrl: './company-profile.scss',
 })
@@ -285,6 +286,21 @@ export class CompanyProfile implements OnInit {
     const el = event.target as HTMLElement;
     this.rawDescription = el.innerText;
     this.profileForm.patchValue({ description: el.innerText });
+  }
+
+  onCompanyLocationSelected(event: { address: string; structured: any }) {
+    const a = event.structured;
+    this.profileForm.patchValue({
+      city:       a.city || a.town || a.village || a.county || '',
+      state:      a.state || '',
+      country:    a.country || '',
+      postalCode: a.postcode || '',
+    });
+  }
+
+  get cityStateLine(): string {
+    const v = this.profileForm.value;
+    return [v.city, v.state, v.postalCode].filter((s: string) => !!s).join(', ');
   }
 
   private toAbsoluteUrl(path: string | null | undefined): string | null {

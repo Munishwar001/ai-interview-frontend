@@ -32,8 +32,8 @@ export const routes: Routes = [
     children: [
       {
         path: 'post-job',
-         canMatch: [authGuard, userAccessGuard],
-         data: {restrictedUserTypes: [UserRole.JobSeeker]},
+        canMatch: [authGuard, userAccessGuard],
+        data: { restrictedUserTypes: [UserRole.JobSeeker] },
         loadComponent: () =>
           import('./features/post-job/post-job-home/post-job-home').then((m) => m.PostJobHome),
       },
@@ -57,6 +57,20 @@ export const routes: Routes = [
         data: { restrictedUserTypes: [UserRole.Employer] },
         loadComponent: () =>
           import('./features/profiles/user-profile/user-profile').then((m) => m.UserProfile),
+      },
+      {
+        path: 'mock-interview',
+        canMatch: [authGuard, userAccessGuard],
+        data: { restrictedUserTypes: [UserRole.Employer] },
+        loadComponent: () =>
+          import('./features/mock-interview/mock-interview').then((m) => m.MockInterview),
+      },
+      {
+        path: 'chat-interview',
+        canMatch: [authGuard, userAccessGuard],
+        data: { restrictedUserTypes: [UserRole.Employer] },
+        loadComponent: () =>
+          import('./features/chat-interview/chat-interview').then((m) => m.ChatInterview),
       },
     ],
   },

@@ -1,25 +1,15 @@
 <!-- sidebar.html -->
 <aside
-  [ngClass]="{
-    'w-64': isSidebarOpen,
-    'w-20': !isSidebarOpen,
-    'hidden sm:w-64 sm:flex md:w-64': !isSidebarOpen,
-    'sm:w-64': isSidebarOpen,
-  }"
-  class="h-full transition-all duration-300 border-r border-gray-100 flex flex-col shadow-sm shrink-0 relative"
+  [ngClass]="isSidebarOpen ? 'w-64' : 'w-16'"
+  class="h-full transition-all duration-300 border-r border-gray-100 flex flex-col shadow-sm shrink-0 relative overflow-visible"
   style="background-color: #f9fafb"
 >
   <!-- Logo -->
   <div class="flex items-center gap-2 px-4 sm:px-5 py-4 sm:py-5 border-b border-gray-100">
-    <div
-      class="w-8 sm:w-9 h-8 sm:h-9 bg-indigo-600 rounded-lg sm:rounded-xl flex items-center justify-center shrink-0"
-    >
+    <div class="w-8 sm:w-9 h-8 sm:h-9 bg-indigo-600 rounded-lg sm:rounded-xl flex items-center justify-center shrink-0">
       <app-icon [name]="'logo'"></app-icon>
     </div>
-    <span
-      class="text-lg sm:text-xl font-bold text-slate-800 overflow-hidden whitespace-nowrap"
-      *ngIf="isSidebarOpen"
-    >
+    <span class="text-lg sm:text-xl font-bold text-slate-800 overflow-hidden whitespace-nowrap" *ngIf="isSidebarOpen">
       Job<span class="text-indigo-600">AI</span>
     </span>
   </div>
@@ -36,7 +26,7 @@
       [routerLink]="item.route"
       routerLinkActive="bg-violet-50 text-violet-700 font-medium"
       [routerLinkActiveOptions]="{ exact: item.exact || false }"
-      class="flex items-center gap-2 sm:gap-3 px-2 sm:px-3 py-2 sm:py-2.5 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900 text-xs sm:text-sm transition-colors"
+      class="relative flex items-center gap-2 sm:gap-3 px-2 sm:px-3 py-2 sm:py-2.5 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900 text-xs sm:text-sm transition-colors"
       [ngClass]="{ 'justify-center': !isSidebarOpen }"
     >
       <app-icon [name]="item.icon"></app-icon>
@@ -50,8 +40,7 @@
     </a>
   </nav>
 
-  <!-- User Profile at bottom -->
-  <div class="px-3 sm:px-4 py-3 sm:py-4 border-t border-gray-100 relative">
+  <!-- User Profile at bottom -->  <div class="px-3 sm:px-4 py-3 sm:py-4 border-t border-gray-100 relative">
     <!-- Popup Menu (appears above) -->
     <div
       *ngIf="isProfileMenuOpen"
