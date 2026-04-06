@@ -3,6 +3,8 @@ import { provideRouter ,withInMemoryScrolling } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideToastr } from 'ngx-toastr';
+import { provideLottieOptions } from 'ngx-lottie';
+import lottiePlayer from 'lottie-web';
 import { routes } from './app.routes';
 import { authInterceptor } from './auth/auth-interceptor';
 import { environment } from '../../environment/environment';
@@ -21,6 +23,9 @@ export const appConfig: ApplicationConfig = {
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes,withInMemoryScrolling({ scrollPositionRestoration: 'top', anchorScrolling: 'enabled' })),
     provideHttpClient(withInterceptors([authInterceptor ,errorInterceptor])),
+    provideLottieOptions({
+      player: () => lottiePlayer,
+    }),
     provideAnimations(),
     provideToastr({
       positionClass: 'toast-top-right',

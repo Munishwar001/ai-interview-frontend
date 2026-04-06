@@ -1,0 +1,84 @@
+<div class="flex flex-col w-full h-full bg-gradient-to-br from-slate-50 via-white to-indigo-50">
+  <!-- Header -->
+  <div class="px-6 py-6 bg-white border-b border-slate-200 shadow-sm">
+    <div>
+      <h2 class="text-xl font-bold text-slate-900">AI Mock Interview Chat</h2>
+      <p class="mt-1 text-sm text-slate-600">Practice your interview skills with real-time feedback</p>
+    </div>
+  </div>
+
+  <!-- Messages Container -->
+  <div class="flex-1 overflow-y-auto" #messagesContainer>
+    <div class="flex flex-col gap-4 p-6">
+      <!-- User and AI Messages -->
+      <div
+        *ngFor="let message of messages"
+        class="flex gap-3"
+        [ngClass]="message.sender === 'user' ? 'justify-end' : 'justify-start'"
+      >
+        <!-- AI Avatar with Lottie Animation -->
+        <div *ngIf="message.sender === 'ai'" class="flex-shrink-0">
+          <div 
+            [attr.data-ai-avatar]="message.id"
+            class="flex items-center justify-center w-10 h-10 rounded-full overflow-hidden"
+          ></div>
+        </div>
+
+        <!-- Message Content -->
+        <div [ngClass]="message.sender === 'user' ? 'flex flex-col items-end gap-1' : 'flex flex-col items-start gap-1'" class="max-w-xs md:max-w-md lg:max-w-lg">
+          <div
+            [ngClass]="message.sender === 'user'
+              ? 'bg-blue-500 text-white rounded-3xl rounded-tr-sm'
+              : 'bg-white text-slate-900 rounded-3xl rounded-tl-sm border border-slate-200'"
+            class="px-4 py-3 text-sm leading-relaxed"
+          >
+            {{ message.text }}
+          </div>
+          <span class="text-xs text-slate-500 px-4">{{ message.timestamp | date : 'short' }}</span>
+        </div>
+
+        <!-- User Avatar -->
+        <div *ngIf="message.sender === 'user'" class="flex-shrink-0">
+          <div class="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 text-white text-xs font-bold">
+            You
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading Indicator -->
+      <div *ngIf="isLoading" class="flex gap-3 justify-start">
+        <div class="flex-shrink-0">
+          <div 
+            data-ai-avatar="loading"
+            class="flex items-center justify-center w-10 h-10 rounded-full overflow-hidden"
+          ></div>
+        </div>
+        <div class="flex items-center gap-1 px-4 py-3 bg-white rounded-3xl rounded-tl-sm border border-slate-200">
+          Thinking...
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Input Area -->
+  <div class="bg-white border-t border-slate-200 flex-shrink-0 p-6">
+    <div class="flex gap-3 items-end">
+      <textarea
+        [(ngModel)]="inputMessage"
+        (keypress)="onKeyPress($event)"
+        placeholder="Type your response here... (Press Enter to send)"
+        class="flex-1 px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-3 focus:ring-purple-100 text-sm resize-none max-h-32 disabled:bg-slate-100 disabled:text-slate-500"
+        [disabled]="isLoading"
+        rows="2"
+      ></textarea>
+      <button
+        (click)="sendMessage()"
+        [disabled]="isLoading || inputMessage.trim().length === 0"
+        class="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold rounded-xl hover:shadow-lg hover:-translate-y-0.5 transition-all disabled:opacity-60 disabled:cursor-not-allowed whitespace-nowrap"
+      >
+        <span *ngIf="!isLoading">Send</span>
+        <span *ngIf="isLoading">Sending...</span>
+      </button>
+    </div>
+  </div>
+</div>

@@ -3,76 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { environment } from '../../../../../../environment/environment';
-
-export interface UserProfileDto {
-  id: number;
-  name?: string;
-  title?: string;
-  location?: string;
-  email?: string;
-  avatar?: string;
-  initial?: string;
-  profileCompletion: number;
-  resumeFileName?: string;
-  resumeFilePath?: string;
-  linkedIn?: string;
-  gitHub?: string;
-  website?: string;
-}
-
-export interface UpsertUserProfileDto {
-  name?: string;
-  title?: string;
-  location?: string;
-  email?: string;
-  avatar?: string;
-  initial?: string;
-  linkedIn?: string;
-  gitHub?: string;
-  website?: string;
-}
-
-export interface ExperienceDto {
-  id: number;
-  jobTitle: string;
-  company: string;
-  location?: string;
-  startDate: string;
-  endDate?: string;
-  isCurrent: boolean;
-  description?: string;
-}
-
-export interface AddExperienceDto {
-  jobTitle: string;
-  company: string;
-  location?: string;
-  startDate: string;
-  endDate?: string;
-  isCurrent: boolean;
-  description?: string;
-}
-
-export interface EducationDto {
-  id: number;
-  degree: string;
-  institution: string;
-  fieldOfStudy?: string;
-  startYear: number;
-  endYear?: number;
-  isCurrent: boolean;
-  description?: string;
-}
-
-export interface AddEducationDto {
-  degree: string;
-  institution: string;
-  fieldOfStudy?: string;
-  startYear: number;
-  endYear?: number;
-  isCurrent: boolean;
-  description?: string;
-}
+import {UserProfileDto ,UpsertUserProfileDto ,ExperienceDto , AddExperienceDto ,
+  EducationDto ,AddEducationDto ,UserSkillDto ,SyncSkillsDto} from './../../profiles.models'
 
 @Injectable({ providedIn: 'root' })
 export class JobSeekerService {
@@ -99,6 +31,24 @@ export class JobSeekerService {
     return this.http.post<{ success: boolean; fileName: string; filePath: string }>(
       `${this.baseUrl}/upload-resume`, fd
     );
+  }
+
+  downloadResume(): Observable<Blob> {
+    return this.http.get(`${this.baseUrl}/download-resume`, { responseType: 'blob' });
+  }
+
+  deleteResume(): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/delete-resume`);
+  }
+
+  uploadAvatar(file: File): Observable<{ avatarPath: string }> {
+    const fd = new FormData();
+    fd.append('avatar', file, file.name);
+    return this.http.post<{ avatarPath: string }>(`${this.baseUrl}/upload-avatar`, fd);
+  }
+
+  deleteAvatar(): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/delete-avatar`);
   }
 
   // ── Experience ─────────────────────────────────────────────────────────────
@@ -133,5 +83,15 @@ export class JobSeekerService {
 
   deleteEducation(id: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/education/${id}`);
+  }
+
+  // ── Skills ─────────────────────────────────────────────────────────────────
+  getSkills(): Observable<UserSkillDto[]> {
+    return this.http.get<UserSkillDto[]>(`${this.baseUrl}/skills`);
+  }
+
+  syncSkills(skillIds: number[]): Observable<{ success: boolean }> {
+    const payload: SyncSkillsDto = { skillIds };
+    return this.http.put<{ success: boolean }>(`${this.baseUrl}/skills`, payload);
   }
 }

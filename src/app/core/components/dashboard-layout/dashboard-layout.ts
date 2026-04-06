@@ -1,13 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { Navbar } from '../../../shared/components/navbar/navbar';
 import { CommonModule } from '@angular/common';
 import { EMPLOYER_MENU, JOBSEEKER_MENU, SidebarItem } from '../../config/sidebar.config';
 import { Sidebar } from '../../../shared/components/sidebar/sidebar';
 import { AuthService } from '../../../auth/services/auth';
 import { UserStore } from '../../../core/services/user-store';
-import { Router } from '@angular/router';
 import { UserRole } from '../../../shared/enums/UserRole ';
+import { filter } from 'rxjs';
 
 @Component({
   selector: 'app-dashboard-layout',
@@ -21,6 +21,8 @@ export class DashboardLayout implements OnInit {
   menuItems: SidebarItem[] = [];
   menuLabel: string = 'Menu';
   isSidebarOpen = true;
+  isFullBleedRoute = false;
+  isMobile = window.innerWidth < 640;
 
   constructor(
     private authService: AuthService,
@@ -29,7 +31,8 @@ export class DashboardLayout implements OnInit {
   ) {}
 
   ngOnInit() {
-    if (window.innerWidth < 768) {
+    // Only auto-collapse on very small screens (phones)
+    if (window.innerWidth < 640) {
       this.isSidebarOpen = false;
     }
 
@@ -50,6 +53,15 @@ export class DashboardLayout implements OnInit {
       this.menuItems = JOBSEEKER_MENU;
       this.menuLabel = 'Menu';
     }
+
+    this.updateRouteLayout(this.router.url);
+    this.router.events.pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd)).subscribe((event) => {
+      this.updateRouteLayout(event.urlAfterRedirects);
+    });
+  }
+
+  private updateRouteLayout(url: string) {
+    this.isFullBleedRoute = url.includes('/dashboard/mock-interview');
   }
 
   toggleSidebar() {

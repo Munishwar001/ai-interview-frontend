@@ -68,7 +68,6 @@ export class AuthService {
       let refreshReq = this.getRefreshRequest();
 
       if (refreshReq.accessToken && refreshReq.refreshToken) {
-        console.log('Refresh');
         return this.refreshToken(this.getRefreshRequest()).pipe(
           switchMap(() => {
             return of(true);
