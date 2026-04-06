@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+import { StatusBadge } from '../../../shared/components/status-badge/status-badge';
 
 interface Job {
   id: number;
@@ -23,7 +24,7 @@ interface Job {
 @Component({
   selector: 'app-posted-job-home',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, StatusBadge],
   templateUrl: './posted-job-home.html',
 })
 export class PostedJobHome implements OnInit {

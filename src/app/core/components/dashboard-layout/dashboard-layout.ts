@@ -62,6 +62,14 @@ export class DashboardLayout implements OnInit {
 
   private updateRouteLayout(url: string) {
     this.isFullBleedRoute = url.includes('/dashboard/mock-interview');
+
+    // Derive page title from the matching menu item
+    const allItems = [...EMPLOYER_MENU, ...JOBSEEKER_MENU];
+    const match = allItems
+      .filter(item => item.route !== '/dashboard') // skip root to avoid always matching
+      .find(item => url.startsWith(item.route));
+
+    this.pageTitle = match ? match.label : 'Dashboard';
   }
 
   toggleSidebar() {
