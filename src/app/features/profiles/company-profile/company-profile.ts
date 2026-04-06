@@ -190,6 +190,11 @@ export class CompanyProfile implements OnInit {
   onLogoChange(event: Event): void {
     const file = (event.target as HTMLInputElement).files?.[0];
     if (!file) return;
+    if (!this.profileForm.value.companyName?.trim()) {
+      this.toastr.warning('Please enter your company name before uploading a logo.', 'Required');
+      (event.target as HTMLInputElement).value = '';
+      return;
+    }
     this.logoFile = file;
     // Preview immediately
     const reader = new FileReader();
@@ -208,6 +213,11 @@ export class CompanyProfile implements OnInit {
   onCoverChange(event: Event): void {
     const file = (event.target as HTMLInputElement).files?.[0];
     if (!file) return;
+    if (!this.profileForm.value.companyName?.trim()) {
+      this.toastr.warning('Please enter your company name before uploading a cover image.', 'Required');
+      (event.target as HTMLInputElement).value = '';
+      return;
+    }
     this.coverFile = file;
     const reader = new FileReader();
     reader.onload = (e) => { this.coverPreview = e.target?.result as string; };
