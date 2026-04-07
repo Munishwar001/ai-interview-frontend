@@ -41,8 +41,21 @@
     </div>
   </div>
 
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="bg-white border border-gray-200 rounded-xl p-8 text-center text-sm text-gray-500 mb-4">
+    Loading posted jobs...
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="!isLoading && errorMessage" class="bg-red-50 border border-red-200 rounded-xl p-5 mb-4">
+    <p class="text-sm text-red-700 font-medium">{{ errorMessage }}</p>
+    <button (click)="loadJobs()" class="mt-3 text-xs font-medium border border-red-200 bg-white text-red-700 px-3 py-2 rounded-lg hover:bg-red-100 transition-colors">
+      Retry
+    </button>
+  </div>
+
   <!-- Job Cards -->
-  <div class="flex flex-col gap-4">
+  <div *ngIf="!isLoading && !errorMessage" class="flex flex-col gap-4">
     <div *ngFor="let job of filteredJobs"
       (click)="openJobPreview(job)"
       class="bg-white border border-gray-200 rounded-xl p-5 hover:border-gray-300 transition-colors"
@@ -55,17 +68,30 @@
         <!-- LEFT: Logo + Meta -->
         <div class="col-span-4">
           <div class="flex items-start gap-3">
-            <!-- Company Initials -->
-            <div class="w-12 h-12 rounded-xl flex items-center justify-center text-base font-semibold flex-shrink-0"
-              [ngClass]="{
-                'bg-green-100 text-green-700': job.status === 'Active',
-                'bg-gray-100 text-gray-500': job.status === 'Closed'
-              }">
-              {{ job.companyInitials }}
-            </div>
+            <ng-container *ngIf="job.companyLogo; else companyInitialsTemplate">
+              <img
+                [src]="job.companyLogo"
+                [alt]="job.company + ' logo'"
+                class="w-12 h-12 rounded-xl object-cover border border-gray-200 flex-shrink-0"
+              />
+            </ng-container>
+            <ng-template #companyInitialsTemplate>
+              <div class="w-12 h-12 rounded-xl flex items-center justify-center text-base font-semibold flex-shrink-0"
+                [ngClass]="{
+                  'bg-green-100 text-green-700': job.status === 'Active',
+                  'bg-gray-100 text-gray-500': job.status === 'Closed'
+                }">
+                {{ job.companyInitials }}
+              </div>
+            </ng-template>
             <div>
               <h3 class="font-semibold text-gray-900 text-base leading-tight">{{ job.title }}</h3>
               <p class="text-sm text-gray-500 mt-0.5">{{ job.company }}</p>
+              <div
+                *ngIf="job.companyDescription"
+                class="text-xs text-gray-500 mt-1 line-clamp-2"
+                [innerHTML]="toHtml(job.companyDescription)">
+              </div>
               <div class="flex flex-wrap gap-x-3 gap-y-1 mt-2 text-xs text-gray-500">
                 <span class="flex items-center gap-1">
                   <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -93,7 +119,7 @@
 
         <!-- MIDDLE: Description + Skills -->
         <div class="col-span-4">
-          <p class="text-sm text-gray-600 leading-relaxed line-clamp-2">{{ job.description }}</p>
+          <div class="text-sm text-gray-600 leading-relaxed line-clamp-2" [innerHTML]="toHtml(job.description)"></div>
           <div class="flex flex-wrap gap-1.5 mt-3">
             <span *ngFor="let skill of job.skills"
               class="text-xs bg-gray-100 text-gray-600 px-2.5 py-1 rounded-md font-medium">
@@ -177,9 +203,24 @@
 
   <div class="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-2xl bg-white shadow-2xl border border-gray-200">
     <div class="sticky top-0 z-10 flex items-start justify-between gap-3 border-b border-gray-100 bg-white px-6 py-4">
-      <div>
-        <h3 class="text-xl font-semibold text-gray-900">{{ selectedJob.title }}</h3>
-        <p class="text-sm text-gray-500 mt-1">{{ selectedJob.company }} • {{ selectedJob.location }}</p>
+      <div class="flex items-start gap-3">
+        <ng-container *ngIf="selectedJob.companyLogo; else modalInitialsTemplate">
+          <img
+            [src]="selectedJob.companyLogo"
+            [alt]="selectedJob.company + ' logo'"
+            class="w-12 h-12 rounded-xl object-cover border border-gray-200 flex-shrink-0"
+          />
+        </ng-container>
+        <ng-template #modalInitialsTemplate>
+          <div class="w-12 h-12 rounded-xl flex items-center justify-center text-base font-semibold flex-shrink-0 bg-green-100 text-green-700">
+            {{ selectedJob.companyInitials }}
+          </div>
+        </ng-template>
+
+        <div>
+          <h3 class="text-xl font-semibold text-gray-900">{{ selectedJob.title }}</h3>
+          <p class="text-sm text-gray-500 mt-1">{{ selectedJob.company }} • {{ selectedJob.location }}</p>
+        </div>
       </div>
       <button (click)="closeJobPreview()" class="h-9 w-9 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50">
         ✕
@@ -210,8 +251,20 @@
       </div>
 
       <div>
+        <h4 class="text-sm font-semibold text-gray-900 mb-2">Company Description</h4>
+        <div
+          *ngIf="selectedJob.companyDescription; else noCompanyDescription"
+          class="text-sm leading-relaxed text-gray-600"
+          [innerHTML]="toHtml(selectedJob.companyDescription)">
+        </div>
+        <ng-template #noCompanyDescription>
+          <p class="text-sm text-gray-500">No company description available.</p>
+        </ng-template>
+      </div>
+
+      <div>
         <h4 class="text-sm font-semibold text-gray-900 mb-2">Job Description</h4>
-        <p class="text-sm leading-relaxed text-gray-600">{{ selectedJob.description }}</p>
+        <div class="text-sm leading-relaxed text-gray-600" [innerHTML]="toHtml(selectedJob.description)"></div>
       </div>
 
       <div>
@@ -222,6 +275,39 @@
           </span>
         </div>
       </div>
+    </div>
+  </div>
+</div>
+
+<div
+  *ngIf="isDeleteDialogOpen"
+  class="fixed inset-0 z-[60] flex items-center justify-center p-4"
+  (click)="closeDeleteDialogFromBackdrop($event)">
+  <div class="absolute inset-0 bg-black/45"></div>
+
+  <div class="relative w-full max-w-md rounded-2xl border border-gray-200 bg-white p-6 shadow-2xl">
+    <h3 class="text-lg font-semibold text-gray-900">Delete Job?</h3>
+    <p class="mt-2 text-sm text-gray-600">
+      Are you sure you want to delete
+      <span class="font-medium text-gray-900">{{ pendingDeleteJob?.title }}</span>?
+      This action cannot be undone.
+    </p>
+
+    <div class="mt-6 flex items-center justify-end gap-2">
+      <button
+        type="button"
+        (click)="closeDeleteDialog()"
+        [disabled]="isDeleting"
+        class="px-4 py-2 text-sm font-medium rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50 disabled:opacity-60 disabled:cursor-not-allowed">
+        No
+      </button>
+      <button
+        type="button"
+        (click)="confirmDelete()"
+        [disabled]="isDeleting"
+        class="px-4 py-2 text-sm font-medium rounded-lg bg-red-600 text-white hover:bg-red-700 disabled:opacity-60 disabled:cursor-not-allowed">
+        {{ isDeleting ? 'Deleting...' : 'Yes, Delete' }}
+      </button>
     </div>
   </div>
 </div>

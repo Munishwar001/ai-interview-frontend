@@ -14,6 +14,30 @@ export interface CreateJobPayload {
   requiredSkills?: string[];
 }
 
+export interface MyJobDto {
+  id: number;
+  title: string;
+  description?: string;
+  location?: string;
+  companyName?: string;
+  companyLogo?: string;
+  companyDescription?: string;
+  jobType?: string;
+  salaryMin?: number | null;
+  salaryMax?: number | null;
+  status?: string;
+  isClosed?: boolean;
+  createdAt?: string;
+  requiredSkills?: string[];
+  skills?: Array<string | { name?: string }>;
+  applicantsCount?: number;
+  viewsCount?: number;
+  shortlistedCount?: number;
+  applicants?: number;
+  views?: number;
+  shortlisted?: number;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -24,6 +48,22 @@ export class JobService {
 
   createJob(payload: CreateJobPayload): Observable<any> {
     return this.http.post(this.baseUrl, payload);
+  }
+
+  getMyJobs(): Observable<MyJobDto[] | { data?: MyJobDto[]; items?: MyJobDto[]; result?: MyJobDto[] }> {
+    return this.http.get<MyJobDto[] | { data?: MyJobDto[]; items?: MyJobDto[]; result?: MyJobDto[] }>(`${this.baseUrl}/my-jobs`);
+  }
+
+  closeJob(id: number): Observable<{ success: boolean }> {
+    return this.http.patch<{ success: boolean }>(`${this.baseUrl}/${id}/close`, {});
+  }
+
+  reopenJob(id: number): Observable<{ success: boolean }> {
+    return this.http.patch<{ success: boolean }>(`${this.baseUrl}/${id}/reopen`, {});
+  }
+
+  deleteJob(id: number): Observable<{ success: boolean }> {
+    return this.http.delete<{ success: boolean }>(`${this.baseUrl}/${id}`);
   }
 
  generateDescription(payload: { title: string; skills: string[] }): Observable<any> {

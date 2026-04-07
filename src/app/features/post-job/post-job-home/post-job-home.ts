@@ -6,7 +6,7 @@ import { Icons } from '../../../shared/icons/icons';
 import { Lookup } from '../../../shared/services/lookup';
 import { AppInput } from '../../../shared/components/app-input/app-input';
 import { AppSelect, SelectOption } from '../../../shared/components/app-select/app-select';
-import { JobService } from '../services/post-job';
+import { CreateJobPayload, JobService } from '../services/post-job';
 import { JobPreviewComponent } from '../job-preview/job-preview.component';
 import { MarkdownService } from '../../../shared/services/markdown.service';
 import { ToastrService } from 'ngx-toastr';
@@ -78,7 +78,21 @@ export class PostJobHome implements OnInit {
       this.toastr.warning('Please fill all required fields.', 'Validation'); 
       return;
     }
-    const payload = this.jobForm.value;
+    const salaryMinValue = this.jobForm.value.salaryMin;
+    const salaryMaxValue = this.jobForm.value.salaryMax;
+
+    const payload: CreateJobPayload = {
+      ...this.jobForm.value,
+      salaryMin:
+        salaryMinValue === '' || salaryMinValue === null || salaryMinValue === undefined
+          ? undefined
+          : Number(salaryMinValue),
+      salaryMax:
+        salaryMaxValue === '' || salaryMaxValue === null || salaryMaxValue === undefined
+          ? undefined
+          : Number(salaryMaxValue),
+    };
+
     this.jobService.createJob(payload).subscribe({
       next: (res) => {
         console.log('Job Created:', res);
