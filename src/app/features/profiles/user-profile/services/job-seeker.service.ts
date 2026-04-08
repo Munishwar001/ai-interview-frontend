@@ -6,6 +6,12 @@ import { environment } from '../../../../../../environment/environment';
 import {UserProfileDto ,UpsertUserProfileDto ,ExperienceDto , AddExperienceDto ,
   EducationDto ,AddEducationDto ,UserSkillDto ,SyncSkillsDto} from './../../profiles.models'
 
+export interface ResumeStatusResponse {
+  isUploaded: boolean;
+  fileName: string | null;
+  filePath: string | null;
+}
+
 @Injectable({ providedIn: 'root' })
 export class JobSeekerService {
   private readonly baseUrl = `${environment.apiUrl}/JobSeeker`;
@@ -31,6 +37,10 @@ export class JobSeekerService {
     return this.http.post<{ success: boolean; fileName: string; filePath: string }>(
       `${this.baseUrl}/upload-resume`, fd
     );
+  }
+
+  getResumeStatus(): Observable<ResumeStatusResponse> {
+    return this.http.get<ResumeStatusResponse>(`${this.baseUrl}/resume-status`);
   }
 
   downloadResume(): Observable<Blob> {

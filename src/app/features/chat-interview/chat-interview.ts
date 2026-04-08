@@ -1,13 +1,29 @@
-import { Component, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ViewChild,
+  ElementRef,
+  AfterViewInit,
+  AfterContentChecked,
+  OnDestroy,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import lottie, { AnimationItem } from 'lottie-web';
+import {
+  MockInterviewService,
+  StartInterviewResponse,
+  InterviewSessionDto,
+} from './services/mock-interview.service';
 
 interface Message {
   id: string;
   sender: 'user' | 'ai';
   text: string;
   timestamp: Date;
+  typedText?: string;
+  isTyping?: boolean;
 }
 
 @Component({
@@ -17,23 +33,46 @@ interface Message {
   templateUrl: './chat-interview.html',
   styleUrl: './chat-interview.scss',
 })
-export class ChatInterview implements OnInit, AfterViewInit {
+export class ChatInterview implements OnInit, AfterViewInit, AfterContentChecked, OnDestroy {
   @ViewChild('messagesContainer') messagesContainer!: ElementRef<HTMLDivElement>;
 
+  sessionId: string | null = null;
+  sessionStatus = 'loading';
+  sessionSkills: string[] = [];
+  sessionError = '';
   messages: Message[] = [];
   inputMessage: string = '';
   isLoading: boolean = false;
+  isSessionLoading = false;
+  isSessionsLoading = false;
+  interviewSessions: InterviewSessionDto[] = [];
   private aiAvatarAnimations: Map<string, AnimationItem> = new Map();
+  private typingTimer: ReturnType<typeof setInterval> | null = null;
+
+  constructor(
+    private mockInterviewService: MockInterviewService,
+    private route: ActivatedRoute,
+  ) {}
 
   ngOnInit() {
-    // Initialize with a welcome message from AI
-    const welcomeMessage: Message = {
-      id: '1',
-      sender: 'ai',
-      text: 'Hello! Welcome to your AI Mock Interview. I\'m ready to help you practice. What role would you like to interview for today?',
-      timestamp: new Date(),
-    };
-    this.messages.push(welcomeMessage);
+    this.route.queryParamMap.subscribe((queryParams) => {
+      const requestedSessionId = queryParams.get('sessionId');
+      const forceNew = queryParams.get('new') === 'true';
+
+      this.loadSessions();
+
+      if (forceNew) {
+        this.startNewInterview();
+        return;
+      }
+
+      if (requestedSessionId) {
+        this.loadSessionById(requestedSessionId);
+        return;
+      }
+
+      this.initializeSession();
+    });
   }
 
   ngAfterViewInit() {
@@ -49,6 +88,163 @@ export class ChatInterview implements OnInit, AfterViewInit {
     setTimeout(() => {
       this.initializeAIAvatarAnimations();
     }, 0);
+  }
+
+  ngOnDestroy(): void {
+    this.stopTyping();
+    this.aiAvatarAnimations.forEach((anim) => anim.destroy());
+    this.aiAvatarAnimations.clear();
+  }
+
+  private initializeSession(): void {
+    this.isSessionLoading = true;
+    this.sessionError = '';
+
+    this.mockInterviewService.getSessions().subscribe({
+      next: (sessions) => {
+        if (sessions.length > 0) {
+          const latestSession = [...sessions].sort(
+            (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
+          )[0];
+          this.handleLoadedSessionDto(latestSession);
+
+          return;
+        }
+
+        this.startNewInterview();
+      },
+      error: () => {
+        this.startNewInterview();
+      },
+    });
+  }
+
+  private startNewSessionFromProfileSkills(): void {
+    this.mockInterviewService.getUserSkills().subscribe({
+      next: (skills) => {
+        const skillNames = skills.map((skill) => skill.name).filter((name): name is string => !!name);
+        this.mockInterviewService.startInterview(skillNames).subscribe({
+          next: (response) => {
+            this.handleStartedSession(response, skillNames);
+          },
+          error: () => {
+            this.isSessionLoading = false;
+            this.sessionStatus = 'error';
+            this.sessionError = 'Unable to start the interview session. Please try again.';
+          },
+        });
+      },
+      error: () => {
+        this.mockInterviewService.startInterview([]).subscribe({
+          next: (response) => {
+            this.handleStartedSession(response, []);
+          },
+          error: () => {
+            this.isSessionLoading = false;
+            this.sessionStatus = 'error';
+            this.sessionError = 'Unable to start the interview session. Please try again.';
+          },
+        });
+      },
+    });
+  }
+
+  startNewInterview(): void {
+    if (this.isSessionLoading || this.isLoading) {
+      return;
+    }
+
+    this.messages = [];
+    this.inputMessage = '';
+    this.sessionError = '';
+    this.sessionStatus = 'loading';
+    this.sessionId = null;
+    this.sessionSkills = [];
+    this.startNewSessionFromProfileSkills();
+  }
+
+  openSession(sessionId: string): void {
+    if (!sessionId || this.isSessionLoading) {
+      return;
+    }
+
+    this.loadSessionById(sessionId);
+  }
+
+  isSelectedSession(sessionId: string): boolean {
+    return this.sessionId === sessionId;
+  }
+
+  private loadSessions(): void {
+    this.isSessionsLoading = true;
+    this.mockInterviewService.getSessions().subscribe({
+      next: (sessions) => {
+        this.interviewSessions = [...sessions].sort(
+          (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
+        );
+        this.isSessionsLoading = false;
+      },
+      error: () => {
+        this.interviewSessions = [];
+        this.isSessionsLoading = false;
+      },
+    });
+  }
+
+  private loadSessionById(sessionId: string): void {
+    this.isSessionLoading = true;
+    this.sessionError = '';
+
+    this.mockInterviewService.getSession(sessionId).subscribe({
+      next: (session) => {
+        this.handleLoadedSessionDto(session);
+      },
+      error: () => {
+        this.isSessionLoading = false;
+        this.sessionStatus = 'error';
+        this.sessionError = 'Unable to load this interview session.';
+      },
+    });
+  }
+
+  private handleStartedSession(response: StartInterviewResponse, fallbackSkills: string[]): void {
+    this.sessionId = response.sessionId;
+    this.sessionSkills = response.skills ?? fallbackSkills;
+    this.sessionStatus = 'active';
+    this.messages = [];
+
+    if (response.firstQuestion) {
+      this.appendAiMessageWithTyping(response.firstQuestion);
+    }
+
+    this.isSessionLoading = false;
+    this.loadSessions();
+  }
+
+  private handleLoadedSessionDto(session: InterviewSessionDto): void {
+    this.handleLoadedSession(
+      session.id,
+      session.skills ?? [],
+      session.status ?? 'active',
+      session.messages ?? [],
+    );
+  }
+
+  private handleLoadedSession(sessionId: string, skills: string[], status: string, messages: Array<{ role: string; content: string; createdAt: string }>): void {
+    this.sessionId = sessionId;
+    this.sessionSkills = skills;
+    this.sessionStatus = status || 'active';
+    localStorage.setItem('mockInterviewSessionId', sessionId);
+    this.messages = messages.map((message, index) => ({
+      id: `${sessionId}-${index}`,
+      sender: message.role === 'user' ? 'user' : 'ai',
+      text: message.content,
+      timestamp: new Date(message.createdAt),
+      typedText: message.role === 'user' ? message.content : message.content,
+      isTyping: false,
+    }));
+    this.isSessionLoading = false;
+    this.scrollToBottom();
   }
 
   private initializeAIAvatarAnimations() {
@@ -69,15 +265,22 @@ export class ChatInterview implements OnInit, AfterViewInit {
   }
 
   sendMessage() {
-    if (this.inputMessage.trim().length === 0) {
+    if (
+      this.inputMessage.trim().length === 0 ||
+      !this.sessionId ||
+      this.isSessionLoading ||
+      this.sessionStatus === 'completed'
+    ) {
       return;
     }
+
+    const userText = this.inputMessage.trim();
 
     // Add user message
     const userMessage: Message = {
       id: Date.now().toString(),
       sender: 'user',
-      text: this.inputMessage,
+      text: userText,
       timestamp: new Date(),
     };
     this.messages.push(userMessage);
@@ -86,31 +289,23 @@ export class ChatInterview implements OnInit, AfterViewInit {
     this.inputMessage = '';
     this.scrollToBottom();
 
-    // Simulate AI response delay
     this.isLoading = true;
-    setTimeout(() => {
-      const aiMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        sender: 'ai',
-        text: this.generateAIResponse(userMessage.text),
-        timestamp: new Date(),
-      };
-      this.messages.push(aiMessage);
-      this.isLoading = false;
-      this.scrollToBottom();
-    }, 1000);
-  }
-
-  private generateAIResponse(userInput: string): string {
-    // Placeholder for AI response logic
-    const responses = [
-      'That\'s a great answer! Can you tell me more about your experience with this?',
-      'Interesting! How would you approach this problem differently?',
-      'Good point! What would be your first step in implementing this?',
-      'I appreciate that response. Let me ask you a follow-up question...',
-      'Excellent! How do you handle edge cases in this scenario?',
-    ];
-    return responses[Math.floor(Math.random() * responses.length)];
+    this.mockInterviewService.sendMessage(this.sessionId, userText).subscribe({
+      next: (response) => {
+        this.appendAiMessageWithTyping(response.aiMessage);
+        if (response.isCompleted) {
+          this.sessionStatus = 'completed';
+        }
+        this.isLoading = false;
+        this.loadSessions();
+        this.scrollToBottom();
+      },
+      error: () => {
+        this.sessionError = 'Unable to send your answer right now. Please try again.';
+        this.isLoading = false;
+        this.scrollToBottom();
+      },
+    });
   }
 
   private scrollToBottom() {
@@ -126,6 +321,46 @@ export class ChatInterview implements OnInit, AfterViewInit {
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault();
       this.sendMessage();
+    }
+  }
+
+  private appendAiMessageWithTyping(text: string): void {
+    this.stopTyping();
+    const aiMessage: Message = {
+      id: `${this.sessionId || 'session'}-${Date.now()}`,
+      sender: 'ai',
+      text,
+      timestamp: new Date(),
+      typedText: '',
+      isTyping: true,
+    };
+    this.messages.push(aiMessage);
+    this.scrollToBottom();
+
+    let index = 0;
+    this.typingTimer = setInterval(() => {
+      const currentMessage = this.messages.find((message) => message.id === aiMessage.id);
+      if (!currentMessage) {
+        this.stopTyping();
+        return;
+      }
+
+      index += 1;
+      currentMessage.typedText = text.slice(0, index);
+      this.scrollToBottom();
+
+      if (index >= text.length) {
+        currentMessage.isTyping = false;
+        currentMessage.typedText = text;
+        this.stopTyping();
+      }
+    }, 10);
+  }
+
+  private stopTyping(): void {
+    if (this.typingTimer) {
+      clearInterval(this.typingTimer);
+      this.typingTimer = null;
     }
   }
 }

@@ -1,10 +1,91 @@
-<div class="flex flex-col w-full h-full bg-gradient-to-br from-slate-50 via-white to-indigo-50">
+<div class="flex w-full h-full bg-gradient-to-br from-slate-50 via-white to-indigo-50">
+  <aside class="hidden lg:flex w-80 flex-col border-r border-slate-200 bg-white/90">
+    <div class="p-4 border-b border-slate-200">
+      <button
+        (click)="startNewInterview()"
+        [disabled]="isSessionLoading || isLoading"
+        class="w-full px-4 py-2.5 rounded-xl bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+      >
+        New Interview
+      </button>
+    </div>
+
+    <div class="px-4 pt-4 pb-2 text-xs font-semibold uppercase tracking-wider text-slate-500">My Sessions</div>
+
+    <div *ngIf="isSessionsLoading" class="px-4 py-3 text-sm text-slate-500">Loading sessions...</div>
+
+    <div *ngIf="!isSessionsLoading && interviewSessions.length === 0" class="px-4 py-3 text-sm text-slate-500">
+      No sessions yet. Start your first interview.
+    </div>
+
+    <div class="flex-1 overflow-y-auto px-2 pb-3">
+      <button
+        *ngFor="let session of interviewSessions"
+        (click)="openSession(session.id)"
+        [ngClass]="isSelectedSession(session.id) ? 'bg-indigo-50 border-indigo-200' : 'bg-white border-slate-200 hover:border-slate-300'"
+        class="w-full text-left mb-2 rounded-xl border px-3 py-3 transition-colors"
+      >
+        <div class="flex items-center justify-between gap-2">
+          <span class="text-xs font-semibold uppercase tracking-wide" [ngClass]="session.status === 'completed' ? 'text-emerald-700' : 'text-indigo-700'">
+            {{ session.status }}
+          </span>
+          <span class="text-xs text-slate-500">{{ session.updatedAt | date : 'MMM d, h:mm a' }}</span>
+        </div>
+
+        <div class="mt-1 text-sm font-semibold text-slate-900">Session {{ session.id | slice:0:8 }}</div>
+
+        <div class="mt-2 flex flex-wrap gap-1" *ngIf="session.skills.length">
+          <span *ngFor="let skill of session.skills | slice:0:3" class="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-700">
+            {{ skill }}
+          </span>
+          <span *ngIf="session.skills.length > 3" class="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-700">
+            +{{ session.skills.length - 3 }}
+          </span>
+        </div>
+      </button>
+    </div>
+  </aside>
+
+  <div class="flex flex-col flex-1 min-w-0">
   <!-- Header -->
   <div class="px-6 py-6 bg-white border-b border-slate-200 shadow-sm">
-    <div>
-      <h2 class="text-xl font-bold text-slate-900">AI Mock Interview Chat</h2>
-      <p class="mt-1 text-sm text-slate-600">Practice your interview skills with real-time feedback</p>
+    <div class="flex items-start justify-between gap-3">
+      <div>
+        <h2 class="text-xl font-bold text-slate-900">AI Mock Interview Chat</h2>
+        <p class="mt-1 text-sm text-slate-600">Practice your interview skills with real-time feedback</p>
+      </div>
+
+      <button
+        (click)="startNewInterview()"
+        [disabled]="isSessionLoading || isLoading"
+        class="lg:hidden px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm font-semibold disabled:opacity-60 disabled:cursor-not-allowed"
+      >
+        New Interview
+      </button>
     </div>
+
+    <div class="mt-4 flex flex-wrap items-center gap-2">
+      <span class="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
+        Session: {{ sessionStatus | titlecase }}
+      </span>
+      <span *ngIf="sessionId" class="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-medium text-slate-600">
+        ID: {{ sessionId | slice:0:8 }}
+      </span>
+      <ng-container *ngIf="sessionSkills.length > 0">
+        <span class="text-xs font-semibold uppercase tracking-wide text-slate-400">Skills</span>
+        <span *ngFor="let skill of sessionSkills" class="rounded-full bg-indigo-50 px-3 py-1 text-xs font-medium text-indigo-700 border border-indigo-100">
+          {{ skill }}
+        </span>
+      </ng-container>
+    </div>
+  </div>
+
+  <div *ngIf="isSessionLoading" class="mx-6 mt-4 rounded-2xl border border-indigo-100 bg-indigo-50/70 px-4 py-3 text-sm text-indigo-700">
+    Loading interview session...
+  </div>
+
+  <div *ngIf="sessionError" class="mx-6 mt-4 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+    {{ sessionError }}
   </div>
 
   <!-- Messages Container -->
@@ -32,7 +113,8 @@
               : 'bg-white text-slate-900 rounded-3xl rounded-tl-sm border border-slate-200'"
             class="px-4 py-3 text-sm leading-relaxed"
           >
-            {{ message.text }}
+            <span>{{ message.typedText || message.text }}</span>
+            <span *ngIf="message.sender === 'ai' && message.isTyping" class="ml-1 inline-block h-4 w-1 animate-pulse rounded bg-indigo-400 align-middle"></span>
           </div>
           <span class="text-xs text-slate-500 px-4">{{ message.timestamp | date : 'short' }}</span>
         </div>
@@ -57,6 +139,13 @@
           Thinking...
         </div>
       </div>
+
+      <div *ngIf="!isLoading && messages.length === 0 && !isSessionLoading" class="flex justify-center py-10">
+        <div class="max-w-md rounded-2xl border border-dashed border-slate-200 bg-white px-5 py-6 text-center shadow-sm">
+          <p class="text-sm font-semibold text-slate-900">Your interview session is ready</p>
+          <p class="mt-1 text-sm text-slate-500">Start by answering the first question below.</p>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -68,17 +157,21 @@
         (keypress)="onKeyPress($event)"
         placeholder="Type your response here... (Press Enter to send)"
         class="flex-1 px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-3 focus:ring-purple-100 text-sm resize-none max-h-32 disabled:bg-slate-100 disabled:text-slate-500"
-        [disabled]="isLoading"
+        [disabled]="isLoading || isSessionLoading || sessionStatus === 'completed'"
         rows="2"
       ></textarea>
       <button
         (click)="sendMessage()"
-        [disabled]="isLoading || inputMessage.trim().length === 0"
+        [disabled]="isLoading || isSessionLoading || sessionStatus === 'completed' || inputMessage.trim().length === 0"
         class="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold rounded-xl hover:shadow-lg hover:-translate-y-0.5 transition-all disabled:opacity-60 disabled:cursor-not-allowed whitespace-nowrap"
       >
         <span *ngIf="!isLoading">Send</span>
         <span *ngIf="isLoading">Sending...</span>
       </button>
     </div>
+    <p *ngIf="sessionStatus === 'completed'" class="mt-2 text-xs text-emerald-700">
+      This interview session is completed. Start a New Interview to continue.
+    </p>
+  </div>
   </div>
 </div>

@@ -29,7 +29,8 @@ export class LandingpageHero implements AfterViewInit, OnDestroy {
   rotatingWords: string[] = [
     'Smarter', 
     'Quicker',
-    'Sharper'
+    'Sharper',
+    'Smarter',
   ];
 
   stats: Stat[] = [

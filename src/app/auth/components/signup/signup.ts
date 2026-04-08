@@ -4,7 +4,8 @@ import { Icons } from '../../../shared/icons/icons';
 import { UserRole } from '../../../shared/enums/UserRole ';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth';
-import { RouterLink } from "@angular/router";
+import { Router, RouterLink } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-signup',
@@ -24,6 +25,8 @@ export class Signup {
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
+    private toastr: ToastrService,
+    private router: Router,
   ) {
     this.signupForm = this.fb.group({
       fullName: ['', [Validators.required]],
@@ -81,10 +84,17 @@ export class Signup {
 
     this.authService.register(payload).subscribe({
       next: (res) => {
-        console.log('Success:', res);
+        if (res?.isSuccess) {
+          this.toastr.success(res.message || 'Account Created Successfully!');
+          this.router.navigate(['/login']);
+          return;
+        }
+
+        this.toastr.error(res?.message || 'Unable to create account. Please try again.');
       },
       error: (err) => {
-        console.error('Error:', err);
+        const errorMessage = err?.error?.message || err?.error || 'Registration failed. Please try again.';
+        this.toastr.error(errorMessage);
       },
     });
   }

@@ -59,6 +59,13 @@ export const routes: Routes = [
           import('./features/profiles/user-profile/user-profile').then((m) => m.UserProfile),
       },
       {
+        path: 'resume',
+        canMatch: [authGuard, userAccessGuard],
+        data: { restrictedUserTypes: [UserRole.Employer] },
+        loadComponent: () =>
+          import('./features/resume-enhancer/resume-enhancer').then((m) => m.ResumeEnhancer),
+      },
+      {
         path: 'mock-interview',
         canMatch: [authGuard, userAccessGuard],
         data: { restrictedUserTypes: [UserRole.Employer] },

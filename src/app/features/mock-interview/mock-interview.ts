@@ -44,7 +44,7 @@ export class MockInterview implements AfterViewInit, OnDestroy {
 
   startInterview() {
     // Navigate to chat interview window
-    this.router.navigate(['/dashboard/chat-interview']);
+    this.router.navigate(['/dashboard/chat-interview'], { queryParams: { new: 'true' } });
   }
 
   chooseRole() {

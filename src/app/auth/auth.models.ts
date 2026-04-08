@@ -7,6 +7,12 @@ export interface RegisterRequest {
   role: UserRole;
 }
 
+export interface RegisterResponse {
+  token: string;
+  isSuccess: boolean;
+  message: string;
+}
+
 export interface LoginRequest {
   email: string;
   password: string;

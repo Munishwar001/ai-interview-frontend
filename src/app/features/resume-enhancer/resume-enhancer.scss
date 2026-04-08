@@ -1,0 +1,20 @@
+/* Only custom keyframe animations — everything else is Tailwind */
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes bounce-dot {
+  0%, 80%, 100% { transform: scale(0.5); opacity: 0.4; }
+  40%            { transform: scale(1);   opacity: 1;   }
+}
+
+.spin-anim {
+  animation: spin 1.8s linear infinite;
+}
+
+.bounce-dot {
+  display: inline-block;
+  animation: bounce-dot 1.2s ease-in-out infinite;
+}

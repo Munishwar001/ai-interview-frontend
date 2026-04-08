@@ -1,7 +1,13 @@
 import { Injectable } from '@angular/core';
 import { exhaustMap, Observable, switchMap, tap, of, catchError, finalize } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
-import { RegisterRequest, LoginRequest, AuthResponse, RefreshRequest } from '../auth.models';
+import {
+  RegisterRequest,
+  RegisterResponse,
+  LoginRequest,
+  AuthResponse,
+  RefreshRequest,
+} from '../auth.models';
 import { environment } from '../../../../environment/environment';
 import { User } from '../../core/services/user';
 import { UserStore } from '../../core/services/user-store';
@@ -24,8 +30,8 @@ export class AuthService {
     private socialAuthService: SocialAuthService,
   ) {}
 
-  register(data: RegisterRequest): Observable<any> {
-    return this.http.post(`${this.baseUrl}/register`, data);
+  register(data: RegisterRequest): Observable<RegisterResponse> {
+    return this.http.post<RegisterResponse>(`${this.baseUrl}/register`, data);
   }
 
   login(data: LoginRequest): Observable<any> {
