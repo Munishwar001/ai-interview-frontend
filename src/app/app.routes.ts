@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { authGuard } from './auth/guard/auth-guard';
 import { UserRole } from './shared/enums/UserRole ';
 import { userAccessGuard } from './core/guard/user-access-guard';
+import { authRedirectGuard } from './auth/guard/auth-redirect-guard';
 
 export const routes: Routes = [
   {
@@ -12,16 +13,19 @@ export const routes: Routes = [
       {
         path: '',
         pathMatch: 'full',
+        canMatch: [authRedirectGuard],
         loadComponent: () => import('./pages/landingpage/landingpage').then((m) => m.Landingpage),
       },
     ],
   },
   {
     path: 'login',
+    canMatch: [authRedirectGuard],
     loadComponent: () => import('./auth/components/login/login').then((m) => m.Login),
   },
   {
     path: 'signup',
+    canMatch: [authRedirectGuard],
     loadComponent: () => import('./auth/components/signup/signup').then((m) => m.Signup),
   },
   {
@@ -78,6 +82,34 @@ export const routes: Routes = [
         data: { restrictedUserTypes: [UserRole.Employer] },
         loadComponent: () =>
           import('./features/chat-interview/chat-interview').then((m) => m.ChatInterview),
+      },
+      {
+        path: 'jobs',
+        canMatch: [authGuard, userAccessGuard],
+        data: { restrictedUserTypes: [UserRole.Employer] },
+        loadComponent: () =>
+          import('./features/jobs/job-recommendations/job-recommendations').then((m) => m.JobRecommendations),
+      },
+      {
+        path: 'applied',
+        canMatch: [authGuard, userAccessGuard],
+        data: { restrictedUserTypes: [UserRole.Employer] },
+        loadComponent: () =>
+          import('./features/jobs/applied-jobs/applied-jobs').then((m) => m.AppliedJobs),
+      },
+      {
+        path: 'applicants',
+        canMatch: [authGuard, userAccessGuard],
+        data: { restrictedUserTypes: [UserRole.JobSeeker] },
+        loadComponent: () =>
+          import('./features/jobs/applicants/applicants').then((m) => m.Applicants),
+      },
+      {
+        path: 'applicants/:jobId',
+        canMatch: [authGuard, userAccessGuard],
+        data: { restrictedUserTypes: [UserRole.JobSeeker] },
+        loadComponent: () =>
+          import('./features/jobs/applicants/applicants').then((m) => m.Applicants),
       },
     ],
   },

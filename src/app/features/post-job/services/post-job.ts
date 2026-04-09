@@ -10,7 +10,7 @@ export interface CreateJobPayload {
   salaryMin?: number;
   salaryMax?: number;
   companyName?: string;
-  jobType?: string;
+  jobType?: number;
   requiredSkills?: string[];
 }
 

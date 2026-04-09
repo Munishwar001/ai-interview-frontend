@@ -151,27 +151,41 @@
 
   <!-- Input Area -->
   <div class="bg-white border-t border-slate-200 flex-shrink-0 p-6">
+    @if (sessionStatus === 'idle') {
+      <p class="text-xs text-purple-600 font-medium mb-2 flex items-center gap-1.5">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+        </svg>
+        Press Enter to start your interview
+      </p>
+    }
     <div class="flex gap-3 items-end">
       <textarea
         [(ngModel)]="inputMessage"
         (keypress)="onKeyPress($event)"
-        placeholder="Type your response here... (Press Enter to send)"
-        class="flex-1 px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-3 focus:ring-purple-100 text-sm resize-none max-h-32 disabled:bg-slate-100 disabled:text-slate-500"
+        [placeholder]="sessionStatus === 'idle' ? 'Press Enter to start...' : 'Type your response here... (Press Enter to send)'"
+        class="flex-1 px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 text-sm resize-none max-h-32 disabled:bg-slate-100 disabled:text-slate-500 transition-colors"
+        [class.border-purple-400]="sessionStatus === 'idle'"
+        [class.ring-purple-100]="sessionStatus === 'idle'"
+        [class.border-slate-200]="sessionStatus !== 'idle'"
+        [class.focus:border-purple-500]="true"
         [disabled]="isLoading || isSessionLoading || sessionStatus === 'completed'"
         rows="2"
       ></textarea>
       <button
         (click)="sendMessage()"
         [disabled]="isLoading || isSessionLoading || sessionStatus === 'completed' || inputMessage.trim().length === 0"
-        class="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold rounded-xl hover:shadow-lg hover:-translate-y-0.5 transition-all disabled:opacity-60 disabled:cursor-not-allowed whitespace-nowrap"
-      >
-        <span *ngIf="!isLoading">Send</span>
-        <span *ngIf="isLoading">Sending...</span>
+        class="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold rounded-xl hover:shadow-lg hover:-translate-y-0.5 transition-all disabled:opacity-60 disabled:cursor-not-allowed whitespace-nowrap">
+        @if (isLoading || isSessionLoading) { Sending... }
+        @else if (sessionStatus === 'idle') { Start }
+        @else { Send }
       </button>
     </div>
-    <p *ngIf="sessionStatus === 'completed'" class="mt-2 text-xs text-emerald-700">
-      This interview session is completed. Start a New Interview to continue.
-    </p>
+    @if (sessionStatus === 'completed') {
+      <p class="mt-2 text-xs text-emerald-700">
+        This interview session is completed. Start a New Interview to continue.
+      </p>
+    }
   </div>
   </div>
 </div>

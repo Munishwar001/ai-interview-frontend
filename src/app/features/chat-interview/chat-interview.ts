@@ -62,7 +62,8 @@ export class ChatInterview implements OnInit, AfterViewInit, AfterContentChecked
       this.loadSessions();
 
       if (forceNew) {
-        this.startNewInterview();
+        // Don't auto-start — just set state to idle so user can start manually
+        this.sessionStatus = 'idle';
         return;
       }
 
@@ -71,7 +72,28 @@ export class ChatInterview implements OnInit, AfterViewInit, AfterContentChecked
         return;
       }
 
-      this.initializeSession();
+      // Check for existing sessions — load latest if found, otherwise stay idle
+      this.isSessionLoading = true;
+      this.mockInterviewService.getSessions().subscribe({
+        next: (sessions) => {
+          this.isSessionLoading = false;
+          if (sessions.length > 0) {
+            const latest = [...sessions].sort(
+              (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
+            )[0];
+            this.handleLoadedSessionDto(latest);
+          } else {
+            // No existing sessions — pre-fill input so user just presses Enter
+            this.sessionStatus = 'idle';
+            this.inputMessage = 'Start the interview';
+          }
+        },
+        error: () => {
+          this.isSessionLoading = false;
+          this.sessionStatus = 'idle';
+          this.inputMessage = 'Start the interview';
+        },
+      });
     });
   }
 
@@ -119,48 +141,14 @@ export class ChatInterview implements OnInit, AfterViewInit, AfterContentChecked
     });
   }
 
-  private startNewSessionFromProfileSkills(): void {
-    this.mockInterviewService.getUserSkills().subscribe({
-      next: (skills) => {
-        const skillNames = skills.map((skill) => skill.name).filter((name): name is string => !!name);
-        this.mockInterviewService.startInterview(skillNames).subscribe({
-          next: (response) => {
-            this.handleStartedSession(response, skillNames);
-          },
-          error: () => {
-            this.isSessionLoading = false;
-            this.sessionStatus = 'error';
-            this.sessionError = 'Unable to start the interview session. Please try again.';
-          },
-        });
-      },
-      error: () => {
-        this.mockInterviewService.startInterview([]).subscribe({
-          next: (response) => {
-            this.handleStartedSession(response, []);
-          },
-          error: () => {
-            this.isSessionLoading = false;
-            this.sessionStatus = 'error';
-            this.sessionError = 'Unable to start the interview session. Please try again.';
-          },
-        });
-      },
-    });
-  }
-
   startNewInterview(): void {
-    if (this.isSessionLoading || this.isLoading) {
-      return;
-    }
-
+    if (this.isSessionLoading || this.isLoading) return;
     this.messages = [];
-    this.inputMessage = '';
     this.sessionError = '';
-    this.sessionStatus = 'loading';
+    this.sessionStatus = 'idle';
     this.sessionId = null;
     this.sessionSkills = [];
-    this.startNewSessionFromProfileSkills();
+    this.inputMessage = 'Start the interview';
   }
 
   openSession(sessionId: string): void {
@@ -265,18 +253,53 @@ export class ChatInterview implements OnInit, AfterViewInit, AfterContentChecked
   }
 
   sendMessage() {
-    if (
-      this.inputMessage.trim().length === 0 ||
-      !this.sessionId ||
-      this.isSessionLoading ||
-      this.sessionStatus === 'completed'
-    ) {
+    if (this.inputMessage.trim().length === 0 || this.isSessionLoading || this.sessionStatus === 'completed') {
       return;
     }
 
     const userText = this.inputMessage.trim();
+    this.inputMessage = '';
 
-    // Add user message
+    // No session yet — create one first, then send the message
+    if (!this.sessionId) {
+      this.isSessionLoading = true;
+      this.sessionStatus = 'loading';
+      this.mockInterviewService.getUserSkills().subscribe({
+        next: (skills) => {
+          const skillNames = skills.map(s => s.name).filter((n): n is string => !!n);
+          this.mockInterviewService.startInterview(skillNames).subscribe({
+            next: (response) => {
+              this.handleStartedSession(response, skillNames);
+              this._sendUserMessage(userText);
+            },
+            error: () => {
+              this.isSessionLoading = false;
+              this.sessionStatus = 'error';
+              this.sessionError = 'Unable to start the interview session. Please try again.';
+            },
+          });
+        },
+        error: () => {
+          this.mockInterviewService.startInterview([]).subscribe({
+            next: (response) => {
+              this.handleStartedSession(response, []);
+              this._sendUserMessage(userText);
+            },
+            error: () => {
+              this.isSessionLoading = false;
+              this.sessionStatus = 'error';
+              this.sessionError = 'Unable to start the interview session. Please try again.';
+            },
+          });
+        },
+      });
+      return;
+    }
+
+    this._sendUserMessage(userText);
+  }
+
+  private _sendUserMessage(userText: string) {
     const userMessage: Message = {
       id: Date.now().toString(),
       sender: 'user',
@@ -284,18 +307,13 @@ export class ChatInterview implements OnInit, AfterViewInit, AfterContentChecked
       timestamp: new Date(),
     };
     this.messages.push(userMessage);
-
-    // Clear input
-    this.inputMessage = '';
     this.scrollToBottom();
 
     this.isLoading = true;
-    this.mockInterviewService.sendMessage(this.sessionId, userText).subscribe({
+    this.mockInterviewService.sendMessage(this.sessionId!, userText).subscribe({
       next: (response) => {
         this.appendAiMessageWithTyping(response.aiMessage);
-        if (response.isCompleted) {
-          this.sessionStatus = 'completed';
-        }
+        if (response.isCompleted) this.sessionStatus = 'completed';
         this.isLoading = false;
         this.loadSessions();
         this.scrollToBottom();

@@ -47,7 +47,7 @@ export class PostJobHome implements OnInit {
     this.jobForm = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(3)]],
       location: [''],
-      jobType: [''],
+      jobType: [null],
       salaryMin: ['', [Validators.min(0)]],
       salaryMax: ['', [Validators.min(0)]],
       requiredSkills: [''],
@@ -80,9 +80,14 @@ export class PostJobHome implements OnInit {
     }
     const salaryMinValue = this.jobForm.value.salaryMin;
     const salaryMaxValue = this.jobForm.value.salaryMax;
+    const jobTypeValue = this.jobForm.value.jobType;
 
     const payload: CreateJobPayload = {
       ...this.jobForm.value,
+      jobType:
+        jobTypeValue === '' || jobTypeValue === null || jobTypeValue === undefined
+          ? undefined
+          : Number(jobTypeValue),
       salaryMin:
         salaryMinValue === '' || salaryMinValue === null || salaryMinValue === undefined
           ? undefined

@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { StatusBadge } from '../../../shared/components/status-badge/status-badge';
 import { JobService, MyJobDto } from '../../post-job/services/post-job';
 import { MarkdownService } from '../../../shared/services/markdown.service';
@@ -48,7 +48,12 @@ export class PostedJobHome implements OnInit {
   constructor(
     private jobService: JobService,
     private markdownService: MarkdownService,
+    private router: Router,
   ) {}
+
+  viewApplicants(jobId: number) {
+    this.router.navigate(['/dashboard/applicants', jobId]);
+  }
 
   get filteredJobs(): Job[] {
     return this.jobs.filter((job) => {

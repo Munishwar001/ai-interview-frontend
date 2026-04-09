@@ -1,0 +1,108 @@
+<div class="min-h-screen bg-gray-50 px-6 py-8">
+
+  <!-- Header -->
+  <div class="relative overflow-hidden rounded-2xl mb-6 bg-gradient-to-br from-indigo-700 via-blue-700 to-cyan-600 px-8 py-7 shadow-lg">
+    <div class="absolute -top-10 -right-10 w-48 h-48 rounded-full bg-white/5 blur-2xl pointer-events-none"></div>
+    <div class="relative">
+      <p class="text-blue-200 text-xs font-semibold uppercase tracking-widest mb-1">Job Seeker</p>
+      <h1 class="text-2xl font-bold text-white">Applied Jobs</h1>
+      <p class="text-blue-200 text-sm mt-1">Track the status of your applications</p>
+    </div>
+    <div class="relative mt-5 grid grid-cols-3 gap-3">
+      <div class="bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3 border border-white/20">
+        <p class="text-2xl font-bold text-white">{{ jobs().length }}</p>
+        <p class="text-blue-200 text-xs mt-0.5">Total Applied</p>
+      </div>
+      <div class="bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3 border border-white/20">
+        <p class="text-2xl font-bold text-white">{{ countByStatus('Shortlisted') }}</p>
+        <p class="text-blue-200 text-xs mt-0.5">Shortlisted</p>
+      </div>
+      <div class="bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3 border border-white/20">
+        <p class="text-2xl font-bold text-white">{{ countByStatus('Hired') }}</p>
+        <p class="text-blue-200 text-xs mt-0.5">Hired</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  @if (isLoading()) {
+    <div class="flex flex-col items-center justify-center py-20">
+      <svg class="w-8 h-8 animate-spin text-blue-500 mb-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+      </svg>
+      <p class="text-sm text-gray-400">Loading your applications...</p>
+    </div>
+  }
+
+  @if (!isLoading()) {
+    <div class="flex flex-col gap-3">
+      @for (job of jobs(); track job.applicationId) {
+        <div class="bg-white border border-gray-200 rounded-2xl p-5 hover:border-blue-200 hover:shadow-md transition-all duration-200">
+          <div class="flex items-start gap-4">
+            <div class="w-12 h-12 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center text-sm font-bold shrink-0">
+              @if (job.companyLogo && !brokenLogoIds.has(job.applicationId)) {
+                <img
+                  [src]="job.companyLogo"
+                  [alt]="job.companyName + ' logo'"
+                  class="w-full h-full object-cover rounded-xl"
+                  (error)="onLogoError(job.applicationId, $event)"
+                />
+              } @else {
+                {{ job.companyName.charAt(0) || 'J' }}
+              }
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-start justify-between gap-4">
+                <div>
+                  <h3 class="font-semibold text-gray-900 text-base">{{ job.title }}</h3>
+                  <p class="text-sm text-gray-500 mt-0.5">{{ job.companyName }}</p>
+                  <div class="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-xs text-gray-400">
+                    @if (job.location) {
+                      <span class="flex items-center gap-1">
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                        </svg>
+                        {{ job.location }}
+                      </span>
+                    }
+                    @if (job.jobType) {
+                      <span>{{ job.jobType }}</span>
+                    }
+                    <span class="flex items-center gap-1">
+                      <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                      </svg>
+                      Applied {{ job.appliedAt | date:'mediumDate' }}
+                    </span>
+                  </div>
+                </div>
+                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold border shrink-0"
+                  [class]="statusColor(job.status)">
+                  {{ job.status || 'Pending' }}
+                </span>
+              </div>
+              @if (job.coverLetter) {
+                <div class="mt-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
+                  <p class="text-xs font-semibold text-gray-500 mb-1">Cover Letter</p>
+                  <p class="text-xs text-gray-600 line-clamp-2">{{ job.coverLetter }}</p>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      }
+
+      @if (jobs().length === 0) {
+        <div class="flex flex-col items-center justify-center py-20 text-center">
+          <div class="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mb-4 border border-blue-100">
+            <svg class="w-7 h-7 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2"/>
+            </svg>
+          </div>
+          <p class="text-gray-700 font-semibold">No applications yet</p>
+          <p class="text-gray-400 text-sm mt-1">Browse job recommendations and start applying</p>
+        </div>
+      }
+    </div>
+  }
+</div>
