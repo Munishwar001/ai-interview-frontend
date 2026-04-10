@@ -2,6 +2,8 @@ import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild, sig
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import * as signalR from '@microsoft/signalr';
+import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../../../environment/environment';
 import { AuthStore } from '../../../auth/services/auth-store';
 import { ToastrService } from 'ngx-toastr';
@@ -32,6 +34,7 @@ export class InterviewRoom implements OnInit, AfterViewInit, OnDestroy {
     private route: ActivatedRoute,
     private authStore: AuthStore,
     private toastr: ToastrService,
+    private http: HttpClient,
   ) {}
 
   ngOnInit() {
@@ -128,11 +131,11 @@ export class InterviewRoom implements OnInit, AfterViewInit, OnDestroy {
     await this.connection.invoke('JoinInterview', this.interviewId);
   }
 
-  private ensurePeerConnection() {
+  private ensurePeerConnection(iceServers?: RTCIceServer[]) {
     if (this.peerConnection) return this.peerConnection;
 
     this.peerConnection = new RTCPeerConnection({
-      iceServers: [
+      iceServers: iceServers ?? [
         { urls: 'stun:stun.l.google.com:19302' },
         { urls: 'stun:stun1.l.google.com:19302' },
       ],
@@ -163,9 +166,13 @@ export class InterviewRoom implements OnInit, AfterViewInit, OnDestroy {
       await this.connection.invoke('SendIceCandidate', this.interviewId, JSON.stringify(event.candidate));
     };
 
-    // Log connection state changes for debugging
     this.peerConnection.onconnectionstatechange = () => {
-      console.log('[WebRTC] Connection state:', this.peerConnection?.connectionState);
+      const state = this.peerConnection?.connectionState;
+      console.log('[WebRTC] Connection state:', state);
+      if (state === 'failed') {
+        console.warn('[WebRTC] Connection failed — attempting ICE restart');
+        this.peerConnection?.restartIce();
+      }
     };
 
     this.peerConnection.oniceconnectionstatechange = () => {
@@ -175,9 +182,25 @@ export class InterviewRoom implements OnInit, AfterViewInit, OnDestroy {
     return this.peerConnection;
   }
 
+  private async getIceServers(): Promise<RTCIceServer[]> {
+    try {
+      const servers = await firstValueFrom(
+        this.http.get<RTCIceServer[]>(`${environment.apiUrl}/interview/ice-servers`)
+      );
+      return servers ?? [];
+    } catch {
+      // Fall back to STUN only if endpoint unavailable
+      return [
+        { urls: 'stun:stun.l.google.com:19302' },
+        { urls: 'stun:stun1.l.google.com:19302' },
+      ];
+    }
+  }
+
   private async createAndSendOffer() {
     if (!this.connection) return;
-    const pc = this.ensurePeerConnection();
+    const iceServers = await this.getIceServers();
+    const pc = this.ensurePeerConnection(iceServers);
 
     const offer = await pc.createOffer();
     await pc.setLocalDescription(offer);
@@ -187,7 +210,8 @@ export class InterviewRoom implements OnInit, AfterViewInit, OnDestroy {
 
   private async receiveOffer(sdp: string) {
     if (!this.connection) return;
-    const pc = this.ensurePeerConnection();
+    const iceServers = await this.getIceServers();
+    const pc = this.ensurePeerConnection(iceServers);
 
     await pc.setRemoteDescription(new RTCSessionDescription({ type: 'offer', sdp }));
     await this.flushPendingCandidates();
