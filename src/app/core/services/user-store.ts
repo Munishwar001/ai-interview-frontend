@@ -62,7 +62,7 @@ export class UserStore {
 
   setUserState(user: UserResponse) {
     const role = user.userRole as UserRole;
-    console.log('Setting user state with role:', role);
+// console.log removed
     var state:UserState = {
       email: user.email,
       fullName: user.fullName,

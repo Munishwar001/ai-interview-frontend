@@ -38,6 +38,20 @@ npm run build
 
 ---
 
+## Production Deployment
+
+1. **Verify Environment Configurations**:
+   Ensure `environment/environment.prod.ts` has the correct production configurations and points to your live backend APIs (e.g. `https://ai-interview-backend-b5p3.onrender.com/api`).
+2. **Build the Application**:
+   Run the following command to generate the production-ready compiled artifacts:
+   ```bash
+   npm run build
+   ```
+3. **Deploy Artifacts**:
+   The built output will be generated inside the `dist/` directory. You can serve the static files using NGINX, Apache, Firebase Hosting, Vercel, or Render.
+
+---
+
 ## Environment
 
 Configure `environment/environment.ts`:

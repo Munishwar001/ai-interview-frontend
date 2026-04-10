@@ -26,7 +26,7 @@ export class FileActionsService {
 
   downloadFromUrl(fileUrl: string, fileName?: string): void {
     const url = this.toAbsoluteUrl(fileUrl);
-    console.log('Downloading from URL:', url);
+// console.log removed
     const anchor = document.createElement('a');
     anchor.href = url;
     anchor.target = '_blank';

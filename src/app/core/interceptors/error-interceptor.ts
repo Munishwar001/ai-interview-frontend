@@ -10,10 +10,10 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
       catchError((err: any) => {
         if (err instanceof HttpErrorResponse) {
           // Server Error
-          console.log("Err server");
+// console.log removed
         } else {
           // Client Error
-          console.log("Err client");
+// console.log removed
         }
 
         if (err && err.status !== 401) {// 401 is handled in auth.interceptor

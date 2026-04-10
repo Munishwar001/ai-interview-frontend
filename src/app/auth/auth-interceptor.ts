@@ -22,20 +22,20 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     catchError((err: HttpErrorResponse) => {
 
       if (err && err.status === 401) { // Unauthorized
-        console.log('before expired msg', err);
+// console.log removed
 
         if (err.error && err.error.errorCategory === ErrorCategory.LOGIN_401) {
           // Do nothing for login form
-          console.log("in login");
+// console.log removed
         }
         else {
           // Token expired
           if (!err.error) {
-            console.log('TOKEN EXPIRED!!');
+// console.log removed
 
             if (refreshTokenInProgress) {
 
-              console.log('IF refreshTokenInProgress');
+// console.log removed
               // If refreshTokenInProgress is true, we will wait until refreshTokenSubject has a non-null value
               // which means the new token is ready and we can retry the request again
               return refreshTokenSubject.pipe(
@@ -45,7 +45,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
               );
             }
             else {
-              console.log('ELSE refreshTokenInProgress');
+// console.log removed
               refreshTokenInProgress = true;
 
               // Set the refreshTokenSubject to null so that subsequent API calls will wait until the new token has been retrieved
@@ -54,12 +54,12 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
               var refreshRequest = authService.getRefreshRequest();
               return authService.refreshToken(refreshRequest).pipe(
                 switchMap((authData) => {
-                  console.log('switch');
+// console.log removed
                   refreshTokenSubject.next(true);
                   return next(addAuthenticationToken(req, localStorageService));
                 }),
                 catchError((error) => {
-                  console.log('catch switch', error);
+// console.log removed
                   router.navigate(['/login']);
                   return throwError(() => 'to login...');
                 }),
@@ -81,7 +81,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 };
 
 const addAuthenticationToken = (request: HttpRequest<unknown>, localStorageService: AuthStore) => {
-  console.log('Add Authentication')
+// console.log removed
   const token = localStorageService.getAccessToken();
   if (!token) {
     return request;

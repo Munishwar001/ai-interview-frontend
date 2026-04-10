@@ -100,7 +100,7 @@ export class PostJobHome implements OnInit {
 
     this.jobService.createJob(payload).subscribe({
       next: (res) => {
-        console.log('Job Created:', res);
+// console.log removed
          this.toastr.success('Job posted successfully!', 'Success');
         this.jobForm.reset();
         if (this.descriptionBox) {

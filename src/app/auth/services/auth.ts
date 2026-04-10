@@ -64,12 +64,12 @@ export class AuthService {
   }
 
   isAuthenticated(): Observable<boolean> {
-    console.log('Checking authentication status...');
+// console.log removed
     if (this.isAccessTokenValid()) {
-      console.log('Not expired');
+// console.log removed
       return of(true);
     } else {
-      console.log('Expired');
+// console.log removed
 
       let refreshReq = this.getRefreshRequest();
 
@@ -90,10 +90,10 @@ export class AuthService {
 
   isAccessTokenValid() {
     let token = this.authStore.getAccessToken();
-    console.log('access toke expire => ' + token?.accessTokenExpiration);
+// console.log removed
 
     const currentDatetime = new Date();
-    console.log('current datetime => ' + currentDatetime);
+// console.log removed
     if (token && new Date(token.accessTokenExpiration) > currentDatetime) {
       return true;
     } else {
@@ -114,7 +114,7 @@ export class AuthService {
   }
 
   revokeRefreshToken() {
-    console.log('revoking...');
+// console.log removed
     let currentRefreshToken = this.authStore.getRefreshToken();
     return this.http.post<boolean>(`${this.baseUrl}/revoke-token`, {
       refreshToken: currentRefreshToken,
@@ -123,7 +123,7 @@ export class AuthService {
 
   logout() {
   this.socialAuthService.signOut().catch(() => {
-    console.log('Google signout failed or not logged in');
+// console.log removed
   });
   
   this.revokeRefreshToken().pipe(

@@ -49,6 +49,6 @@ export class MockInterview implements AfterViewInit, OnDestroy {
 
   chooseRole() {
     // Placeholder for role selection logic
-    console.log('Choose role functionality');
+// console.log removed
   }
 }
