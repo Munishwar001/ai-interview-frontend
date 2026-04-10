@@ -105,6 +105,10 @@ export class InterviewRoom implements OnInit, AfterViewInit, OnDestroy {
       await this.createAndSendOffer();
     });
 
+    this.connection.on('JoinedInterview', (id: number) => {
+      console.log('[SignalR] Successfully joined interview room:', id);
+    });
+
     this.connection.on('ReceiveOffer', async (sdp: string) => {
       await this.receiveOffer(sdp);
     });
@@ -129,9 +133,13 @@ export class InterviewRoom implements OnInit, AfterViewInit, OnDestroy {
     if (this.peerConnection) return this.peerConnection;
 
     this.peerConnection = new RTCPeerConnection({
-      iceServers: [{ urls: 'stun:stun.l.google.com:19302' }],
+      iceServers: [
+        { urls: 'stun:stun.l.google.com:19302' },
+        { urls: 'stun:stun1.l.google.com:19302' },
+      ],
     });
 
+    // Add local tracks — must happen before creating offer/answer
     if (this.localStream) {
       this.localStream.getTracks().forEach((track) => {
         this.peerConnection!.addTrack(track, this.localStream!);
@@ -139,16 +147,30 @@ export class InterviewRoom implements OnInit, AfterViewInit, OnDestroy {
     }
 
     this.peerConnection.ontrack = (event) => {
-      const [stream] = event.streams;
-      if (this.remoteVideoRef?.nativeElement && stream) {
-        this.remoteVideoRef.nativeElement.srcObject = stream;
-        this.hasRemote.set(true);
-      }
+      const stream = event.streams?.[0] ?? new MediaStream([event.track]);
+      // Use setTimeout to ensure the DOM element is available
+      setTimeout(() => {
+        const videoEl = this.remoteVideoRef?.nativeElement;
+        if (videoEl) {
+          videoEl.srcObject = stream;
+          videoEl.play().catch(() => {/* autoplay policy — user interaction needed */});
+          this.hasRemote.set(true);
+        }
+      }, 0);
     };
 
     this.peerConnection.onicecandidate = async (event) => {
       if (!event.candidate || !this.connection) return;
       await this.connection.invoke('SendIceCandidate', this.interviewId, JSON.stringify(event.candidate));
+    };
+
+    // Log connection state changes for debugging
+    this.peerConnection.onconnectionstatechange = () => {
+      console.log('[WebRTC] Connection state:', this.peerConnection?.connectionState);
+    };
+
+    this.peerConnection.oniceconnectionstatechange = () => {
+      console.log('[WebRTC] ICE state:', this.peerConnection?.iceConnectionState);
     };
 
     return this.peerConnection;
@@ -168,7 +190,8 @@ export class InterviewRoom implements OnInit, AfterViewInit, OnDestroy {
     if (!this.connection) return;
     const pc = this.ensurePeerConnection();
 
-    await pc.setRemoteDescription({ type: 'offer', sdp });
+    await pc.setRemoteDescription(new RTCSessionDescription({ type: 'offer', sdp }));
+    await this.flushPendingCandidates();
     const answer = await pc.createAnswer();
     await pc.setLocalDescription(answer);
 
@@ -177,18 +200,44 @@ export class InterviewRoom implements OnInit, AfterViewInit, OnDestroy {
 
   private async receiveAnswer(sdp: string) {
     if (!this.peerConnection) return;
-    await this.peerConnection.setRemoteDescription({ type: 'answer', sdp });
+    if (this.peerConnection.signalingState === 'have-local-offer') {
+      await this.peerConnection.setRemoteDescription(new RTCSessionDescription({ type: 'answer', sdp }));
+      await this.flushPendingCandidates();
+    }
   }
 
+  private pendingCandidates: RTCIceCandidateInit[] = [];
+
   private async receiveIceCandidate(payload: string) {
+    let parsed: RTCIceCandidateInit;
+    try {
+      parsed = JSON.parse(payload);
+    } catch {
+      parsed = { candidate: payload };
+    }
+
     const pc = this.ensurePeerConnection();
 
-    try {
-      const parsed = JSON.parse(payload);
-      await pc.addIceCandidate(new RTCIceCandidate(parsed));
-    } catch {
-      await pc.addIceCandidate(new RTCIceCandidate({ candidate: payload }));
+    // Queue if remote description not set yet
+    if (!pc.remoteDescription) {
+      this.pendingCandidates.push(parsed);
+      return;
     }
+
+    try {
+      await pc.addIceCandidate(new RTCIceCandidate(parsed));
+    } catch (e) {
+      console.warn('[WebRTC] Failed to add ICE candidate:', e);
+    }
+  }
+
+  private async flushPendingCandidates() {
+    const pc = this.peerConnection;
+    if (!pc) return;
+    for (const c of this.pendingCandidates) {
+      try { await pc.addIceCandidate(new RTCIceCandidate(c)); } catch { /* ignore */ }
+    }
+    this.pendingCandidates = [];
   }
 
   private async cleanup() {
@@ -204,6 +253,7 @@ export class InterviewRoom implements OnInit, AfterViewInit, OnDestroy {
       this.peerConnection.close();
       this.peerConnection = null;
     }
+    this.pendingCandidates = [];
 
     if (this.localStream) {
       this.localStream.getTracks().forEach((track) => track.stop());
