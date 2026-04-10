@@ -2,8 +2,6 @@ import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild, sig
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import * as signalR from '@microsoft/signalr';
-import { HttpClient } from '@angular/common/http';
-import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../../../environment/environment';
 import { AuthStore } from '../../../auth/services/auth-store';
 import { ToastrService } from 'ngx-toastr';
@@ -34,7 +32,6 @@ export class InterviewRoom implements OnInit, AfterViewInit, OnDestroy {
     private route: ActivatedRoute,
     private authStore: AuthStore,
     private toastr: ToastrService,
-    private http: HttpClient,
   ) {}
 
   ngOnInit() {
@@ -95,20 +92,17 @@ export class InterviewRoom implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private async setupSignalR() {
+    const token = this.authStore.getAccessToken()?.accessToken || '';
+
     this.connection = new signalR.HubConnectionBuilder()
       .withUrl(`${environment.url}/hubs/interview`, {
-        // Always fetch a fresh token so reconnects don't use a stale/expired one
-        accessTokenFactory: () => this.authStore.getAccessToken()?.accessToken || '',
+        accessTokenFactory: () => token,
       })
       .withAutomaticReconnect()
       .build();
 
     this.connection.on('ParticipantJoined', async () => {
       await this.createAndSendOffer();
-    });
-
-    this.connection.on('JoinedInterview', (id: number) => {
-      console.log('[SignalR] Successfully joined interview room:', id);
     });
 
     this.connection.on('ReceiveOffer', async (sdp: string) => {
@@ -131,17 +125,13 @@ export class InterviewRoom implements OnInit, AfterViewInit, OnDestroy {
     await this.connection.invoke('JoinInterview', this.interviewId);
   }
 
-  private ensurePeerConnection(iceServers?: RTCIceServer[]) {
+  private ensurePeerConnection() {
     if (this.peerConnection) return this.peerConnection;
 
     this.peerConnection = new RTCPeerConnection({
-      iceServers: iceServers ?? [
-        { urls: 'stun:stun.l.google.com:19302' },
-        { urls: 'stun:stun1.l.google.com:19302' },
-      ],
+      iceServers: [{ urls: 'stun:stun.l.google.com:19302' }],
     });
 
-    // Add local tracks — must happen before creating offer/answer
     if (this.localStream) {
       this.localStream.getTracks().forEach((track) => {
         this.peerConnection!.addTrack(track, this.localStream!);
@@ -149,16 +139,11 @@ export class InterviewRoom implements OnInit, AfterViewInit, OnDestroy {
     }
 
     this.peerConnection.ontrack = (event) => {
-      const stream = event.streams?.[0] ?? new MediaStream([event.track]);
-      // Use setTimeout to ensure the DOM element is available
-      setTimeout(() => {
-        const videoEl = this.remoteVideoRef?.nativeElement;
-        if (videoEl) {
-          videoEl.srcObject = stream;
-          videoEl.play().catch(() => {/* autoplay policy — user interaction needed */});
-          this.hasRemote.set(true);
-        }
-      }, 0);
+      const [stream] = event.streams;
+      if (this.remoteVideoRef?.nativeElement && stream) {
+        this.remoteVideoRef.nativeElement.srcObject = stream;
+        this.hasRemote.set(true);
+      }
     };
 
     this.peerConnection.onicecandidate = async (event) => {
@@ -166,41 +151,12 @@ export class InterviewRoom implements OnInit, AfterViewInit, OnDestroy {
       await this.connection.invoke('SendIceCandidate', this.interviewId, JSON.stringify(event.candidate));
     };
 
-    this.peerConnection.onconnectionstatechange = () => {
-      const state = this.peerConnection?.connectionState;
-      console.log('[WebRTC] Connection state:', state);
-      if (state === 'failed') {
-        console.warn('[WebRTC] Connection failed — attempting ICE restart');
-        this.peerConnection?.restartIce();
-      }
-    };
-
-    this.peerConnection.oniceconnectionstatechange = () => {
-      console.log('[WebRTC] ICE state:', this.peerConnection?.iceConnectionState);
-    };
-
     return this.peerConnection;
-  }
-
-  private async getIceServers(): Promise<RTCIceServer[]> {
-    try {
-      const servers = await firstValueFrom(
-        this.http.get<RTCIceServer[]>(`${environment.apiUrl}/interview/ice-servers`)
-      );
-      return servers ?? [];
-    } catch {
-      // Fall back to STUN only if endpoint unavailable
-      return [
-        { urls: 'stun:stun.l.google.com:19302' },
-        { urls: 'stun:stun1.l.google.com:19302' },
-      ];
-    }
   }
 
   private async createAndSendOffer() {
     if (!this.connection) return;
-    const iceServers = await this.getIceServers();
-    const pc = this.ensurePeerConnection(iceServers);
+    const pc = this.ensurePeerConnection();
 
     const offer = await pc.createOffer();
     await pc.setLocalDescription(offer);
@@ -210,11 +166,9 @@ export class InterviewRoom implements OnInit, AfterViewInit, OnDestroy {
 
   private async receiveOffer(sdp: string) {
     if (!this.connection) return;
-    const iceServers = await this.getIceServers();
-    const pc = this.ensurePeerConnection(iceServers);
+    const pc = this.ensurePeerConnection();
 
-    await pc.setRemoteDescription(new RTCSessionDescription({ type: 'offer', sdp }));
-    await this.flushPendingCandidates();
+    await pc.setRemoteDescription({ type: 'offer', sdp });
     const answer = await pc.createAnswer();
     await pc.setLocalDescription(answer);
 
@@ -223,44 +177,18 @@ export class InterviewRoom implements OnInit, AfterViewInit, OnDestroy {
 
   private async receiveAnswer(sdp: string) {
     if (!this.peerConnection) return;
-    if (this.peerConnection.signalingState === 'have-local-offer') {
-      await this.peerConnection.setRemoteDescription(new RTCSessionDescription({ type: 'answer', sdp }));
-      await this.flushPendingCandidates();
-    }
+    await this.peerConnection.setRemoteDescription({ type: 'answer', sdp });
   }
-
-  private pendingCandidates: RTCIceCandidateInit[] = [];
 
   private async receiveIceCandidate(payload: string) {
-    let parsed: RTCIceCandidateInit;
-    try {
-      parsed = JSON.parse(payload);
-    } catch {
-      parsed = { candidate: payload };
-    }
-
     const pc = this.ensurePeerConnection();
 
-    // Queue if remote description not set yet
-    if (!pc.remoteDescription) {
-      this.pendingCandidates.push(parsed);
-      return;
-    }
-
     try {
+      const parsed = JSON.parse(payload);
       await pc.addIceCandidate(new RTCIceCandidate(parsed));
-    } catch (e) {
-      console.warn('[WebRTC] Failed to add ICE candidate:', e);
+    } catch {
+      await pc.addIceCandidate(new RTCIceCandidate({ candidate: payload }));
     }
-  }
-
-  private async flushPendingCandidates() {
-    const pc = this.peerConnection;
-    if (!pc) return;
-    for (const c of this.pendingCandidates) {
-      try { await pc.addIceCandidate(new RTCIceCandidate(c)); } catch { /* ignore */ }
-    }
-    this.pendingCandidates = [];
   }
 
   private async cleanup() {
@@ -276,7 +204,6 @@ export class InterviewRoom implements OnInit, AfterViewInit, OnDestroy {
       this.peerConnection.close();
       this.peerConnection = null;
     }
-    this.pendingCandidates = [];
 
     if (this.localStream) {
       this.localStream.getTracks().forEach((track) => track.stop());

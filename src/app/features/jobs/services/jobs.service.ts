@@ -89,6 +89,57 @@ export interface InterviewDto {
   [key: string]: unknown;
 }
 
+export interface ApplicationChatRoomDto {
+  applicationId: number;
+  participantName: string;
+  participantEmail?: string;
+  participantAvatar?: string;
+  jobTitle: string;
+  status: string;
+  lastMessage?: string;
+  lastMessageAt?: string;
+}
+
+export interface ApplicationChatMessageDto {
+  id: number;
+  applicationId: number;
+  senderId: string;
+  senderName: string;
+  message: string;
+  createdAt: string;
+}
+
+interface BackendApplicationChatRoom {
+  applicationId?: number;
+  participantName?: string;
+  userName?: string;
+  participantEmail?: string;
+  email?: string;
+  participantAvatar?: string;
+  avatar?: string;
+  jobTitle?: string;
+  title?: string;
+  status?: string;
+  lastMessage?: string;
+  latestMessage?: string;
+  lastMessageAt?: string;
+  latestMessageAt?: string;
+}
+
+interface BackendApplicationChatMessage {
+  id?: number;
+  messageId?: number;
+  applicationId?: number;
+  senderId?: string;
+  userId?: string;
+  senderName?: string;
+  name?: string;
+  message?: string;
+  text?: string;
+  createdAt?: string;
+  sentAt?: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class JobsService {
   private readonly base = `${environment.apiUrl}/applications`;
@@ -162,6 +213,24 @@ export class JobsService {
     return this.http.get<InterviewDto>(`${this.base}/interviews/${interviewId}`);
   }
 
+  getChatRooms(): Observable<ApplicationChatRoomDto[]> {
+    return this.http
+      .get<BackendApplicationChatRoom[]>(`${this.base}/chat/rooms`)
+      .pipe(map((rooms) => rooms.map((room) => this.toApplicationChatRoom(room))));
+  }
+
+  getChatMessages(applicationId: number): Observable<ApplicationChatMessageDto[]> {
+    return this.http
+      .get<BackendApplicationChatMessage[]>(`${this.base}/${applicationId}/chat/messages`)
+      .pipe(map((messages) => messages.map((message) => this.toApplicationChatMessage(message))));
+  }
+
+  sendChatMessage(applicationId: number, message: string): Observable<ApplicationChatMessageDto> {
+    return this.http
+      .post<BackendApplicationChatMessage>(`${this.base}/${applicationId}/chat/messages`, { message })
+      .pipe(map((created) => this.toApplicationChatMessage(created)));
+  }
+
   private toJobListItem(job: BackendJob): JobListItem {
     return {
       jobId: job.jobId ?? job.id ?? 0,
@@ -206,5 +275,29 @@ export class JobsService {
     if (path.startsWith('http')) return path;
     const base = (environment.url || '').replace(/\/$/, '');
     return `${base}${path}`;
+  }
+
+  private toApplicationChatRoom(room: BackendApplicationChatRoom): ApplicationChatRoomDto {
+    return {
+      applicationId: room.applicationId ?? 0,
+      participantName: room.participantName ?? room.userName ?? 'Unknown User',
+      participantEmail: room.participantEmail ?? room.email,
+      participantAvatar: this.toAbsoluteUrl(room.participantAvatar ?? room.avatar),
+      jobTitle: room.jobTitle ?? room.title ?? '',
+      status: room.status ?? 'Shortlisted',
+      lastMessage: room.lastMessage ?? room.latestMessage,
+      lastMessageAt: room.lastMessageAt ?? room.latestMessageAt,
+    };
+  }
+
+  private toApplicationChatMessage(message: BackendApplicationChatMessage): ApplicationChatMessageDto {
+    return {
+      id: message.id ?? message.messageId ?? 0,
+      applicationId: message.applicationId ?? 0,
+      senderId: message.senderId ?? message.userId ?? '',
+      senderName: message.senderName ?? message.name ?? 'User',
+      message: message.message ?? message.text ?? '',
+      createdAt: message.createdAt ?? message.sentAt ?? new Date().toISOString(),
+    };
   }
 }

@@ -123,6 +123,12 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/jobs/interview-room/interview-room').then((m) => m.InterviewRoom),
       },
+      {
+        path: 'chats',
+        canMatch: [authGuard],
+        loadComponent: () =>
+          import('./features/jobs/chats/chats').then((m) => m.Chats),
+      },
     ],
   },
   {

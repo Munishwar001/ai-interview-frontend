@@ -36,11 +36,13 @@
     "@microsoft/signalr": "^10.0.0",
     "@tailwindcss/postcss": "^4.2.1",
     "@types/leaflet": "^1.9.21",
+    "emoji-picker-element": "^1.29.1",
     "gsap": "^3.14.2",
     "leaflet": "^1.9.4",
     "localstorage-slim": "^2.7.1",
     "lottie-web": "^5.13.0",
     "marked": "^17.0.5",
+    "ngx-emoji-picker": "^0.1.6",
     "ngx-lottie": "^21.2.0",
     "ngx-toastr": "19.1.0",
     "postcss": "^8.5.8",
@@ -49,6 +51,7 @@
     "tailwindcss": "^4.2.1",
     "three": "^0.183.2",
     "tslib": "^2.3.0",
+    "twemoji": "^14.0.2",
     "zone.js": "~0.15.0"
   },
   "devDependencies": {

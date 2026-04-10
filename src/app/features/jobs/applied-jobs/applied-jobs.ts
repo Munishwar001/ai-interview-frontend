@@ -1,5 +1,6 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { JobsService } from '../services/jobs.service';
 
@@ -19,7 +20,7 @@ export interface AppliedJob {
 @Component({
   selector: 'app-applied-jobs',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './applied-jobs.html',
 })
 export class AppliedJobs implements OnInit {
