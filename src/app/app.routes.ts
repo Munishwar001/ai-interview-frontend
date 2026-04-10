@@ -111,6 +111,18 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/jobs/applicants/applicants').then((m) => m.Applicants),
       },
+      {
+        path: 'interviews',
+        canMatch: [authGuard],
+        loadComponent: () =>
+          import('./features/jobs/interviews/interviews').then((m) => m.Interviews),
+      },
+      {
+        path: 'interviews/:interviewId',
+        canMatch: [authGuard],
+        loadComponent: () =>
+          import('./features/jobs/interview-room/interview-room').then((m) => m.InterviewRoom),
+      },
     ],
   },
   {

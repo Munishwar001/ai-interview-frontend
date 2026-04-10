@@ -70,6 +70,25 @@ export interface ApplyJobDto {
   coverLetter?: string;
 }
 
+export interface ScheduleVideoInterviewDto {
+  scheduledAt: string;
+  notes?: string;
+}
+
+export interface InterviewDto {
+  id?: number;
+  interviewId?: number;
+  applicationId?: number;
+  jobId?: number;
+  scheduledAt?: string;
+  notes?: string;
+  status?: string;
+  meetingUrl?: string;
+  joinUrl?: string;
+  roomUrl?: string;
+  [key: string]: unknown;
+}
+
 @Injectable({ providedIn: 'root' })
 export class JobsService {
   private readonly base = `${environment.apiUrl}/applications`;
@@ -125,6 +144,22 @@ export class JobsService {
 
   updateStatus(applicationId: number, status: string): Observable<void> {
     return this.http.patch<void>(`${this.base}/${applicationId}/status`, { status });
+  }
+
+  scheduleInterview(applicationId: number, payload: ScheduleVideoInterviewDto): Observable<InterviewDto> {
+    return this.http.post<InterviewDto>(`${this.base}/${applicationId}/interviews`, payload);
+  }
+
+  getInterviewsByJob(jobId: number): Observable<InterviewDto[]> {
+    return this.http.get<InterviewDto[]>(`${this.base}/jobs/${jobId}/interviews`);
+  }
+
+  getMyInterviews(): Observable<InterviewDto[]> {
+    return this.http.get<InterviewDto[]>(`${this.base}/my/interviews`);
+  }
+
+  getInterview(interviewId: number): Observable<InterviewDto> {
+    return this.http.get<InterviewDto>(`${this.base}/interviews/${interviewId}`);
   }
 
   private toJobListItem(job: BackendJob): JobListItem {

@@ -82,6 +82,11 @@ export const JOBSEEKER_MENU: SidebarItem[] = [
     route: '/dashboard/applied'
   },
   {
+    label: 'Interviews',
+    icon: 'interview',
+    route: '/dashboard/interviews'
+  },
+  {
     label: 'Mock Interview',
     icon: 'interview',
     route: '/dashboard/mock-interview',

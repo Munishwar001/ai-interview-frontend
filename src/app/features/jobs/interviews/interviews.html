@@ -1,0 +1,46 @@
+<div class="min-h-screen bg-gray-50 px-4 py-6 sm:px-6 sm:py-8">
+  <div class="max-w-5xl mx-auto">
+    <div class="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm mb-4">
+      <h1 class="text-xl font-bold text-gray-900">Scheduled Interviews</h1>
+      <p class="text-sm text-gray-500 mt-1">Join your upcoming video interviews.</p>
+    </div>
+
+    @if (isLoading()) {
+      <div class="bg-white border border-gray-200 rounded-2xl p-8 text-center text-gray-500">Loading interviews...</div>
+    }
+
+    @if (!isLoading()) {
+      <div class="space-y-3">
+        @for (item of interviews(); track item.displayId) {
+          <div class="bg-white border border-gray-200 rounded-2xl p-4 sm:p-5">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div>
+                <p class="text-sm font-semibold text-gray-900">{{ item.displayJobTitle }}</p>
+                <p class="text-xs text-gray-500 mt-1">Interview #{{ item.displayId }}</p>
+                <p class="text-xs text-gray-500 mt-1">
+                  {{ item.scheduledAt ? (item.scheduledAt | date:'medium') : 'Schedule pending' }}
+                </p>
+              </div>
+
+              <a
+                [routerLink]="['/dashboard/interviews', item.displayId]"
+                class="inline-flex items-center justify-center px-4 py-2 rounded-xl bg-violet-600 hover:bg-violet-700 text-white text-sm font-semibold transition-colors"
+              >
+                Join Interview
+              </a>
+            </div>
+          </div>
+        }
+
+        @if (!interviews().length) {
+          <div class="bg-white border border-gray-200 rounded-2xl p-8 text-center">
+            <p class="text-gray-700 font-semibold">No interviews scheduled</p>
+            <p class="text-gray-500 text-sm mt-1">
+              {{ isEmployer ? 'Schedule an interview from the applicants page.' : 'You will see employer scheduled interviews here.' }}
+            </p>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>
