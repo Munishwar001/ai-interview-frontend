@@ -92,11 +92,10 @@ export class InterviewRoom implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private async setupSignalR() {
-    const token = this.authStore.getAccessToken()?.accessToken || '';
-
     this.connection = new signalR.HubConnectionBuilder()
       .withUrl(`${environment.url}/hubs/interview`, {
-        accessTokenFactory: () => token,
+        // Always fetch a fresh token so reconnects don't use a stale/expired one
+        accessTokenFactory: () => this.authStore.getAccessToken()?.accessToken || '',
       })
       .withAutomaticReconnect()
       .build();
