@@ -1,6 +1,7 @@
 import { Injectable, signal, computed } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
+import { Observable } from 'rxjs';
 import { UserProfileData } from '../../profiles.models';
 import { JobSeekerService } from './job-seeker.service';
 import { environment } from '../../../../../../environment/environment';
@@ -14,6 +15,7 @@ export class ProfileStateService {
   readonly isUploadingResume = signal(false);
   readonly isUploadingAvatar = signal(false);
   readonly showAvatarModal = signal(false);
+  readonly showPdfPreview = signal(false);
 
   readonly profile = signal<UserProfileData>({
     name: '', title: '', location: '', email: '',
@@ -37,6 +39,10 @@ export class ProfileStateService {
 
   readonly resumeFileName = computed(() =>
     this.profile().resumeFileName ?? this.profile().resume?.name ?? null
+  );
+
+  readonly resumeFilePath = computed(() =>
+    this.profile().resumeFilePath ?? null
   );
 
   profileForm!: FormGroup;
@@ -185,6 +191,10 @@ export class ProfileStateService {
     });
   }
 
+  loadPdfBlob(): Observable<Blob> {
+    return this.svc.downloadResume();
+  }
+
   // ── Avatar ──────────────────────────────────────────────────────────────────
   onAvatarSelected(file: File) {
     this.isUploadingAvatar.set(true);
@@ -210,5 +220,15 @@ export class ProfileStateService {
       },
       error: () => this.toastr.error('Failed to remove avatar.'),
     });
+  }
+
+  openPdfPreview() {
+    if (this.resumeFilePath()) {
+      this.showPdfPreview.set(true);
+    }
+  }
+
+  closePdfPreview() {
+    this.showPdfPreview.set(false);
   }
 }

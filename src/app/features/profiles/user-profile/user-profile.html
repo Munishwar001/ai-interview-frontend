@@ -343,6 +343,16 @@
         <!-- Actions -->
         <div class="flex items-center gap-2 shrink-0">
           <button
+            (click)="openPdfPreview()"
+            class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-violet-700 bg-white border border-violet-200 rounded-lg hover:bg-violet-50 transition"
+          >
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+            </svg>
+            View
+          </button>
+          <button
             (click)="downloadResume()"
             class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-violet-700 bg-white border border-violet-200 rounded-lg hover:bg-violet-50 transition"
           >
@@ -381,6 +391,64 @@
         </div>
       </div>
     </section>
+
+    <!-- PDF Preview Modal -->
+    @if (showPdfPreview()) {
+      <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+           (click)="closePdfPreview()">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-4xl h-screen max-h-[90vh] flex flex-col"
+             (click)="$event.stopPropagation()">
+          
+          <!-- Header -->
+          <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+            <h3 class="text-lg font-semibold text-gray-900">{{ resumeFileName() }}</h3>
+            <button
+              (click)="closePdfPreview()"
+              class="p-2 rounded-lg hover:bg-gray-100 transition text-gray-400 hover:text-gray-600"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+
+          <!-- PDF Viewer -->
+          <div class="flex-1 overflow-hidden bg-gray-100">
+            @if (safePdfUrl()) {
+              <iframe
+                [src]="safePdfUrl()"
+                class="w-full h-full border-none"
+                title="Resume PDF Preview">
+              </iframe>
+            }
+          </div>
+
+          <!-- Footer with actions -->
+          <div class="flex items-center justify-between px-6 py-3 border-t border-gray-100 bg-gray-50">
+            <p class="text-xs text-gray-500">PDF Viewer</p>
+            <div class="flex items-center gap-2">
+              <a
+                [href]="resumeFilePath()"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-violet-700 bg-white border border-violet-200 rounded-lg hover:bg-violet-50 transition"
+              >
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                </svg>
+                Open in New Tab
+              </a>
+              <button
+                (click)="closePdfPreview()"
+                class="px-4 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
 
     <!-- ═══════════════════════════════════════════════════════════
          SECTION: Experience

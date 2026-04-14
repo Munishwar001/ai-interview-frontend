@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { LocationSearch } from '../../../shared/components/location-search/location-search';
 import { DatePickerComponent } from '../../../shared/components/date-picker/date-picker';
 import { EmptyState } from '../../../shared/components/empty-state/empty-state';
@@ -21,12 +22,15 @@ import { SkillsStateService } from './services/skills-state.service';
 })
 export class UserProfile implements OnInit {
   readonly currentYear = new Date().getFullYear();
+  private pdfDataUrl = signal<SafeResourceUrl | null>(null);
+  readonly safePdfUrl = this.pdfDataUrl.asReadonly();
 
   constructor(
     public ps: ProfileStateService,
     public exp: ExperienceStateService,
     public edu: EducationStateService,
     public skills: SkillsStateService,
+    private sanitizer: DomSanitizer,
   ) {}
 
   ngOnInit() {
@@ -67,6 +71,28 @@ export class UserProfile implements OnInit {
   removeResume() { this.ps.removeResume(); }
   downloadResume() { this.ps.downloadResume(); }
   printResume() { this.ps.printResume(); }
+  
+  openPdfPreview() {
+    this.ps.loadPdfBlob().subscribe({
+      next: (blob) => {
+        const dataUrl = URL.createObjectURL(blob);
+        const safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(dataUrl);
+        this.pdfDataUrl.set(safeUrl);
+        this.ps.openPdfPreview();
+      },
+      error: () => {
+        console.error('Failed to load PDF for preview');
+      },
+    });
+  }
+
+  closePdfPreview() {
+    this.ps.closePdfPreview();
+    this.pdfDataUrl.set(null);
+  }
+
+  get resumeFilePath() { return this.ps.resumeFilePath; }
+  get showPdfPreview() { return this.ps.showPdfPreview; }
 
   triggerAvatarUpload() { document.getElementById('avatarInput')?.click(); }
   onAvatarSelected(event: Event) {

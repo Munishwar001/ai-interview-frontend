@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
+import { gsap } from 'gsap';
 import { UserStore } from '../../core/services/user-store';
 
 interface StatCard {
@@ -65,10 +66,13 @@ interface ActiveJob {
   templateUrl: './dashboard.html',
   styleUrls: ['./dashboard.scss']
 })
-export class Dashboard implements OnInit {
+export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
+  @ViewChild('wavingHand') wavingHand?: ElementRef<HTMLElement>;
+
   userName = 'Munishwar';
   isEmployer = false;
   isNavigating = false;
+  private handWaveTween?: gsap.core.Tween;
 
   // Job Seeker Stats
   jobSeekerStats: StatCard[] = [
@@ -280,6 +284,33 @@ export class Dashboard implements OnInit {
     const userState = this.userStore.state;
     this.isEmployer = userState.isEmployerAccess;
     this.userName = userState.fullName || 'Munishwar';
+  }
+
+  ngAfterViewInit(): void {
+    if (!this.wavingHand?.nativeElement) {
+      return;
+    }
+
+    if (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      return;
+    }
+
+    this.handWaveTween = gsap.fromTo(
+      this.wavingHand.nativeElement,
+      { rotation: 0 },
+      {
+        rotation: 18,
+        duration: 0.22,
+        ease: 'power2.inOut',
+        yoyo: true,
+        repeat: 5,
+        transformOrigin: '70% 70%'
+      }
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.handWaveTween?.kill();
   }
 
   get statCards(): StatCard[] {
