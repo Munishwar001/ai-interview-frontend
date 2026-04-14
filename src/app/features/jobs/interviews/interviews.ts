@@ -1,6 +1,6 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { forkJoin, map, of } from 'rxjs';
 import { JobsService, InterviewDto } from '../services/jobs.service';
 import { JobService, MyJobDto } from '../../post-job/services/post-job';
@@ -16,16 +16,19 @@ interface InterviewViewModel extends InterviewDto {
   standalone: true,
   imports: [CommonModule, RouterLink],
   templateUrl: './interviews.html',
+  styleUrl: './interviews.scss'
 })
 export class Interviews implements OnInit {
   interviews = signal<InterviewViewModel[]>([]);
   isLoading = signal(true);
   isEmployer = false;
+  isNavigating = false;
 
   constructor(
     private jobsService: JobsService,
     private jobService: JobService,
     private userStore: UserStore,
+    private router: Router
   ) {}
 
   ngOnInit() {

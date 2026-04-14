@@ -64,18 +64,26 @@ export class InterviewRoom implements OnInit, AfterViewInit, OnDestroy {
     await this.cleanup();
   }
 
-  async toggleMic() {
-    if (!this.localStream) return;
+  toggleMic() {
     const enabled = !this.micEnabled();
-    this.localStream.getAudioTracks().forEach((t) => t.enabled = enabled);
     this.micEnabled.set(enabled);
+    
+    if (this.localStream) {
+      this.localStream.getAudioTracks().forEach((t) => t.enabled = enabled);
+    }
+    
+    console.log('Mic toggled:', enabled ? 'ON' : 'OFF');
   }
 
-  async toggleCamera() {
-    if (!this.localStream) return;
+  toggleCamera() {
     const enabled = !this.cameraEnabled();
-    this.localStream.getVideoTracks().forEach((t) => t.enabled = enabled);
     this.cameraEnabled.set(enabled);
+    
+    if (this.localStream) {
+      this.localStream.getVideoTracks().forEach((t) => t.enabled = enabled);
+    }
+    
+    console.log('Camera toggled:', enabled ? 'ON' : 'OFF');
   }
 
   async leaveRoom() {

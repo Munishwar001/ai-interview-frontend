@@ -63,7 +63,9 @@ export class DashboardLayout implements OnInit {
   private updateRouteLayout(url: string) {
     this.isFullBleedRoute =
       url.includes('/dashboard/mock-interview') ||
-      url.includes('/dashboard/chats');
+      url.includes('/dashboard/chats') ||
+      url === '/dashboard' ||
+      url === '/dashboard/';
 
     // Derive page title from the matching menu item
     const allItems = [...EMPLOYER_MENU, ...JOBSEEKER_MENU];

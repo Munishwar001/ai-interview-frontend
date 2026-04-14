@@ -1,0 +1,240 @@
+<div class="dashboard-container" [class.navigating]="isNavigating">
+  <div class="dashboard-content">
+    <!-- Header Section -->
+    <div class="dashboard-header">
+      <div class="welcome-section">
+        <h1 class="welcome-title">Welcome back, {{ userName }}! 👋</h1>
+        <p class="welcome-subtitle">Here's what's happening with your {{ isEmployer ? 'hiring today' : 'job search today' }}.</p>
+      </div>
+      <button *ngIf="!isEmployer" class="enhance-resume-btn" (click)="enhanceResume()">
+        <span class="btn-icon">✨</span>
+        Enhance Resume with AI
+      </button>
+      <button *ngIf="isEmployer" class="enhance-resume-btn" (click)="postNewJob()">
+        <span class="btn-icon">➕</span>
+        Post New Job
+      </button>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+      <div class="stat-card" *ngFor="let stat of statCards">
+        <div class="stat-content">
+          <div class="stat-header">
+            <span class="stat-title">{{ stat.title }}</span>
+            <div class="stat-icon" [style.background-color]="stat.iconBg">
+              {{ stat.icon }}
+            </div>
+          </div>
+          <div class="stat-value">{{ stat.value }}</div>
+          <div class="stat-progress" *ngIf="stat.title === 'Profile Completion'">
+            <div class="progress-bar">
+              <div class="progress-fill" [style.width]="stat.value"></div>
+            </div>
+          </div>
+          <div class="stat-change" *ngIf="stat.change">
+            {{ stat.change }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Job Seeker Dashboard -->
+    <div class="content-grid" *ngIf="!isEmployer">
+      <!-- Recommended Jobs Section -->
+      <div class="section recommended-jobs-section">
+        <div class="section-header">
+          <div class="section-title-wrapper">
+            <h2 class="section-title">Recommended Jobs</h2>
+            <span class="ai-badge">🤖 AI Powered</span>
+          </div>
+          <button class="view-all-btn" (click)="viewAllJobs()">
+            View All
+            <span class="arrow">→</span>
+          </button>
+        </div>
+
+        <div class="jobs-list">
+          <div class="job-card" *ngFor="let job of recommendedJobs">
+            <div class="job-header">
+              <div class="job-logo">{{ job.logo }}</div>
+              <div class="job-info">
+                <h3 class="job-title">{{ job.title }}</h3>
+                <div class="job-company">
+                  <span class="company-icon">🏢</span>
+                  {{ job.company }}
+                </div>
+              </div>
+              <div class="match-badge">{{ job.matchPercentage }}% Match</div>
+            </div>
+            
+            <div class="job-details">
+              <div class="job-detail-item">
+                <span class="detail-icon">📍</span>
+                {{ job.location }}
+              </div>
+              <div class="job-detail-item">
+                <span class="detail-icon">💰</span>
+                {{ job.salary }}
+              </div>
+              <div class="job-detail-item">
+                <span class="detail-icon">🕐</span>
+                {{ job.postedTime }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Applications Section -->
+      <div class="section recent-applications-section">
+        <div class="section-header">
+          <h2 class="section-title">Recent Applications</h2>
+          <button class="view-all-btn" (click)="viewAllApplications()">
+            View All
+            <span class="arrow">→</span>
+          </button>
+        </div>
+
+        <div class="applications-list">
+          <div class="application-card" *ngFor="let app of recentApplications">
+            <div class="application-info">
+              <h3 class="application-job-title">{{ app.jobTitle }}</h3>
+              <p class="application-company">{{ app.company }}</p>
+              <p class="application-date">{{ app.appliedDate }}</p>
+            </div>
+            <div class="application-status">
+              <span class="status-badge" [style.background-color]="app.statusColor">
+                {{ app.status }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Employer Dashboard -->
+    <div class="employer-content" *ngIf="isEmployer">
+      <!-- AI Hiring Insights -->
+      <div class="insights-section">
+        <div class="insight-card">
+          <div class="insight-icon">🤖</div>
+          <div class="insight-content">
+            <h3 class="insight-title">AI Hiring Insights</h3>
+            <p class="insight-description">Focus on your recent job postings and applicant data. Here are some recommendations:</p>
+          </div>
+        </div>
+
+        <div class="insights-grid">
+          <div class="mini-insight">
+            <span class="mini-icon">🎯</span>
+            <div class="mini-content">
+              <h4 class="mini-title">Top Performing Job</h4>
+              <p class="mini-text">Senior Frontend Developer has 20 more qualified applicants</p>
+            </div>
+          </div>
+          <div class="mini-insight">
+            <span class="mini-icon">📈</span>
+            <div class="mini-content">
+              <h4 class="mini-title">Salary Benchmark</h4>
+              <p class="mini-text">Your offers are 10% below market average</p>
+            </div>
+          </div>
+          <div class="mini-insight">
+            <span class="mini-icon">⏱️</span>
+            <div class="mini-content">
+              <h4 class="mini-title">Response Time</h4>
+              <p class="mini-text">Faster responses increase acceptance by 45%</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Employer Grid -->
+      <div class="employer-grid">
+        <!-- Recent Applicants -->
+        <div class="section applicants-section">
+          <div class="section-header">
+            <h2 class="section-title">Recent Applicants</h2>
+            <span class="ai-badge">🤖 AI Scored</span>
+            <button class="view-all-btn" (click)="viewAllApplicants()">
+              View All
+              <span class="arrow">→</span>
+            </button>
+          </div>
+
+          <div class="applicants-list">
+            <div class="applicant-card" *ngFor="let applicant of recentApplicants">
+              <div class="applicant-avatar">{{ applicant.avatar }}</div>
+              <div class="applicant-info">
+                <h3 class="applicant-name">{{ applicant.name }}</h3>
+                <p class="applicant-position">{{ applicant.position }}</p>
+                <p class="applicant-time">{{ applicant.appliedTime }}</p>
+              </div>
+              <div class="applicant-match">
+                <span class="match-badge-employer">{{ applicant.matchPercentage }}% Match</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Upcoming Interviews & Active Jobs -->
+        <div class="side-sections">
+          <!-- Upcoming Interviews -->
+          <div class="section interviews-mini-section">
+            <div class="section-header">
+              <h2 class="section-title">Upcoming Interviews</h2>
+              <button class="view-all-btn" (click)="viewAllInterviews()">
+                View All
+                <span class="arrow">→</span>
+              </button>
+            </div>
+
+            <div class="interviews-mini-list">
+              <div class="interview-mini-card" *ngFor="let interview of upcomingInterviews">
+                <div class="interview-avatar">{{ interview.avatar }}</div>
+                <div class="interview-info">
+                  <h4 class="interview-name">{{ interview.candidateName }}</h4>
+                  <p class="interview-position">{{ interview.position }}</p>
+                  <p class="interview-time">{{ interview.scheduledTime }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Active Jobs -->
+          <div class="section active-jobs-section">
+            <div class="section-header">
+              <h2 class="section-title">Active Jobs</h2>
+              <button class="view-all-btn" (click)="viewAllActiveJobs()">
+                View All
+                <span class="arrow">→</span>
+              </button>
+            </div>
+
+            <div class="active-jobs-list">
+              <div class="active-job-card" *ngFor="let job of activeJobs">
+                <div class="job-main-info">
+                  <h4 class="active-job-title">{{ job.title }}</h4>
+                  <div class="job-meta">
+                    <span class="job-location">📍 {{ job.location }}</span>
+                    <span class="job-applicants">👥 {{ job.applicants }}</span>
+                  </div>
+                </div>
+                <span class="job-status-badge" [style.background-color]="job.statusColor">
+                  {{ job.status }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Watermark -->
+  <div class="watermark">
+    <p class="watermark-text">Activate Windows</p>
+    <p class="watermark-subtext">Go to Settings to activate Windows.</p>
+  </div>
+</div>

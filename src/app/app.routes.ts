@@ -35,6 +35,12 @@ export const routes: Routes = [
       import('./core/components/dashboard-layout/dashboard-layout').then((m) => m.DashboardLayout),
     children: [
       {
+        path: '',
+        canMatch: [authGuard],
+        loadComponent: () =>
+          import('./features/dashboard/dashboard').then((m) => m.Dashboard),
+      },
+      {
         path: 'post-job',
         canMatch: [authGuard, userAccessGuard],
         data: { restrictedUserTypes: [UserRole.JobSeeker] },

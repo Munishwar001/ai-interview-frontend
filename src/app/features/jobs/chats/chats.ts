@@ -6,6 +6,7 @@ import { ToastrService } from 'ngx-toastr';
 import 'emoji-picker-element';
 import { environment } from '../../../../../environment/environment';
 import { AuthStore } from '../../../auth/services/auth-store';
+import { UserStore } from '../../../core/services/user-store';
 import {
   ApplicationChatMessageDto,
   ApplicationChatRoomDto,
@@ -18,6 +19,7 @@ import {
   imports: [CommonModule, FormsModule],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './chats.html',
+  styleUrl: './chats.scss'
 })
 export class Chats implements OnInit, OnDestroy, AfterViewChecked {
   @ViewChild('messageScroller') messageScroller?: ElementRef<HTMLDivElement>;
@@ -42,6 +44,7 @@ export class Chats implements OnInit, OnDestroy, AfterViewChecked {
     private jobsService: JobsService,
     private authStore: AuthStore,
     private toastr: ToastrService,
+    private userStore: UserStore
   ) {}
 
   async ngOnInit() {
@@ -128,22 +131,44 @@ export class Chats implements OnInit, OnDestroy, AfterViewChecked {
   }
 
   isMine(message: ApplicationChatMessageDto): boolean {
-    const senderId = this.normalizeIdentity(message.senderId);
-    if (senderId && this.currentIdentitySet.has(senderId)) return true;
-
+    // Get current logged-in user's info from UserStore
+    const currentUser = this.userStore.state;
+    const currentUserEmail = this.normalizeIdentity(currentUser.email);
+    const currentUserName = this.normalizeIdentity(currentUser.fullName);
+    
     const senderName = this.normalizeIdentity(message.senderName);
-    if (senderName && this.currentIdentitySet.has(senderName)) return true;
+    const senderId = this.normalizeIdentity(message.senderId);
 
-    const participantName = this.normalizeIdentity(this.selectedRoom()?.participantName);
-    const participantEmail = this.normalizeIdentity(this.selectedRoom()?.participantEmail);
+    console.log('=== isMine Debug ===');
+    console.log('Message:', message.message);
+    console.log('SenderId:', senderId);
+    console.log('SenderName:', senderName);
+    console.log('CurrentUserId:', this.currentUserId);
+    console.log('CurrentUserEmail:', currentUserEmail);
+    console.log('CurrentUserName:', currentUserName);
+    console.log('Identity Set:', Array.from(this.currentIdentitySet));
 
-    // Two-party fallback: if sender clearly matches participant identity, it's not mine.
-    if (senderName && (senderName === participantName || senderName === participantEmail)) return false;
+    // First, try to match by senderId with current user ID
+    if (senderId && this.currentUserId && senderId === this.currentUserId) {
+      console.log('Result: TRUE (senderId matches currentUserId)');
+      return true;
+    }
 
-    // If sender isn't participant and we couldn't match token claims, treat it as mine.
-    if (senderName && participantName && senderName !== participantName) return true;
+    // Second, check if senderId is in our identity set (could be email, sub, etc.)
+    if (senderId && this.currentIdentitySet.has(senderId)) {
+      console.log('Result: TRUE (senderId in identity set)');
+      return true;
+    }
 
-    return !!this.currentUserId && senderId === this.currentUserId;
+    // Third, check if senderName matches current user's email or name
+    if (senderName && (senderName === currentUserEmail || senderName === currentUserName)) {
+      console.log('Result: TRUE (senderName matches current user)');
+      return true;
+    }
+
+    // Otherwise it's not mine
+    console.log('Result: FALSE (no match found)');
+    return false;
   }
 
   onEnterKey(event: Event) {
