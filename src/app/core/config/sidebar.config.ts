@@ -44,11 +44,6 @@ export const EMPLOYER_MENU: SidebarItem[] = [
     label: 'Chats',
     icon: 'chat',
     route: '/dashboard/chats'
-  },
-  {
-    label: 'Settings',
-    icon: 'settings',
-    route: '/dashboard/settings'
   }
 ];
 
@@ -96,10 +91,5 @@ export const JOBSEEKER_MENU: SidebarItem[] = [
     label: 'Chats',
     icon: 'chat',
     route: '/dashboard/chats'
-  },
-  {
-    label: 'Settings',
-    icon: 'settings',
-    route: '/dashboard/settings'
   }
 ];
