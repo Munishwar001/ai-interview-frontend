@@ -5,11 +5,12 @@ import { JobsService, JobListItem } from '../services/jobs.service';
 import { ToastrService } from 'ngx-toastr';
 import { LocationSearch } from '../../../shared/components/location-search/location-search';
 import { CompanyProfileService } from '../../profiles/company-profile/Services/company-profile.service';
+import { Icons } from '../../../shared/icons/icons';
 
 @Component({
   selector: 'app-job-recommendations',
   standalone: true,
-  imports: [CommonModule, FormsModule, LocationSearch],
+  imports: [CommonModule, FormsModule, LocationSearch, Icons],
   templateUrl: './job-recommendations.html',
 })
 export class JobRecommendations implements OnInit {

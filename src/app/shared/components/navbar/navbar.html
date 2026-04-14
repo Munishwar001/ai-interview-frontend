@@ -3,9 +3,7 @@
   <!-- Left: Sidebar toggle + Page title -->
   <div class="flex items-center gap-2 sm:gap-3 min-w-0">
     <button class="p-1 sm:p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors shrink-0"   (click)="onToggle()">
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-      </svg>
+      <app-icon name="menu" class="w-5 h-5"></app-icon>
     </button>
     <h1 class="text-sm sm:text-base font-semibold text-gray-800 truncate">{{ title }}</h1>
   </div>
@@ -17,10 +15,7 @@
       <button 
         (click)="toggleNotifications()"
         class="relative p-1.5 sm:p-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
-        <svg class="w-4 sm:w-5 h-4 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-        </svg>
+        <app-icon name="bell" class="w-4 sm:w-5 h-4 sm:h-5"></app-icon>
         @if (getUnreadCount() > 0) {
           <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full animate-ping"></span>
           <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
@@ -48,9 +43,7 @@
                   (click)="refreshNotifications()"
                   class="text-xs text-gray-500 hover:text-violet-600 transition"
                   title="Refresh notifications">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-                  </svg>
+                  <app-icon name="reload" class="w-4 h-4"></app-icon>
                 </button>
               </div>
             </div>
@@ -106,9 +99,7 @@
             @if (!loadingNotifications() && notifications().length === 0) {
               <div class="flex flex-col items-center justify-center py-12 px-6 text-center">
                 <div class="w-14 h-14 bg-violet-50 rounded-2xl flex items-center justify-center mb-3 border border-violet-100">
-                  <svg class="w-6 h-6 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
-                  </svg>
+                  <app-icon name="bell" class="w-6 h-6 text-violet-400"></app-icon>
                 </div>
                 <p class="text-sm font-semibold text-gray-700">No notifications</p>
                 <p class="text-xs text-gray-400 mt-1">You're all caught up!</p>

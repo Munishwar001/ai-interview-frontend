@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { JobsService } from '../services/jobs.service';
+import { Icons } from '../../../shared/icons/icons';
 
 export interface AppliedJob {
   applicationId: number;
@@ -20,7 +21,7 @@ export interface AppliedJob {
 @Component({
   selector: 'app-applied-jobs',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, Icons],
   templateUrl: './applied-jobs.html',
 })
 export class AppliedJobs implements OnInit {

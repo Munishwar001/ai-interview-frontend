@@ -12,11 +12,12 @@ import {
   ApplicationChatRoomDto,
   JobsService,
 } from '../services/jobs.service';
+import { Icons } from '../../../shared/icons/icons';
 
 @Component({
   selector: 'app-chats',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, Icons],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './chats.html',
   styleUrl: './chats.scss'

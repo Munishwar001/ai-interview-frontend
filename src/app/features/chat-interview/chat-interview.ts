@@ -11,6 +11,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import lottie, { AnimationItem } from 'lottie-web';
+import { Icons } from '../../shared/icons/icons';
 import {
   MockInterviewService,
   StartInterviewResponse,
@@ -29,7 +30,7 @@ interface Message {
 @Component({
   selector: 'app-chat-interview',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, Icons],
   templateUrl: './chat-interview.html',
   styleUrl: './chat-interview.scss',
 })

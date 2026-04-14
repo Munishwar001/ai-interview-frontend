@@ -9,6 +9,7 @@ import { ToastrService } from 'ngx-toastr';
 import { JobService, MyJobDto } from '../../post-job/services/post-job';
 import { environment } from '../../../../../environment/environment';
 import { JobSeekerService } from '../../profiles/user-profile/services/job-seeker.service';
+import { Icons } from '../../../shared/icons/icons';
 
 interface ApplicantViewModel extends ApplicantDto {
   jobId?: number;
@@ -23,7 +24,7 @@ type AppStatus = typeof STATUSES[number];
 @Component({
   selector: 'app-applicants',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, Icons],
   templateUrl: './applicants.html',
 })
 export class Applicants implements OnInit {

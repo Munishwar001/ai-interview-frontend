@@ -6,6 +6,7 @@ import { StatusBadge } from '../../../shared/components/status-badge/status-badg
 import { JobService, MyJobDto } from '../../post-job/services/post-job';
 import { MarkdownService } from '../../../shared/services/markdown.service';
 import { environment } from '../../../../../environment/environment';
+import { Icons } from '../../../shared/icons/icons';
 
 interface Job {
   id: number;
@@ -29,7 +30,7 @@ interface Job {
 @Component({
   selector: 'app-posted-job-home',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, StatusBadge],
+  imports: [CommonModule, FormsModule, RouterModule, StatusBadge, Icons],
   templateUrl: './posted-job-home.html',
 })
 export class PostedJobHome implements OnInit {

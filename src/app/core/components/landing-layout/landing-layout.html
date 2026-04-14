@@ -51,34 +51,8 @@
         (click)="toggleMobileMenu()"
         class="lg:hidden p-1.5 sm:p-2.5 rounded-lg text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 transition cursor-pointer"
       >
-        <svg
-          *ngIf="!isMobileMenuOpen"
-          class="w-6 h-6"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M4 6h16M4 12h16M4 18h16"
-          />
-        </svg>
-        <svg
-          *ngIf="isMobileMenuOpen"
-          class="w-6 h-6"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M6 18L18 6M6 6l12 12"
-          />
-        </svg>
+        <app-icon *ngIf="!isMobileMenuOpen" name="menu" class="w-6 h-6"></app-icon>
+        <app-icon *ngIf="isMobileMenuOpen" name="close" class="w-6 h-6"></app-icon>
       </button>
 
       <!-- Get Started -->

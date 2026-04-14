@@ -5,11 +5,12 @@ import * as signalR from '@microsoft/signalr';
 import { environment } from '../../../../../environment/environment';
 import { AuthStore } from '../../../auth/services/auth-store';
 import { ToastrService } from 'ngx-toastr';
+import { Icons } from '../../../shared/icons/icons';
 
 @Component({
   selector: 'app-interview-room',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, Icons],
   templateUrl: './interview-room.html',
 })
 export class InterviewRoom implements OnInit, AfterViewInit, OnDestroy {

@@ -6,6 +6,7 @@ import { JobSeekerService } from '../profiles/user-profile/services/job-seeker.s
 import { FileActionsService } from '../../shared/services/file-actions';
 import { ResumeEnhancerService } from './resume-enhancer.service';
 import { AppDatePipe } from '../../shared/pipes/app-date.pipe';
+import { Icons } from '../../shared/icons/icons';
 
 type ViewState = 'idle' | 'loading' | 'results';
 
@@ -26,7 +27,7 @@ interface ResumeAnalysis {
 @Component({
   selector: 'app-resume-enhancer',
   standalone: true,
-  imports: [CommonModule, NgTemplateOutlet, AppDatePipe],
+  imports: [CommonModule, NgTemplateOutlet, AppDatePipe, Icons],
   templateUrl: './resume-enhancer.html',
   styleUrl: './resume-enhancer.scss',
 })

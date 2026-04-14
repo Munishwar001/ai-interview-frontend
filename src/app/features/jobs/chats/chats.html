@@ -57,9 +57,7 @@
         @if (!rooms().length) {
           <div class="flex flex-col items-center justify-center py-16 px-6 text-center">
             <div class="w-14 h-14 bg-violet-50 rounded-2xl flex items-center justify-center mb-3 border border-violet-100">
-              <svg class="w-6 h-6 text-violet-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
-              </svg>
+              <app-icon name="chat" class="w-6 h-6 text-violet-400"></app-icon>
             </div>
             <p class="text-sm font-semibold text-gray-700">No chats yet</p>
             <p class="text-xs text-gray-400 mt-1">Chats appear when an application is shortlisted or hired</p>
@@ -75,9 +73,7 @@
     @if (!selectedRoom()) {
       <div class="flex-1 flex flex-col items-center justify-center text-center p-8">
         <div class="w-20 h-20 bg-violet-50 rounded-3xl flex items-center justify-center mb-5 border border-violet-100">
-          <svg class="w-9 h-9 text-violet-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
-          </svg>
+          <app-icon name="chat" class="w-9 h-9 text-violet-400"></app-icon>
         </div>
         <p class="text-base font-semibold text-gray-800">Select a conversation</p>
         <p class="text-sm text-gray-400 mt-1 max-w-xs">Choose a chat from the left to start messaging</p>
@@ -187,10 +183,8 @@
           <button type="button" (click)="send()"
             [disabled]="sending() || !draft.trim()"
             class="w-9 h-9 rounded-xl bg-violet-600 hover:bg-violet-700 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center transition-colors shrink-0">
-            <svg class="w-4 h-4 text-white" [class.animate-spin]="sending()" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path *ngIf="sending()" d="M21 12a9 9 0 1 1-6.219-8.56"/>
-              <path *ngIf="!sending()" stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"/>
-            </svg>
+            <app-icon *ngIf="sending()" name="spinner" class="w-4 h-4 text-white animate-spin"></app-icon>
+            <app-icon *ngIf="!sending()" name="send" class="w-4 h-4 text-white"></app-icon>
           </button>
         </div>
         <p class="text-[10px] text-gray-400 mt-1.5 ml-1">Shift+Enter for new line</p>

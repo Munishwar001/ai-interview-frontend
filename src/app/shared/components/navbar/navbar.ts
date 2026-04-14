@@ -5,11 +5,12 @@ import * as signalR from '@microsoft/signalr';
 import { JobsService, ApplicationChatRoomDto } from '../../../features/jobs/services/jobs.service';
 import { AuthStore } from '../../../auth/services/auth-store';
 import { environment } from '../../../../../environment/environment';
+import { Icons } from '../../icons/icons';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, Icons],
   templateUrl: './navbar.html',
   styleUrl: './navbar.scss',
 })
