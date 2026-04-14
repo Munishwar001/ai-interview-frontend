@@ -33,9 +33,10 @@
       <span class="flex-1" *ngIf="isSidebarOpen">{{ item.label }}</span>
       <span
         *ngIf="item.badge && isSidebarOpen"
-        class="text-[8px] sm:text-[10px] font-semibold bg-violet-100 text-violet-700 px-1.5 py-0.5 rounded-full"
+        class="inline-flex items-center gap-1 text-[8px] sm:text-[10px] font-semibold bg-violet-100 text-violet-700 px-1.5 py-0.5 rounded-full"
       >
-        {{ item.badge }}
+        <app-icon *ngIf="item.badge === 'AI'" name="sparkles" class="w-2.5 h-2.5"></app-icon>
+        {{ item.badge === 'AI' ? 'Ai ' : item.badge }}
       </span>
     </a>
   </nav>

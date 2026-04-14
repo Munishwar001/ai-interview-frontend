@@ -2,6 +2,7 @@ import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } fr
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { gsap } from 'gsap';
+import { Icons } from '../../shared/icons/icons';
 import { UserStore } from '../../core/services/user-store';
 import { JobsService, ApplicantDto, InterviewDto, JobListItem } from '../jobs/services/jobs.service';
 import { JobService, MyJobDto } from '../post-job/services/post-job';
@@ -70,7 +71,7 @@ interface ActiveJob {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, Icons],
   templateUrl: './dashboard.html',
   styleUrls: ['./dashboard.scss']
 })

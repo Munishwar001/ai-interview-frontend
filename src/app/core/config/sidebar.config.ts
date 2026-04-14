@@ -15,7 +15,7 @@ export const EMPLOYER_MENU: SidebarItem[] = [
   },
   {
     label: 'Company Profile',
-    icon: 'profile',
+    icon: 'company-profile',
     route: '/dashboard/company-profile'
   },
   {

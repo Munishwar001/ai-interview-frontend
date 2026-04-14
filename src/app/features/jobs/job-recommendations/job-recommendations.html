@@ -33,16 +33,22 @@
         Search
       </button>
       <button (click)="loadRecommended()"
-        class="w-full sm:w-auto px-4 py-2.5 border border-gray-200 text-gray-600 text-sm font-medium rounded-xl hover:bg-gray-50 transition-colors">
-        ✦ Recommended
+        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 border border-gray-200 text-gray-600 text-sm font-medium rounded-xl hover:bg-gray-50 transition-colors">
+        <app-icon name="sparkles" class="w-3.5 h-3.5"></app-icon>
+        Recommended
       </button>
     </div>
   </div>
 
   <!-- Tab indicator -->
   <div class="flex items-center gap-2 mb-4">
-    <span class="text-sm font-semibold text-gray-700">
-      {{ activeTab === 'recommended' ? '✦ AI Recommended' : 'Search Results' }}
+    <span class="text-sm font-semibold text-gray-700 inline-flex items-center gap-1.5">
+      @if (activeTab === 'recommended') {
+        <app-icon name="sparkles" class="w-3.5 h-3.5"></app-icon>
+        AI Recommended
+      } @else {
+        Search Results
+      }
     </span>
     <span class="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">{{ jobs().length }} jobs</span>
   </div>

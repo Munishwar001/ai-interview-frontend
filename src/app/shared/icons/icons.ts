@@ -6,6 +6,7 @@ import { NgSwitch, NgSwitchCase } from '@angular/common';
   standalone: true,
   imports: [NgSwitch, NgSwitchCase],
   templateUrl: './icons.html',
+  styleUrl: './icons.scss',
   host: { '[class]': 'class' },
 })
 export class Icons {

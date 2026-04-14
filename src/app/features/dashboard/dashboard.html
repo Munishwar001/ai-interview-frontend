@@ -10,7 +10,7 @@
         <p class="welcome-subtitle">Here's what's happening with your {{ isEmployer ? 'hiring today' : 'job search today' }}.</p>
       </div>
       <button *ngIf="!isEmployer" class="enhance-resume-btn" (click)="enhanceResume()">
-        <span class="btn-icon">✨</span>
+        <app-icon name="sparkles" class="btn-icon"></app-icon>
         Enhance Resume with AI
       </button>
       <button *ngIf="isEmployer" class="enhance-resume-btn" (click)="postNewJob()">
@@ -73,7 +73,7 @@
               <div class="job-info">
                 <h3 class="job-title">{{ job.title }}</h3>
                 <div class="job-company">
-                  <span class="company-icon">🏢</span>
+                  <app-icon name="employer" class="company-icon"></app-icon>
                   {{ job.company }}
                 </div>
               </div>
@@ -82,23 +82,23 @@
             
             <div class="job-details">
               <div class="job-detail-item">
-                <span class="detail-icon">📍</span>
+                <app-icon name="location" class="detail-icon"></app-icon>
                 {{ job.location }}
               </div>
               <div class="job-detail-item">
-                <span class="detail-icon">🏷️</span>
+                <app-icon name="briefcase" class="detail-icon"></app-icon>
                 {{ job.jobType || 'Not specified' }}
               </div>
               <div class="job-detail-item">
-                <span class="detail-icon">💰</span>
+                <app-icon name="currency" class="detail-icon"></app-icon>
                 {{ job.salary }}
               </div>
               <div class="job-detail-item">
-                <span class="detail-icon">🕐</span>
+                <app-icon name="calendar" class="detail-icon"></app-icon>
                 {{ job.postedTime }}
               </div>
               <div class="job-detail-item" *ngIf="job.skills?.length">
-                <span class="detail-icon">🧩</span>
+                <app-icon name="circuit" class="detail-icon"></app-icon>
                 {{ job.skills?.slice(0, 3)?.join(', ') }}
               </div>
             </div>
@@ -138,7 +138,7 @@
       <!-- AI Hiring Insights -->
       <div class="insights-section">
         <div class="insight-card">
-          <div class="insight-icon">🤖</div>
+          <div class="insight-icon"><app-icon name="sparkles-insight"></app-icon></div>
           <div class="insight-content">
             <h3 class="insight-title">AI Hiring Insights</h3>
             <p class="insight-description">Focus on your recent job postings and applicant data. Here are some recommendations:</p>
@@ -176,7 +176,7 @@
         <div class="section applicants-section">
           <div class="section-header">
             <h2 class="section-title">Recent Applicants</h2>
-            <span class="ai-badge">🤖 AI Scored</span>
+            <span class="ai-badge"><app-icon name="sparkles" class="ai-badge-icon"></app-icon> AI Scored</span>
             <button class="view-all-btn" (click)="viewAllApplicants()">
               View All
               <span class="arrow">→</span>
@@ -237,7 +237,7 @@
                 <div class="job-main-info">
                   <h4 class="active-job-title">{{ job.title }}</h4>
                   <div class="job-meta">
-                    <span class="job-location">📍 {{ job.location }}</span>
+                    <span class="job-location"><app-icon name="location"></app-icon> {{ job.location }}</span>
                     <span class="job-applicants">👥 {{ job.applicants }}</span>
                   </div>
                 </div>
