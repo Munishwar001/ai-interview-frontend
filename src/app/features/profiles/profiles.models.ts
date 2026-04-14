@@ -61,6 +61,7 @@ export interface UserProfileDto {
   avatar?: string;
   initial?: string;
   profileCompletion: number;
+  profileViews?: number;
   resumeFileName?: string;
   resumeFilePath?: string;
   linkedIn?: string;

@@ -3,6 +3,11 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { gsap } from 'gsap';
 import { UserStore } from '../../core/services/user-store';
+import { JobsService, ApplicantDto, InterviewDto, JobListItem } from '../jobs/services/jobs.service';
+import { JobService, MyJobDto } from '../post-job/services/post-job';
+import { JobSeekerService } from '../profiles/user-profile/services/job-seeker.service';
+import { CompanyProfileService } from '../profiles/company-profile/Services/company-profile.service';
+import { catchError, forkJoin, map, of } from 'rxjs';
 
 interface StatCard {
   title: string;
@@ -17,7 +22,10 @@ interface Job {
   id: string;
   title: string;
   company: string;
+  companyLogo?: string;
   location: string;
+  jobType?: string;
+  skills?: string[];
   salary: string;
   postedTime: string;
   matchPercentage: number;
@@ -69,221 +77,35 @@ interface ActiveJob {
 export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('wavingHand') wavingHand?: ElementRef<HTMLElement>;
 
-  userName = 'Munishwar';
+  userName = 'User';
   isEmployer = false;
   isNavigating = false;
+  isLoading = false;
+  brokenJobLogoIds = new Set<string>();
   private handWaveTween?: gsap.core.Tween;
 
-  // Job Seeker Stats
-  jobSeekerStats: StatCard[] = [
-    {
-      title: 'Profile Completion',
-      value: '75%',
-      icon: '📄',
-      iconBg: '#E8E5FF'
-    },
-    {
-      title: 'Applications Sent',
-      value: 12,
-      icon: '💼',
-      iconBg: '#F0E8FF',
-      change: '+3 this week',
-      changeType: 'positive'
-    },
-    {
-      title: 'Interviews',
-      value: 3,
-      icon: '✅',
-      iconBg: '#E5F9F0',
-      change: '2 scheduled this week',
-      changeType: 'positive'
-    },
-    {
-      title: 'Profile Views',
-      value: 48,
-      icon: '📈',
-      iconBg: '#FFF4E5',
-      change: '+15% from last week',
-      changeType: 'positive'
-    }
-  ];
-
-  // Employer Stats
-  employerStats: StatCard[] = [
-    {
-      title: 'Active Jobs',
-      value: 8,
-      icon: '💼',
-      iconBg: '#E8E5FF',
-      change: '+2 this month',
-      changeType: 'positive'
-    },
-    {
-      title: 'Total Applicants',
-      value: 142,
-      icon: '👥',
-      iconBg: '#F0E8FF',
-      change: '+24 this week',
-      changeType: 'positive'
-    },
-    {
-      title: 'Shortlisted',
-      value: 36,
-      icon: '✅',
-      iconBg: '#E5F9F0',
-      change: 'Ready for interview',
-      changeType: 'positive'
-    },
-    {
-      title: "This Week's Views",
-      value: '1.2K',
-      icon: '📊',
-      iconBg: '#FFF4E5',
-      change: '+18% from last week',
-      changeType: 'positive'
-    }
-  ];
-
-  recommendedJobs: Job[] = [
-    {
-      id: '1',
-      title: 'Senior Frontend Developer',
-      company: 'TechCorp',
-      location: 'San Francisco, CA',
-      salary: '$120K - $160K',
-      postedTime: '2 hours ago',
-      matchPercentage: 90,
-      logo: '🏢'
-    },
-    {
-      id: '2',
-      title: 'Full Stack Engineer',
-      company: 'StartupXYZ',
-      location: 'Remote',
-      salary: '$100K - $140K',
-      postedTime: '5 hours ago',
-      matchPercentage: 88,
-      logo: '🚀'
-    },
-    {
-      id: '3',
-      title: 'React Developer',
-      company: 'DigitalAgency',
-      location: 'New York, NY',
-      salary: '$90K - $120K',
-      postedTime: '1 day ago',
-      matchPercentage: 82,
-      logo: '🎨'
-    }
-  ];
-
-  recentApplications: Application[] = [
-    {
-      id: '1',
-      jobTitle: 'Software Engineer',
-      company: 'Google',
-      appliedDate: 'Jan 28, 2024',
-      status: 'Under Review',
-      statusColor: '#FFA500'
-    },
-    {
-      id: '2',
-      jobTitle: 'Frontend Developer',
-      company: 'Meta',
-      appliedDate: 'Jan 25, 2024',
-      status: 'Interview',
-      statusColor: '#4CAF50'
-    },
-    {
-      id: '3',
-      jobTitle: 'Web Developer',
-      company: 'Amazon',
-      appliedDate: 'Jan 20, 2024',
-      status: 'Rejected',
-      statusColor: '#F44336'
-    }
-  ];
-
-  recentApplicants: Applicant[] = [
-    {
-      id: '1',
-      name: 'John Doe',
-      position: 'Senior Frontend Developer',
-      appliedTime: 'Applied 2 hours ago',
-      matchPercentage: 92,
-      avatar: 'J'
-    },
-    {
-      id: '2',
-      name: 'Jane Smith',
-      position: 'Full Stack Engineer',
-      appliedTime: 'Applied 5 hours ago',
-      matchPercentage: 89,
-      avatar: 'J'
-    },
-    {
-      id: '3',
-      name: 'Mike Johnson',
-      position: 'React Developer',
-      appliedTime: 'Applied 1 day ago',
-      matchPercentage: 85,
-      avatar: 'M'
-    }
-  ];
-
-  upcomingInterviews: Interview[] = [
-    {
-      id: '1',
-      candidateName: 'Sarah Chen',
-      position: 'Senior Frontend Developer',
-      scheduledTime: 'Today, 2:00 PM',
-      avatar: 'S'
-    },
-    {
-      id: '2',
-      candidateName: 'Alex Kim',
-      position: 'Full Stack Engineer',
-      scheduledTime: 'Tomorrow, 10:00 AM',
-      avatar: 'A'
-    }
-  ];
-
-  activeJobs: ActiveJob[] = [
-    {
-      id: '1',
-      title: 'Senior Frontend Developer',
-      location: 'SF, CA',
-      applicants: 45,
-      status: 'active',
-      statusColor: '#10b981'
-    },
-    {
-      id: '2',
-      title: 'Full Stack Engineer',
-      location: 'NY, NY',
-      applicants: 38,
-      status: 'active',
-      statusColor: '#10b981'
-    },
-    {
-      id: '3',
-      title: 'UI/UX Designer',
-      location: 'Remote',
-      applicants: 52,
-      status: 'pending',
-      statusColor: '#f59e0b'
-    }
-  ];
+  jobSeekerStats: StatCard[] = this.buildDefaultJobSeekerStats();
+  employerStats: StatCard[] = this.buildDefaultEmployerStats();
+  recommendedJobs: Job[] = [];
+  recentApplications: Application[] = [];
+  recentApplicants: Applicant[] = [];
+  upcomingInterviews: Interview[] = [];
+  activeJobs: ActiveJob[] = [];
 
   constructor(
     private router: Router,
-    private userStore: UserStore
+    private userStore: UserStore,
+    private jobsService: JobsService,
+    private jobService: JobService,
+    private jobSeekerService: JobSeekerService,
+    private companyProfileService: CompanyProfileService,
   ) {}
 
   ngOnInit(): void {
     const userState = this.userStore.state;
     this.isEmployer = userState.isEmployerAccess;
     this.userName = userState.fullName || 'Munishwar';
+    this.loadDashboardData();
   }
 
   ngAfterViewInit(): void {
@@ -317,6 +139,199 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
     return this.isEmployer ? this.employerStats : this.jobSeekerStats;
   }
 
+  private loadDashboardData(): void {
+    this.isLoading = true;
+    this.recommendedJobs = [];
+    this.recentApplications = [];
+    this.recentApplicants = [];
+    this.upcomingInterviews = [];
+    this.activeJobs = [];
+
+    if (this.isEmployer) {
+      this.employerStats = this.buildDefaultEmployerStats();
+      this.loadEmployerDashboard();
+      return;
+    }
+
+    this.jobSeekerStats = this.buildDefaultJobSeekerStats();
+    this.loadJobSeekerDashboard();
+  }
+
+  private loadJobSeekerDashboard(): void {
+    forkJoin({
+      profile: this.jobSeekerService.getProfile().pipe(catchError(() => of(null))),
+      profileViews: this.jobSeekerService.getProfileViews().pipe(map((res) => res.views), catchError(() => of(0))),
+      recommended: this.jobsService.getLatestJobs(3).pipe(catchError(() => of([] as JobListItem[]))),
+      applications: this.jobsService.getMyApplications().pipe(catchError(() => of([] as any[]))),
+      interviews: this.jobsService.getMyInterviews().pipe(catchError(() => of([] as InterviewDto[]))),
+    }).subscribe(({ profile, profileViews, recommended, applications, interviews }) => {
+      const sortedApps = [...applications].sort((a, b) => this.toMillis(b?.appliedAt ?? b?.createdAt) - this.toMillis(a?.appliedAt ?? a?.createdAt));
+
+      this.recommendedJobs = recommended.slice(0, 3).map((job, idx) => this.toDashboardJob(job, idx));
+      this.recentApplications = sortedApps.slice(0, 3).map((item) => this.toDashboardApplication(item));
+
+      const profileCompletion = profile?.profileCompletion ?? 0;
+      const interviewsCount = interviews.length;
+      const applicationsCount = applications.length;
+
+      this.jobSeekerStats = [
+        {
+          title: 'Profile Completion',
+          value: `${profileCompletion}%`,
+          icon: '📄',
+          iconBg: '#E8E5FF'
+        },
+        {
+          title: 'Applications Sent',
+          value: applicationsCount,
+          icon: '💼',
+          iconBg: '#F0E8FF',
+          change: `${applicationsCount} total applications`,
+          changeType: 'positive'
+        },
+        {
+          title: 'Interviews',
+          value: interviewsCount,
+          icon: '✅',
+          iconBg: '#E5F9F0',
+          change: `${interviewsCount} scheduled`,
+          changeType: 'positive'
+        },
+        {
+          title: 'Profile Views',
+          value: profileViews,
+          icon: '📈',
+          iconBg: '#FFF4E5',
+          change: 'Total profile views',
+          changeType: 'positive'
+        }
+      ];
+
+      this.isLoading = false;
+    });
+  }
+
+  private loadEmployerDashboard(): void {
+    this.jobService.getMyJobs().pipe(
+      map((response) => this.extractJobs(response)),
+      catchError(() => of([] as MyJobDto[]))
+    ).subscribe((jobs) => {
+      if (!jobs.length) {
+        this.employerStats = [
+          { title: 'Active Jobs', value: 0, icon: '💼', iconBg: '#E8E5FF' },
+          { title: 'Total Applicants', value: 0, icon: '👥', iconBg: '#F0E8FF' },
+          { title: 'Shortlisted', value: 0, icon: '✅', iconBg: '#E5F9F0' },
+          { title: "This Week's Views", value: 0, icon: '📊', iconBg: '#FFF4E5' }
+        ];
+        this.recentApplicants = [];
+        this.upcomingInterviews = [];
+        this.activeJobs = [];
+        this.isLoading = false;
+        return;
+      }
+
+      const applicantsRequests = jobs.map((job) =>
+        this.jobsService.getApplicants(job.id).pipe(
+          map((applicants) => applicants.map((applicant) => ({ applicant, job }))),
+          catchError(() => of([] as Array<{ applicant: ApplicantDto; job: MyJobDto }>))
+        )
+      );
+
+      const interviewsRequests = jobs.map((job) =>
+        this.jobsService.getInterviewsByJob(job.id).pipe(
+          map((interviews) => interviews.map((interview) => ({ interview, job }))),
+          catchError(() => of([] as Array<{ interview: InterviewDto; job: MyJobDto }>))
+        )
+      );
+
+      forkJoin({
+        applicantsGroups: forkJoin(applicantsRequests),
+        interviewGroups: forkJoin(interviewsRequests),
+        profileViews: this.companyProfileService.getProfileViews().pipe(map((res) => res.views), catchError(() => of(0))),
+      }).subscribe(({ applicantsGroups, interviewGroups, profileViews }) => {
+        const allApplicants = applicantsGroups.flat();
+        const allInterviews = interviewGroups.flat();
+
+        const activeJobsCount = jobs.filter((job) => !job.isClosed && (job.status ?? '').toLowerCase() !== 'closed').length;
+        const totalApplicants = jobs.reduce((sum, job) => sum + Number(job.applicantsCount ?? job.applicants ?? 0), 0);
+        const totalShortlisted = jobs.reduce((sum, job) => sum + Number(job.shortlistedCount ?? job.shortlisted ?? 0), 0);
+        const totalViews = jobs.reduce((sum, job) => sum + Number(job.viewsCount ?? job.views ?? 0), 0);
+
+        this.employerStats = [
+          {
+            title: 'Active Jobs',
+            value: activeJobsCount,
+            icon: '💼',
+            iconBg: '#E8E5FF',
+            change: `${jobs.length} total jobs`,
+            changeType: 'positive'
+          },
+          {
+            title: 'Total Applicants',
+            value: totalApplicants,
+            icon: '👥',
+            iconBg: '#F0E8FF',
+            change: `${allApplicants.length} fetched records`,
+            changeType: 'positive'
+          },
+          {
+            title: 'Shortlisted',
+            value: totalShortlisted,
+            icon: '✅',
+            iconBg: '#E5F9F0',
+            change: 'Ready for interview',
+            changeType: 'positive'
+          },
+          {
+            title: "This Week's Views",
+            value: profileViews >= 1000 ? `${(profileViews / 1000).toFixed(1)}K` : profileViews,
+            icon: '📊',
+            iconBg: '#FFF4E5',
+            change: totalViews > 0 ? `${totalViews} job views total` : 'Company profile views',
+            changeType: 'positive'
+          }
+        ];
+
+        this.recentApplicants = allApplicants
+          .sort((a, b) => this.toMillis(b.applicant.appliedAt) - this.toMillis(a.applicant.appliedAt))
+          .slice(0, 3)
+          .map(({ applicant, job }) => ({
+            id: String(applicant.applicationId),
+            name: applicant.applicantName || 'Unknown Applicant',
+            position: job.title || 'Untitled Job',
+            appliedTime: this.relativeTime(applicant.appliedAt),
+            matchPercentage: this.statusToMatch(applicant.status),
+            avatar: (applicant.applicantName || 'U').charAt(0).toUpperCase(),
+          }));
+
+        this.upcomingInterviews = allInterviews
+          .sort((a, b) => this.toMillis(a.interview.scheduledAt) - this.toMillis(b.interview.scheduledAt))
+          .slice(0, 2)
+          .map(({ interview, job }) => ({
+            id: String(interview.interviewId ?? interview.id ?? 0),
+            candidateName: 'Scheduled Candidate',
+            position: job.title || 'Untitled Job',
+            scheduledTime: interview.scheduledAt ? new Date(interview.scheduledAt).toLocaleString() : 'Schedule pending',
+            avatar: 'C',
+          }));
+
+        this.activeJobs = jobs.slice(0, 3).map((job) => {
+          const status = this.mapJobStatus(job);
+          return {
+            id: String(job.id),
+            title: job.title || 'Untitled Job',
+            location: job.location || 'Remote',
+            applicants: Number(job.applicantsCount ?? job.applicants ?? 0),
+            status,
+            statusColor: status === 'active' ? '#10b981' : status === 'pending' ? '#f59e0b' : '#9ca3af',
+          };
+        });
+
+        this.isLoading = false;
+      });
+    });
+  }
+
   viewAllJobs(): void {
     this.navigateWithAnimation('/dashboard/jobs');
   }
@@ -347,6 +362,127 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
 
   applyToJob(jobId: string): void {
     console.log('Apply to job:', jobId);
+  }
+
+  private toDashboardJob(job: JobListItem, idx: number): Job {
+    return {
+      id: String(job.jobId),
+      title: job.title || 'Untitled Role',
+      company: job.companyName || 'Unknown Company',
+      companyLogo: job.companyLogo,
+      location: job.location || 'Remote',
+      jobType: job.jobType || 'Not specified',
+      skills: job.skills ?? [],
+      salary: this.formatSalary(job.salaryMin, job.salaryMax),
+      postedTime: this.relativeTime(job.postedDate),
+      matchPercentage: Math.max(70, 95 - idx * 7),
+      logo: (job.companyName || 'C').charAt(0).toUpperCase(),
+    };
+  }
+
+  showJobLogo(job: Job): boolean {
+    return !!job.companyLogo && !this.brokenJobLogoIds.has(job.id);
+  }
+
+  onJobLogoError(jobId: string, event: Event): void {
+    this.brokenJobLogoIds.add(jobId);
+    const img = event.target as HTMLImageElement;
+    img.src = '';
+  }
+
+  private toDashboardApplication(item: any): Application {
+    const status = this.normalizeApplicationStatus(item?.status);
+    return {
+      id: String(item?.applicationId ?? item?.id ?? 0),
+      jobTitle: item?.title ?? item?.jobTitle ?? 'Untitled Role',
+      company: item?.companyName ?? item?.company ?? 'Unknown Company',
+      appliedDate: this.formatDate(item?.appliedAt ?? item?.createdAt),
+      status,
+      statusColor: this.applicationStatusColor(status),
+    };
+  }
+
+  private extractJobs(response: MyJobDto[] | { data?: MyJobDto[]; items?: MyJobDto[]; result?: MyJobDto[] }): MyJobDto[] {
+    if (Array.isArray(response)) {
+      return response;
+    }
+    return response.data ?? response.items ?? response.result ?? [];
+  }
+
+  private formatSalary(min?: number | null, max?: number | null): string {
+    if (!min && !max) return 'Not disclosed';
+    if (min && max) return `$${min.toLocaleString()} - $${max.toLocaleString()}`;
+    if (min) return `From $${min.toLocaleString()}`;
+    return `Up to $${(max ?? 0).toLocaleString()}`;
+  }
+
+  private formatDate(value?: string): string {
+    if (!value) return 'Recently';
+    const dt = new Date(value);
+    if (Number.isNaN(dt.getTime())) return 'Recently';
+    return dt.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+
+  private relativeTime(value?: string): string {
+    if (!value) return 'Recently';
+    const ts = this.toMillis(value);
+    if (!ts) return 'Recently';
+    const hours = Math.floor((Date.now() - ts) / 3600000);
+    if (hours < 1) return 'Just now';
+    if (hours < 24) return `${hours} hours ago`;
+    const days = Math.floor(hours / 24);
+    return days === 1 ? '1 day ago' : `${days} days ago`;
+  }
+
+  private toMillis(value?: string): number {
+    if (!value) return 0;
+    const dt = new Date(value);
+    return Number.isNaN(dt.getTime()) ? 0 : dt.getTime();
+  }
+
+  private normalizeApplicationStatus(status?: string): 'Under Review' | 'Interview' | 'Rejected' {
+    const key = (status ?? '').toLowerCase();
+    if (key.includes('interview') || key.includes('shortlisted') || key.includes('hired')) return 'Interview';
+    if (key.includes('reject')) return 'Rejected';
+    return 'Under Review';
+  }
+
+  private applicationStatusColor(status: 'Under Review' | 'Interview' | 'Rejected'): string {
+    if (status === 'Interview') return '#4CAF50';
+    if (status === 'Rejected') return '#F44336';
+    return '#FFA500';
+  }
+
+  private statusToMatch(status?: string): number {
+    const key = (status ?? '').toLowerCase();
+    if (key.includes('hired')) return 96;
+    if (key.includes('shortlisted')) return 90;
+    if (key.includes('pending')) return 80;
+    return 72;
+  }
+
+  private mapJobStatus(job: MyJobDto): 'active' | 'closed' | 'pending' {
+    if (job.isClosed || (job.status ?? '').toLowerCase() === 'closed') return 'closed';
+    if ((job.status ?? '').toLowerCase() === 'pending') return 'pending';
+    return 'active';
+  }
+
+  private buildDefaultJobSeekerStats(): StatCard[] {
+    return [
+      { title: 'Profile Completion', value: '0%', icon: '📄', iconBg: '#E8E5FF' },
+      { title: 'Applications Sent', value: 0, icon: '💼', iconBg: '#F0E8FF', change: 'No applications yet', changeType: 'positive' },
+      { title: 'Interviews', value: 0, icon: '✅', iconBg: '#E5F9F0', change: 'No interviews yet', changeType: 'positive' },
+      { title: 'Profile Views', value: 0, icon: '📈', iconBg: '#FFF4E5', change: 'No activity yet', changeType: 'positive' }
+    ];
+  }
+
+  private buildDefaultEmployerStats(): StatCard[] {
+    return [
+      { title: 'Active Jobs', value: 0, icon: '💼', iconBg: '#E8E5FF', change: 'No jobs yet', changeType: 'positive' },
+      { title: 'Total Applicants', value: 0, icon: '👥', iconBg: '#F0E8FF', change: 'No applicants yet', changeType: 'positive' },
+      { title: 'Shortlisted', value: 0, icon: '✅', iconBg: '#E5F9F0', change: 'No shortlist yet', changeType: 'positive' },
+      { title: "This Week's Views", value: 0, icon: '📊', iconBg: '#FFF4E5', change: 'No views yet', changeType: 'positive' }
+    ];
   }
 
   private navigateWithAnimation(route: string): void {

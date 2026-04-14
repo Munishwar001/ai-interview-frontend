@@ -8,6 +8,7 @@ import { JobsService, ApplicantDto, InterviewDto } from '../services/jobs.servic
 import { ToastrService } from 'ngx-toastr';
 import { JobService, MyJobDto } from '../../post-job/services/post-job';
 import { environment } from '../../../../../environment/environment';
+import { JobSeekerService } from '../../profiles/user-profile/services/job-seeker.service';
 
 interface ApplicantViewModel extends ApplicantDto {
   jobId?: number;
@@ -47,6 +48,7 @@ export class Applicants implements OnInit {
     private route: ActivatedRoute,
     private svc: JobsService,
     private jobService: JobService,
+    private jobSeekerService: JobSeekerService,
     private toastr: ToastrService,
   ) {}
 
@@ -105,6 +107,16 @@ export class Applicants implements OnInit {
       const matchStatus = this.filterStatus === 'All' || a.status === this.filterStatus;
       const matchSearch = !this.search || a.applicantName?.toLowerCase().includes(this.search.toLowerCase()) || a.jobTitle?.toLowerCase().includes(this.search.toLowerCase());
       return matchStatus && matchSearch;
+    });
+  }
+
+  selectApplicant(app: ApplicantViewModel) {
+    this.selectedApplicant = app;
+    if (!app.userId) return;
+
+    this.jobSeekerService.incrementProfileViews(app.userId).subscribe({
+      next: () => {},
+      error: () => {},
     });
   }
 

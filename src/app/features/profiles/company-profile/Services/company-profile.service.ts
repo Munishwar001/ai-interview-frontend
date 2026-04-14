@@ -19,6 +19,14 @@ export class CompanyProfileService {
     );
   }
 
+  getProfileViews(): Observable<{ views: number }> {
+    return this.http.get<{ views: number }>(`${this.baseUrl}/views`);
+  }
+
+  incrementProfileViewsByCompanyId(companyId: number): Observable<{ success: boolean }> {
+    return this.http.post<{ success: boolean }>(`${this.baseUrl}/views/company/${companyId}/increment`, {});
+  }
+
   /** PUT /CompanyProfile — application/json */
   saveProfile(payload: any): Observable<any> {
     return this.http.put<any>(this.baseUrl, payload);

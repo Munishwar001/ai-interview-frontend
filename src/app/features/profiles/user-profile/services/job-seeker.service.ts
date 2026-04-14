@@ -27,6 +27,14 @@ export class JobSeekerService {
     );
   }
 
+  getProfileViews(): Observable<{ views: number }> {
+    return this.http.get<{ views: number }>(`${this.baseUrl}/profile/views`);
+  }
+
+  incrementProfileViews(userId: string): Observable<{ success: boolean; skipped?: boolean }> {
+    return this.http.post<{ success: boolean; skipped?: boolean }>(`${this.baseUrl}/profile/views/${userId}/increment`, {});
+  }
+
   upsertProfile(dto: UpsertUserProfileDto): Observable<void> {
     return this.http.put<void>(`${this.baseUrl}/profile`, dto);
   }

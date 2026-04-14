@@ -5,6 +5,7 @@ import { environment } from '../../../../../environment/environment';
 
 export interface JobListItem {
   jobId: number;
+  companyId?: number;
   title: string;
   companyName: string;
   companyLogo?: string;
@@ -25,6 +26,7 @@ interface BackendSkill {
 interface BackendJob {
   id?: number;
   jobId?: number;
+  companyId?: number;
   title?: string;
   companyName?: string;
   companyLogo?: string;
@@ -40,6 +42,7 @@ interface BackendJob {
 
 export interface ApplicantDto {
   applicationId: number;
+  userId?: string;
   applicantName: string;
   applicantEmail: string;
   avatar?: string;
@@ -168,6 +171,14 @@ export class JobsService {
       .pipe(map((jobs) => jobs.map((job) => this.toJobListItem(job))));
   }
 
+  getLatestJobs(limit: number = 3): Observable<JobListItem[]> {
+    const safeLimit = Number.isFinite(limit) && limit > 0 ? Math.floor(limit) : 3;
+    const params = new HttpParams().set('limit', safeLimit.toString());
+    return this.http
+      .get<BackendJob[]>(`${this.base}/jobs/latest`, { params })
+      .pipe(map((jobs) => jobs.map((job) => this.toJobListItem(job))));
+  }
+
   apply(jobId: number, coverLetter?: string): Observable<{ applicationId: number }> {
     return this.http.post<{ applicationId: number }>(
       `${this.base}/jobs/${jobId}/apply`,
@@ -234,6 +245,7 @@ export class JobsService {
   private toJobListItem(job: BackendJob): JobListItem {
     return {
       jobId: job.jobId ?? job.id ?? 0,
+      companyId: job.companyId,
       title: job.title ?? '',
       companyName: job.companyName ?? '',
       companyLogo: this.toAbsoluteUrl(job.companyLogo),
@@ -259,6 +271,7 @@ export class JobsService {
   private toApplicantDto(app: BackendApplicant): ApplicantDto {
     return {
       applicationId: app.applicationId ?? app.id ?? 0,
+      userId: app.userId,
       applicantName: app.applicantName ?? app.name ?? 'Unknown Applicant',
       applicantEmail: app.applicantEmail ?? app.email ?? '',
       avatar: this.toAbsoluteUrl(app.avatar),

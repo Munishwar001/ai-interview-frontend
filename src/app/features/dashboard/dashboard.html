@@ -60,7 +60,16 @@
         <div class="jobs-list">
           <div class="job-card" *ngFor="let job of recommendedJobs">
             <div class="job-header">
-              <div class="job-logo">{{ job.logo }}</div>
+              <div class="job-logo">
+                <img
+                  *ngIf="showJobLogo(job)"
+                  [src]="job.companyLogo"
+                  [alt]="job.company + ' logo'"
+                  class="job-logo-img"
+                  (error)="onJobLogoError(job.id, $event)"
+                />
+                <span *ngIf="!showJobLogo(job)">{{ job.logo }}</span>
+              </div>
               <div class="job-info">
                 <h3 class="job-title">{{ job.title }}</h3>
                 <div class="job-company">
@@ -77,12 +86,20 @@
                 {{ job.location }}
               </div>
               <div class="job-detail-item">
+                <span class="detail-icon">🏷️</span>
+                {{ job.jobType || 'Not specified' }}
+              </div>
+              <div class="job-detail-item">
                 <span class="detail-icon">💰</span>
                 {{ job.salary }}
               </div>
               <div class="job-detail-item">
                 <span class="detail-icon">🕐</span>
                 {{ job.postedTime }}
+              </div>
+              <div class="job-detail-item" *ngIf="job.skills?.length">
+                <span class="detail-icon">🧩</span>
+                {{ job.skills?.slice(0, 3)?.join(', ') }}
               </div>
             </div>
           </div>

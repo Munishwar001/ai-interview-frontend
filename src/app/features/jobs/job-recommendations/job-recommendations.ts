@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { JobsService, JobListItem } from '../services/jobs.service';
 import { ToastrService } from 'ngx-toastr';
 import { LocationSearch } from '../../../shared/components/location-search/location-search';
+import { CompanyProfileService } from '../../profiles/company-profile/Services/company-profile.service';
 
 @Component({
   selector: 'app-job-recommendations',
@@ -50,7 +51,11 @@ export class JobRecommendations implements OnInit {
     return Array.from({ length: end - start + 1 }, (_, i) => start + i);
   });
 
-  constructor(private svc: JobsService, private toastr: ToastrService) {}
+  constructor(
+    private svc: JobsService,
+    private toastr: ToastrService,
+    private companyProfileService: CompanyProfileService,
+  ) {}
 
   ngOnInit() { this.loadRecommended(); }
 
@@ -86,6 +91,13 @@ export class JobRecommendations implements OnInit {
     this.selectedJob = job;
     this.coverLetter = '';
     this.showApplyModal = true;
+
+    if (job.companyId) {
+      this.companyProfileService.incrementProfileViewsByCompanyId(job.companyId).subscribe({
+        next: () => {},
+        error: () => {},
+      });
+    }
   }
 
   submitApply() {
