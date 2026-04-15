@@ -14,7 +14,7 @@
         Enhance Resume with AI
       </button>
       <button *ngIf="isEmployer" class="enhance-resume-btn" (click)="postNewJob()">
-        <span class="btn-icon">➕</span>
+        <app-icon name="plus" class="btn-icon"></app-icon>
         Post New Job
       </button>
     </div>
@@ -26,7 +26,7 @@
           <div class="stat-header">
             <span class="stat-title">{{ stat.title }}</span>
             <div class="stat-icon" [style.background-color]="stat.iconBg">
-              {{ stat.icon }}
+              <app-icon [name]="stat.iconName" [class]="stat.iconClass || ''"></app-icon>
             </div>
           </div>
           <div class="stat-value">{{ stat.value }}</div>
@@ -49,7 +49,7 @@
         <div class="section-header">
           <div class="section-title-wrapper">
             <h2 class="section-title">Recommended Jobs</h2>
-            <span class="ai-badge">🤖 AI Powered</span>
+            <app-powered-badge text="AI Powered"></app-powered-badge>
           </div>
           <button class="view-all-btn" (click)="viewAllJobs()">
             View All
@@ -73,7 +73,7 @@
               <div class="job-info">
                 <h3 class="job-title">{{ job.title }}</h3>
                 <div class="job-company">
-                  <app-icon name="employer" class="company-icon"></app-icon>
+                  <app-icon name="users" class="company-icon"></app-icon>
                   {{ job.company }}
                 </div>
               </div>
@@ -147,21 +147,21 @@
 
         <div class="insights-grid">
           <div class="mini-insight">
-            <span class="mini-icon">🎯</span>
+            <app-icon name="target" class="mini-icon"></app-icon>
             <div class="mini-content">
               <h4 class="mini-title">Top Performing Job</h4>
               <p class="mini-text">Senior Frontend Developer has 20 more qualified applicants</p>
             </div>
           </div>
           <div class="mini-insight">
-            <span class="mini-icon">📈</span>
+            <app-icon name="trending-up" class="mini-icon"></app-icon>
             <div class="mini-content">
               <h4 class="mini-title">Salary Benchmark</h4>
               <p class="mini-text">Your offers are 10% below market average</p>
             </div>
           </div>
           <div class="mini-insight">
-            <span class="mini-icon">⏱️</span>
+            <app-icon name="clock" class="mini-icon"></app-icon>
             <div class="mini-content">
               <h4 class="mini-title">Response Time</h4>
               <p class="mini-text">Faster responses increase acceptance by 45%</p>
@@ -176,7 +176,7 @@
         <div class="section applicants-section">
           <div class="section-header">
             <h2 class="section-title">Recent Applicants</h2>
-            <span class="ai-badge"><app-icon name="sparkles" class="ai-badge-icon"></app-icon> AI Scored</span>
+            <app-powered-badge text="AI Scored"></app-powered-badge>
             <button class="view-all-btn" (click)="viewAllApplicants()">
               View All
               <span class="arrow">→</span>
@@ -238,7 +238,7 @@
                   <h4 class="active-job-title">{{ job.title }}</h4>
                   <div class="job-meta">
                     <span class="job-location"><app-icon name="location"></app-icon> {{ job.location }}</span>
-                    <span class="job-applicants">👥 {{ job.applicants }}</span>
+                    <span class="job-applicants"><app-icon name="users"></app-icon> {{ job.applicants }}</span>
                   </div>
                 </div>
                 <span class="job-status-badge" [style.background-color]="job.statusColor">

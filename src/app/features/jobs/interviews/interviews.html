@@ -3,7 +3,9 @@
     <!-- Header Section -->
     <div class="interviews-header">
       <div class="header-content">
-        <div class="header-icon">📅</div>
+        <div class="header-icon">
+          <app-icon name="calendar-grid" class="w-7 h-7 text-white"></app-icon>
+        </div>
         <div class="header-text">
           <h1 class="header-title">Scheduled Interviews</h1>
           <p class="header-subtitle">Join your upcoming video interviews.</p>
@@ -32,7 +34,7 @@
           <div class="interview-card">
             <div class="card-header">
               <div class="interview-badge">
-                <span class="badge-icon">🎥</span>
+                <app-icon name="interview" class="badge-icon"></app-icon>
                 <span class="badge-text">Interview #{{ item.displayId }}</span>
               </div>
               <div class="status-indicator active">
@@ -46,13 +48,13 @@
               
               <div class="interview-details">
                 <div class="detail-item">
-                  <span class="detail-icon">📅</span>
+                  <app-icon name="calendar-grid" class="detail-icon"></app-icon>
                   <span class="detail-text">
                     {{ item.scheduledAt ? (item.scheduledAt | date:'MMM dd, yyyy') : 'Schedule pending' }}
                   </span>
                 </div>
                 <div class="detail-item">
-                  <span class="detail-icon">🕐</span>
+                  <app-icon name="clock" class="detail-icon"></app-icon>
                   <span class="detail-text">
                     {{ item.scheduledAt ? (item.scheduledAt | date:'hh:mm a') : 'Time TBD' }}
                   </span>
@@ -65,7 +67,7 @@
                 [routerLink]="['/dashboard/interviews', item.displayId]"
                 class="join-btn"
               >
-                <span class="btn-icon">▶</span>
+                <app-icon name="camera-video" class="btn-icon w-4 h-4"></app-icon>
                 <span class="btn-text">Join Interview</span>
                 <span class="btn-arrow">→</span>
               </a>

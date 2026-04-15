@@ -2,6 +2,7 @@ import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { forkJoin, map, of } from 'rxjs';
+import { Icons } from '../../../shared/icons/icons';
 import { JobsService, InterviewDto } from '../services/jobs.service';
 import { JobService, MyJobDto } from '../../post-job/services/post-job';
 import { UserStore } from '../../../core/services/user-store';
@@ -14,7 +15,7 @@ interface InterviewViewModel extends InterviewDto {
 @Component({
   selector: 'app-interviews',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, Icons],
   templateUrl: './interviews.html',
   styleUrl: './interviews.scss'
 })
@@ -23,6 +24,7 @@ export class Interviews implements OnInit {
   isLoading = signal(true);
   isEmployer = false;
   isNavigating = false;
+  private readonly appIcon = Icons;
 
   constructor(
     private jobsService: JobsService,

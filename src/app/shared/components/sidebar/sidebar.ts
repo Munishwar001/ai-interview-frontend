@@ -17,10 +17,22 @@ export class Sidebar implements OnInit {
   @Output() logout = new EventEmitter<void>();
 
   isProfileMenuOpen = false;
-  userState!: UserState;
+  userState: UserState | null = null;
 
   get avatarLetter(): string {
     return this.userState?.fullName?.charAt(0)?.toUpperCase() || '?';
+  }
+
+  get profileMenuRoute(): string {
+    return this.userState?.isEmployerAccess ? '/dashboard/company-profile' : '/dashboard/profile';
+  }
+
+  get profileMenuLabel(): string {
+    return this.userState?.isEmployerAccess ? 'Company Profile' : 'Profile';
+  }
+
+  get profileMenuIcon(): string {
+    return this.userState?.isEmployerAccess ? 'company-profile' : 'profile';
   }
 
   constructor(private userStore: UserStore) {}

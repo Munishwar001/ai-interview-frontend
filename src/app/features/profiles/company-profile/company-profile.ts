@@ -10,10 +10,12 @@ import { CompanyProfileService } from './Services/company-profile.service';
 import { MarkdownService } from '../../../shared/services/markdown.service';
 import { environment } from '../../../../../environment/environment';
 import { Lookup, lookup } from '../../../shared/services/lookup';
+import { PoweredBadgeComponent } from '../../../shared/components/powered-badge/powered-badge';
 
 @Component({
   selector: 'app-company-profile',
-  imports: [ReactiveFormsModule, CommonModule, AppInput, AppSelect, Icons, LocationSearch],
+  standalone: true,
+  imports: [ReactiveFormsModule, CommonModule, AppInput, AppSelect, Icons, LocationSearch, PoweredBadgeComponent],
   templateUrl: './company-profile.html',
   styleUrl: './company-profile.scss',
 })

@@ -10,10 +10,12 @@ import { CreateJobPayload, JobService } from '../services/post-job';
 import { JobPreviewComponent } from '../job-preview/job-preview.component';
 import { MarkdownService } from '../../../shared/services/markdown.service';
 import { ToastrService } from 'ngx-toastr';
+import { PoweredBadgeComponent } from '../../../shared/components/powered-badge/powered-badge';
 
 @Component({
   selector: 'app-post-job-home',
-  imports: [ReactiveFormsModule, FormsModule, CommonModule, Icons, AppInput, AppSelect, JobPreviewComponent],
+  standalone: true,
+  imports: [ReactiveFormsModule, FormsModule, CommonModule, Icons, AppInput, AppSelect, JobPreviewComponent, PoweredBadgeComponent],
   templateUrl: './post-job-home.html',
   styleUrl: './post-job-home.scss',
 })

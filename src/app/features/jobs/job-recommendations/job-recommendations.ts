@@ -6,11 +6,12 @@ import { ToastrService } from 'ngx-toastr';
 import { LocationSearch } from '../../../shared/components/location-search/location-search';
 import { CompanyProfileService } from '../../profiles/company-profile/Services/company-profile.service';
 import { Icons } from '../../../shared/icons/icons';
+import { PoweredBadgeComponent } from '../../../shared/components/powered-badge/powered-badge';
 
 @Component({
   selector: 'app-job-recommendations',
   standalone: true,
-  imports: [CommonModule, FormsModule, LocationSearch, Icons],
+  imports: [CommonModule, FormsModule, LocationSearch, Icons, PoweredBadgeComponent],
   templateUrl: './job-recommendations.html',
 })
 export class JobRecommendations implements OnInit {

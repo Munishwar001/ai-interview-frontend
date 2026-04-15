@@ -9,11 +9,13 @@ import { JobService, MyJobDto } from '../post-job/services/post-job';
 import { JobSeekerService } from '../profiles/user-profile/services/job-seeker.service';
 import { CompanyProfileService } from '../profiles/company-profile/Services/company-profile.service';
 import { catchError, forkJoin, map, of } from 'rxjs';
+import { PoweredBadgeComponent } from '../../shared/components/powered-badge/powered-badge';
 
 interface StatCard {
   title: string;
   value: number | string;
-  icon: string;
+  iconName: string;
+  iconClass?: string;
   iconBg: string;
   change?: string;
   changeType?: 'positive' | 'negative';
@@ -71,7 +73,7 @@ interface ActiveJob {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule, Icons],
+  imports: [CommonModule, RouterModule, Icons, PoweredBadgeComponent],
   templateUrl: './dashboard.html',
   styleUrls: ['./dashboard.scss']
 })
@@ -179,13 +181,15 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
         {
           title: 'Profile Completion',
           value: `${profileCompletion}%`,
-          icon: '📄',
+          iconName: 'user-circle',
+          iconClass: 'w-5 h-5 text-indigo-600',
           iconBg: '#E8E5FF'
         },
         {
           title: 'Applications Sent',
           value: applicationsCount,
-          icon: '💼',
+          iconName: 'work',
+          iconClass: 'w-6 h-6 text-indigo-600',
           iconBg: '#F0E8FF',
           change: `${applicationsCount} total applications`,
           changeType: 'positive'
@@ -193,7 +197,8 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
         {
           title: 'Interviews',
           value: interviewsCount,
-          icon: '✅',
+          iconName: 'circle-check',
+          iconClass: 'w-6 h-6 text-emerald-500',
           iconBg: '#E5F9F0',
           change: `${interviewsCount} scheduled`,
           changeType: 'positive'
@@ -201,7 +206,8 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
         {
           title: 'Profile Views',
           value: profileViews,
-          icon: '📈',
+          iconName: 'eye',
+          iconClass: 'w-6 h-6 text-orange-500',
           iconBg: '#FFF4E5',
           change: 'Total profile views',
           changeType: 'positive'
@@ -219,10 +225,10 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
     ).subscribe((jobs) => {
       if (!jobs.length) {
         this.employerStats = [
-          { title: 'Active Jobs', value: 0, icon: '💼', iconBg: '#E8E5FF' },
-          { title: 'Total Applicants', value: 0, icon: '👥', iconBg: '#F0E8FF' },
-          { title: 'Shortlisted', value: 0, icon: '✅', iconBg: '#E5F9F0' },
-          { title: "This Week's Views", value: 0, icon: '📊', iconBg: '#FFF4E5' }
+          { title: 'Active Jobs', value: 0, iconName: 'work', iconClass: 'w-6 h-6 text-indigo-600', iconBg: '#E8E5FF' },
+          { title: 'Total Applicants', value: 0, iconName: 'users', iconClass: 'w-5 h-5 text-purple-800', iconBg: '#F0E8FF' },
+          { title: 'Shortlisted', value: 0, iconName: 'circle-check', iconClass: 'w-6 h-6 text-emerald-500', iconBg: '#E5F9F0' },
+          { title: "This Week's Views", value: 0, iconName: 'eye', iconClass: 'w-6 h-6 text-orange-500', iconBg: '#FFF4E5' }
         ];
         this.recentApplicants = [];
         this.upcomingInterviews = [];
@@ -262,7 +268,8 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
           {
             title: 'Active Jobs',
             value: activeJobsCount,
-            icon: '💼',
+            iconName: 'work',
+            iconClass: 'w-6 h-6 text-indigo-600',
             iconBg: '#E8E5FF',
             change: `${jobs.length} total jobs`,
             changeType: 'positive'
@@ -270,7 +277,8 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
           {
             title: 'Total Applicants',
             value: totalApplicants,
-            icon: '👥',
+            iconName: 'users',
+            iconClass: 'w-5 h-5 text-purple-800',
             iconBg: '#F0E8FF',
             change: `${allApplicants.length} fetched records`,
             changeType: 'positive'
@@ -278,7 +286,8 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
           {
             title: 'Shortlisted',
             value: totalShortlisted,
-            icon: '✅',
+            iconName: 'circle-check',
+            iconClass: 'w-6 h-6 text-emerald-500',
             iconBg: '#E5F9F0',
             change: 'Ready for interview',
             changeType: 'positive'
@@ -286,7 +295,8 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
           {
             title: "This Week's Views",
             value: profileViews >= 1000 ? `${(profileViews / 1000).toFixed(1)}K` : profileViews,
-            icon: '📊',
+            iconName: 'eye',
+            iconClass: 'w-6 h-6 text-orange-500',
             iconBg: '#FFF4E5',
             change: totalViews > 0 ? `${totalViews} job views total` : 'Company profile views',
             changeType: 'positive'
@@ -470,19 +480,19 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
 
   private buildDefaultJobSeekerStats(): StatCard[] {
     return [
-      { title: 'Profile Completion', value: '0%', icon: '📄', iconBg: '#E8E5FF' },
-      { title: 'Applications Sent', value: 0, icon: '💼', iconBg: '#F0E8FF', change: 'No applications yet', changeType: 'positive' },
-      { title: 'Interviews', value: 0, icon: '✅', iconBg: '#E5F9F0', change: 'No interviews yet', changeType: 'positive' },
-      { title: 'Profile Views', value: 0, icon: '📈', iconBg: '#FFF4E5', change: 'No activity yet', changeType: 'positive' }
+      { title: 'Profile Completion', value: '0%', iconName: 'user-circle', iconClass: 'w-5 h-5 text-indigo-600', iconBg: '#E8E5FF' },
+      { title: 'Applications Sent', value: 0, iconName: 'work', iconClass: 'w-6 h-6 text-indigo-600', iconBg: '#F0E8FF', change: 'No applications yet', changeType: 'positive' },
+      { title: 'Interviews', value: 0, iconName: 'circle-check', iconClass: 'w-6 h-6 text-emerald-500', iconBg: '#E5F9F0', change: 'No interviews yet', changeType: 'positive' },
+      { title: 'Profile Views', value: 0, iconName: 'eye', iconClass: 'w-6 h-6 text-orange-500', iconBg: '#FFF4E5', change: 'No activity yet', changeType: 'positive' }
     ];
   }
 
   private buildDefaultEmployerStats(): StatCard[] {
     return [
-      { title: 'Active Jobs', value: 0, icon: '💼', iconBg: '#E8E5FF', change: 'No jobs yet', changeType: 'positive' },
-      { title: 'Total Applicants', value: 0, icon: '👥', iconBg: '#F0E8FF', change: 'No applicants yet', changeType: 'positive' },
-      { title: 'Shortlisted', value: 0, icon: '✅', iconBg: '#E5F9F0', change: 'No shortlist yet', changeType: 'positive' },
-      { title: "This Week's Views", value: 0, icon: '📊', iconBg: '#FFF4E5', change: 'No views yet', changeType: 'positive' }
+      { title: 'Active Jobs', value: 0, iconName: 'work', iconClass: 'w-6 h-6 text-indigo-600', iconBg: '#E8E5FF', change: 'No jobs yet', changeType: 'positive' },
+      { title: 'Total Applicants', value: 0, iconName: 'users', iconClass: 'w-5 h-5 text-purple-800', iconBg: '#F0E8FF', change: 'No applicants yet', changeType: 'positive' },
+      { title: 'Shortlisted', value: 0, iconName: 'circle-check', iconClass: 'w-6 h-6 text-emerald-500', iconBg: '#E5F9F0', change: 'No shortlist yet', changeType: 'positive' },
+      { title: "This Week's Views", value: 0, iconName: 'eye', iconClass: 'w-6 h-6 text-orange-500', iconBg: '#FFF4E5', change: 'No views yet', changeType: 'positive' }
     ];
   }
 

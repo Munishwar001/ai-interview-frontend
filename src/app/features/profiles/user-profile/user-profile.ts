@@ -4,8 +4,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { LocationSearch } from '../../../shared/components/location-search/location-search';
 import { DatePickerComponent } from '../../../shared/components/date-picker/date-picker';
-import { EmptyState } from '../../../shared/components/empty-state/empty-state';
 import { AppDatePipe } from '../../../shared/pipes/app-date.pipe';
+import { PoweredBadgeComponent } from '../../../shared/components/powered-badge/powered-badge';
 import { Experience, Education, LocationSelection } from '../profiles.models';
 import { ProfileStateService } from './services/profile-state.service';
 import { ExperienceStateService } from './services/experience-state.service';
@@ -15,7 +15,7 @@ import { SkillsStateService } from './services/skills-state.service';
 @Component({
   selector: 'app-user-profile',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, LocationSearch, DatePickerComponent, EmptyState, AppDatePipe],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, LocationSearch, DatePickerComponent, AppDatePipe, PoweredBadgeComponent],
   templateUrl: './user-profile.html',
   styleUrl: './user-profile.scss',
   providers: [ProfileStateService, ExperienceStateService, EducationStateService, SkillsStateService],
