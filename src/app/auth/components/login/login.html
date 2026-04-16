@@ -21,6 +21,11 @@
 
             <form [formGroup]="loginForm" (ngSubmit)="onSignIn()">
 
+                <!-- Error Message -->
+                <div *ngIf="errorMessage" class="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+                  {{ errorMessage }}
+                </div>
+
                 <!-- Role Toggle -->
                 <div class="mb-4 sm:mb-5">
                     <p class="text-xs sm:text-sm font-medium text-slate-700 mb-2">Sign in as</p>

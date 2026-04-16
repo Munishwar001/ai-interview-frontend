@@ -20,6 +20,7 @@ export class Login implements OnInit {
   loginForm: FormGroup;
   selectedRole: 'jobseeker' | 'employer' = 'employer';
   showPassword: boolean = false;
+  errorMessage: string = '';
 
   constructor(
     private fb: FormBuilder,
@@ -35,6 +36,10 @@ export class Login implements OnInit {
   }
 
   ngOnInit(): void {
+    this.loginForm.valueChanges.subscribe(() => {
+      this.errorMessage = '';
+    });
+
     this.socialAuth.authState.subscribe((user) => {
       if (user) {
         // console.log('Google User:', user);
@@ -86,6 +91,8 @@ export class Login implements OnInit {
       },
       error: (err) => {
         console.error('Login Error:', err);
+        this.errorMessage = err?.error?.detail || err?.error?.message || 'Unable to login. Please try again.';
+        this.toastr.error(this.errorMessage);
       },
     });
   }
