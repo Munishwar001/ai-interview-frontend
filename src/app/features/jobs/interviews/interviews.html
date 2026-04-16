@@ -1,75 +1,75 @@
-<div class="interviews-container" [class.navigating]="isNavigating">
-  <div class="interviews-content">
+<div class="min-h-full bg-slate-50 relative overflow-hidden transition-all duration-300" [class.opacity-0]="isNavigating" [class.scale-[0.98]]="isNavigating">
+  <div class="h-full overflow-y-auto p-3 sm:p-4 lg:p-5 xl:p-6">
     <!-- Header Section -->
-    <div class="interviews-header">
-      <div class="header-content">
-        <div class="header-icon">
+    <div class="mb-5 flex flex-col gap-4 rounded-2xl bg-white p-4 shadow-sm sm:mb-6 sm:flex-row sm:items-center sm:justify-between sm:gap-5 sm:p-5 lg:mb-8 lg:p-6">
+      <div class="flex flex-1 items-center gap-3 sm:gap-4">
+        <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 shadow-md shadow-indigo-200 sm:h-12 sm:w-12 lg:h-14 lg:w-14">
           <app-icon name="calendar-grid" class="w-7 h-7 text-white"></app-icon>
         </div>
-        <div class="header-text">
-          <h1 class="header-title">Scheduled Interviews</h1>
-          <p class="header-subtitle">Join your upcoming video interviews.</p>
+        <div class="min-w-0 flex-1">
+          <h1 class="m-0 text-xl font-bold text-slate-900 sm:text-2xl">Scheduled Interviews</h1>
+          <p class="m-0 text-sm text-slate-500">Join your upcoming video interviews.</p>
         </div>
       </div>
-      <div class="header-stats">
-        <div class="stat-badge">
-          <span class="stat-number">{{ interviews().length }}</span>
-          <span class="stat-label">Total</span>
+      <div class="flex gap-3 sm:w-auto">
+        <div class="flex min-w-[80px] flex-col items-center rounded-xl bg-gradient-to-br from-slate-100 to-slate-200 px-5 py-2.5">
+          <span class="text-2xl font-bold text-indigo-600">{{ interviews().length }}</span>
+          <span class="text-xs font-medium text-slate-500">Total</span>
         </div>
       </div>
     </div>
 
     <!-- Loading State -->
     @if (isLoading()) {
-      <div class="loading-container">
-        <div class="loading-spinner"></div>
-        <p class="loading-text">Loading interviews...</p>
+      <div class="flex flex-col items-center justify-center rounded-2xl bg-white px-5 py-16 shadow-sm sm:py-20">
+        <div class="h-11 w-11 animate-spin rounded-full border-4 border-slate-200 border-t-indigo-500"></div>
+        <p class="mt-4 text-sm font-medium text-slate-500">Loading interviews...</p>
       </div>
     }
 
     <!-- Interviews List -->
     @if (!isLoading()) {
-      <div class="interviews-grid">
+      <div class="grid grid-cols-1 gap-4 md:grid-cols-[repeat(auto-fill,minmax(300px,1fr))] lg:gap-6">
         @for (item of interviews(); track item.displayId) {
-          <div class="interview-card">
-            <div class="card-header">
-              <div class="interview-badge">
-                <app-icon name="interview" class="badge-icon"></app-icon>
-                <span class="badge-text">Interview #{{ item.displayId }}</span>
+          <div class="overflow-hidden rounded-2xl bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg">
+            <div class="flex flex-col gap-3 border-b border-slate-200 bg-gradient-to-br from-slate-50 to-slate-200 p-4 sm:flex-row sm:items-center sm:justify-between sm:gap-2 sm:p-5">
+              <div class="inline-flex items-center gap-2 rounded-lg bg-white px-3 py-1.5 shadow-sm">
+                <app-icon name="interview" class="h-4 w-4"></app-icon>
+                <span class="text-xs font-semibold text-slate-900 sm:text-sm">Interview #{{ item.displayId }}</span>
               </div>
-              <div class="status-indicator active">
-                <span class="status-dot"></span>
-                <span class="status-text">Scheduled</span>
+              <div class="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1">
+                <span class="h-2 w-2 animate-pulse rounded-full bg-emerald-500"></span>
+                <span class="text-xs font-semibold text-emerald-700">Scheduled</span>
               </div>
             </div>
 
-            <div class="card-body">
-              <h3 class="interview-title">{{ item.displayJobTitle }}</h3>
+            <div class="p-4 sm:p-5">
+              <h3 class="m-0 mb-3 text-lg font-bold text-slate-900">{{ item.displayJobTitle }}</h3>
               
-              <div class="interview-details">
-                <div class="detail-item">
-                  <app-icon name="calendar-grid" class="detail-icon"></app-icon>
-                  <span class="detail-text">
+              <div class="flex flex-col gap-2.5">
+                <div class="flex items-center gap-2.5 rounded-lg bg-slate-50 p-2.5">
+                  <app-icon name="calendar-grid" class="h-5 w-5 shrink-0"></app-icon>
+                  <span class="text-sm font-medium text-slate-600">
                     {{ item.scheduledAt ? (item.scheduledAt | date:'MMM dd, yyyy') : 'Schedule pending' }}
                   </span>
                 </div>
-                <div class="detail-item">
-                  <app-icon name="clock" class="detail-icon"></app-icon>
-                  <span class="detail-text">
+                <div class="flex items-center gap-2.5 rounded-lg bg-slate-50 p-2.5">
+                  <app-icon name="clock" class="h-5 w-5 shrink-0"></app-icon>
+                  <span class="text-sm font-medium text-slate-600">
                     {{ item.scheduledAt ? (item.scheduledAt | date:'hh:mm a') : 'Time TBD' }}
                   </span>
                 </div>
               </div>
             </div>
 
-            <div class="card-footer">
+            <div class="border-t border-slate-200 bg-slate-50 p-4 sm:p-5">
               <a
                 [routerLink]="['/dashboard/interviews', item.displayId]"
-                class="join-btn"
+                class="group flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 px-4 py-2.5 text-sm font-semibold text-white no-underline shadow-sm shadow-indigo-200 transition hover:-translate-y-0.5 hover:shadow-md"
               >
-                <app-icon name="camera-video" class="btn-icon w-4 h-4"></app-icon>
-                <span class="btn-text">Join Interview</span>
-                <span class="btn-arrow">→</span>
+                <app-icon name="camera-video" class="h-4 w-4"></app-icon>
+                <span class="flex-1">Join Interview</span>
+                <span class="transition-transform group-hover:translate-x-1">→</span>
               </a>
             </div>
           </div>
@@ -77,10 +77,10 @@
 
         <!-- Empty State -->
         @if (!interviews().length) {
-          <div class="empty-state">
-            <div class="empty-icon">📭</div>
-            <h3 class="empty-title">No interviews scheduled</h3>
-            <p class="empty-description">
+          <div class="col-span-full flex flex-col items-center justify-center rounded-2xl bg-white px-4 py-12 text-center shadow-sm sm:px-6 sm:py-16">
+            <div class="mb-3 text-5xl opacity-50">📭</div>
+            <h3 class="m-0 mb-2 text-lg font-bold text-slate-900 sm:text-xl">No interviews scheduled</h3>
+            <p class="m-0 max-w-md text-sm text-slate-500">
               {{ isEmployer ? 'Schedule an interview from the applicants page.' : 'You will see employer scheduled interviews here.' }}
             </p>
           </div>
@@ -90,8 +90,8 @@
   </div>
 
   <!-- Watermark -->
-  <div class="watermark">
-    <p class="watermark-text">Activate Windows</p>
-    <p class="watermark-subtext">Go to Settings to activate Windows.</p>
+  <div class="pointer-events-none fixed bottom-3 right-3 z-10 text-right opacity-60 sm:bottom-4 sm:right-4 lg:bottom-5 lg:right-5 print:hidden">
+    <p class="m-0 mb-1 text-xs text-slate-500 sm:text-sm">Activate Windows</p>
+    <p class="m-0 text-[10px] text-slate-400 sm:text-xs">Go to Settings to activate Windows.</p>
   </div>
 </div>
