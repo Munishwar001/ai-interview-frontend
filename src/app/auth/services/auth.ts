@@ -7,6 +7,8 @@ import {
   LoginRequest,
   AuthResponse,
   RefreshRequest,
+  ForgotPasswordReq,
+  ResetPasswordReq,
 } from '../auth.models';
 import { environment } from '../../../../environment/environment';
 import { User } from '../../core/services/user';
@@ -32,6 +34,14 @@ export class AuthService {
 
   register(data: RegisterRequest): Observable<RegisterResponse> {
     return this.http.post<RegisterResponse>(`${this.baseUrl}/register`, data);
+  }
+
+  forgotPassword(data: ForgotPasswordReq): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/forgot-password`, data);
+  }
+
+  resetPassword(data: ResetPasswordReq): Observable<{ message?: string; Message?: string }> {
+    return this.http.post<{ message?: string; Message?: string }>(`${this.baseUrl}/reset-password`, data);
   }
 
   login(data: LoginRequest): Observable<any> {

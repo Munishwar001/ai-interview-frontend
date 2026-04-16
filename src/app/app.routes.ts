@@ -29,6 +29,17 @@ export const routes: Routes = [
     loadComponent: () => import('./auth/components/signup/signup').then((m) => m.Signup),
   },
   {
+    path: 'forgot-password',
+    canMatch: [authRedirectGuard],
+    loadComponent: () =>
+      import('./auth/components/forgot-password/forgot-password').then((m) => m.ForgotPassword),
+  },
+  {
+    path: 'reset-password',
+    loadComponent: () =>
+      import('./auth/components/reset-password/reset-password').then((m) => m.ResetPassword),
+  },
+  {
     path: 'dashboard',
     canMatch: [authGuard],
     loadComponent: () =>

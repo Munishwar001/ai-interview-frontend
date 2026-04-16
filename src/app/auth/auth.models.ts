@@ -18,6 +18,16 @@ export interface LoginRequest {
   password: string;
 }
 
+export interface ForgotPasswordReq {
+  email: string;
+}
+
+export interface ResetPasswordReq {
+  Uid: string;
+  Code: string;
+  NewPassword: string;
+}
+
 export interface AuthResponse {
     email: string;
     accessToken: string;
